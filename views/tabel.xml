@@ -325,6 +325,18 @@
             </field>
         </record>
 
+<!-- fcac search view -->
+	<record id="view_fcac_search" model="ir.ui.view">
+		<field name="name">tabel.fcac.search</field>
+		<field name="model">tabel.fcac</field>
+		<field name="type">search</field>
+		<field name="arch" type="xml">
+		<search string="Checker">
+		    <field name="ank_rn" select="True"/>
+		    <field name="id" select="True"/>
+		</search>
+		</field>
+	</record>
  <!-- fcac form view -->
          <record model="ir.ui.view" id="fcac_form_view">
             <field name="name">fcac.form</field>
@@ -368,8 +380,8 @@
 		<field name="type">search</field>
 		<field name="arch" type="xml">
 		<search string="Checker">
-<!--		    <field name="surname" select="True"/> 
-		    <field name="full_name" select="True"/>-->
+<!--		    <field name="surname" select="True"/> -->
+		    <field name="full_name" select="True"/>
 		    <field name="id" select="True"/>
 		</search>
 		</field>

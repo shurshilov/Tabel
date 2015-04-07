@@ -36,7 +36,7 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 
 	#cur.execute("SELECT G.id, G.ANK_RN, G.POST_RN, G.SUBDIV_RN, G.VIDISP_RN, G.STARTDATE, G.ENDDATE FROM (SELECT T.id, T.ANK_RN, T.POST_RN, T.SUBDIV_RN, T.VIDISP_RN, T.STARTDATE, T.ENDDATE FROM tmp_z AS T LEFT JOIN tabel_fcac AS P  ON T.id = P.id WHERE P.id IS NULL) AS G, tabel_ank AS H where G.ank_rn = H.id  ;")
 	#INSERT DATA add something which lacks
-	cur.execute("INSERT INTO tabel_person (id, surname, firstname, secondname) SELECT T.id, T.SURNAME, T.FIRSTNAME, T.SECONDNAME FROM tmp_z AS T LEFT JOIN tabel_person AS P  ON T.id = P.id WHERE P.id IS NULL ;")
+	cur.execute("INSERT INTO tabel_person (id, surname, firstname, secondname, full_name) SELECT T.id, T.SURNAME, T.FIRSTNAME, T.SECONDNAME,  CONCAT(T.SURNAME,T.FIRSTNAME,T.SECONDNAME) FROM tmp_z AS T LEFT JOIN tabel_person AS P  ON T.id = P.id WHERE P.id IS NULL ;")
 	
 	#rows = cur.fetchall()
 	#for i in rows:

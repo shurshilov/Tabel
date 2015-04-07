@@ -150,6 +150,9 @@ class Division(models.Model):
 
 class String(models.Model):
     _name = 'tabel.string'
+    _rec_name = 'id_fcac'
+    _order = 'id_fcac'
+
 #    _defaults = {'order_line': lambda obj, cr, uid, context: '/',}
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
     id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id")

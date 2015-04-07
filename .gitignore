@@ -9,3 +9,5 @@
 *.csv~
 import/database
 orm.py
+import.py
+import/import.py
