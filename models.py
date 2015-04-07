@@ -91,7 +91,6 @@ class Person(models.Model):
         	res=[]
 
         	for emp in self.browse(cr, uid, ids,context=context):
-   		#res.append((emp.id, emp.name + ', ' + emp.emp_code))    
 			res.append((emp.id,emp.surname+" "+emp.firstname+" "+emp.secondname))
 	        return res
 
@@ -100,7 +99,6 @@ class Ank(models.Model):
 	_name = 'tabel.ank'
 	_rec_name = 'orgbase_rn'
 	_order = 'orgbase_rn'
-	#orgbase_rn = fields.Integer(string="ORGBASE_RN")
 	orgbase_rn = fields.Many2one('tabel.person',  ondelete='cascade', string="orgbase_rn")
 	tab_num = fields.Integer(string="TAB_NUM")
 	jobbegin = fields.Date(string="time begin of work")
@@ -148,7 +146,6 @@ class Fcac(models.Model):
 class Division(models.Model):
     _name = 'tabel.division'
 
-  #  id_parus_division = fields.Integer(string="name of Division")
     name = fields.Char(string="name of Division", required=True)
 
 class String(models.Model):
@@ -157,8 +154,6 @@ class String(models.Model):
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
     id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id")
     stqnt = fields.Float(string="ставка")
-       
-   # _order = 'id_fcac'	
 
     hours1 = fields.Char(string="1")
     hours2 = fields.Char(string="2")
@@ -216,13 +211,11 @@ class String(models.Model):
                 i.order_line = prev + 1
                 prev = i.order_line
 	for record in self:
-#		record.post = record.id_fcac.post_rn		
 		record.days_absences_sum = 0
 		record.days_absences = " "
 		record.days_appear = "0"
 		record.hours_main = "0.0"
 		record.hours_internal= "0.0"
-#		d_abse = {u' О': 0, u'О': 0, 'О': 0,' О': 0}
 		d_abse = {u'В': 0,u'Н': 0,u'Г': 0,u'О': 0,u'Б': 0,u'Р': 0,u'С': 0,u'П': 0,u'К': 0,u'А': 0,u'ВУ': 0,u'ОУ': 0,u'РП': 0,u'Ф': 0,u'НН': 0,u'Дк': 0,u'Сп': 0,u'Об': 0}
 		vidisp = record.id_fcac.vidisp_rn.name
                 vidisp1 = u' Внутренний совместитель'
@@ -245,7 +238,6 @@ class String(models.Model):
 						
 					record.days_appear = str (int(record.days_appear) + 1)
 				except ValueError:
-					
 					d_abse[a]=d_abse[a]+1
 					record.days_absences_sum= record.days_absences_sum+1 
 					record.days_absences = " " 
@@ -287,12 +279,6 @@ class String(models.Model):
                 sum (record.hours30)
 		sum (record.hours31)
 
-#    @api.one
-#    @api.depends('hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
-#    def _compute_value_two(self):
-#	self.two_half =0
-#       self.two_half = self.hours16+self.hours17+self.hours18+self.hours19+self.hours20+self.hours21+self.hours22+self.hours23+self.hours24+self.hours25+self.hours26+self.hours27+self.hours28+self.hours29+self.hours30+self.hours31
-
 class Password(models.Model):
 
 	_name = 'tabel.password' 
@@ -302,17 +288,8 @@ class Password(models.Model):
 
 	user_id = fields.Many2one('res.users','Пользователь',default = user)
 	password = fields.Char(string="password")
-   
-	#@api.one
-   	#@api.constrains('password')
-    	#def check_value(self):
-    	#	if len(self.password) < 3:
-       	#		raise exceptions.ValidationError("The password is too small!")
-#	@api.depends('user_id')
-#	def auto (self, cr, uid):
-#		values['user_id']=uid
+
 	def create(self, cr, uid, values, context):
-#		return super(Password, self).create(cr, uid, values, context)
 		if  context['state']=='create':
 			context = {}
 			vals = {}
@@ -324,7 +301,7 @@ class Password(models.Model):
 			h.update(code_private)
 			vals ['user_id']=user_id
 			vals ['password']=h.hexdigest()
-			id = super(Password, self).create(cr, uid, vals, context=context)
+			id = super(Password, self).create(cr, uid, vals, context=None)
 			return id
 		
 		#super(Password, self).unlink(cr, uid, ids, context)
@@ -333,7 +310,7 @@ class Password(models.Model):
 		return id
 #	
 	
-	def create1(self, cr, uid, values, context):
+	def validation(self, cr, uid, values, context):
 		code_private=context['password']
 		user_id=context['user_id']
                 code_private=code_private.upper()[:8]
@@ -342,7 +319,7 @@ class Password(models.Model):
                 vals ['password']=code_private
 
                 check_flag=False
-                id_emp_sec=self.pool.get('tabel.password').search(cr,uid,[('user_id.id','=',user_id)])
+                id_emp_sec=self.pool.get('tabel.password').search(cr,uid,[('user_id.id','=',uid)])
                 for r in self.pool.get('tabel.password').browse(cr, uid, id_emp_sec, context=context):
                         h = hashlib.sha256()
                         h.update(code_private)
@@ -455,8 +432,6 @@ class Tabel(models.Model):
 		return x.isdigit()
 	d="".join((x for x in str(self.id_division) if is_mychar(x)))	
 #	Нужно сделать через промежуточную таблицу апдейт
-#   	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T bel_string AS P  ON T.id = P.id_fcac WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+d+"   )  ;")
-#        self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT id,"+str(self.id)+"  FROM tabel_fcac  WHERE startdate::date <='"+str(self.time_end_t)+"' and enddate::date >= '"+str(self.time_start_t)+"' and subdiv_rn = "+d+"   ) WHERE id IS NULL ;")
  	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+d+"   )  ;")
 
     @api.one 
@@ -586,7 +561,6 @@ class Tabel(models.Model):
 
 
 	self.signature_tabel=h.hexdigest()
-#	time.sleep(0.1)
         self.state = 'confirmed'
 
     @api.one
@@ -596,20 +570,20 @@ class Tabel(models.Model):
     def action_done(self):
         self.state = 'done'
     #Всплывающее окошко валидации
-    def validation(self,cr,uid,ids,context):
+#    def validation(self,cr,uid,ids,context):
 #        if context is None:
 #            context = {} 
-        return {	   
-            'type': 'ir.actions.act_window',
-            'view_type': 'form',
-            'view_mode': 'form',
+#        return {	   
+#            'type': 'ir.actions.act_window',
+#            'view_type': 'form',
+#            'view_mode': 'form',
 #	    'view_id': my_specific_view,
 #	    'search_view_id':'view_password_search',
-            'context': context,
-            'res_model': 'tabel.password',
+#            'context': context,
+#            'res_model': 'tabel.password',
 #            'nodestroy': True,
-	    'target': 'new',
-	}
+#	    'target': 'new',
+#	}
 #    def action_valid2(self,cr,uid,values,context):
 #	my_model = self.pool.get('tabel.password')
 #	my_model.action_valid(self,cr,uid,values)

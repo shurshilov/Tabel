@@ -18,17 +18,13 @@
     <record model="ir.ui.view" id="password_form_view">
 	<field name="name">password.form</field>
 	<field name="model">tabel.password</field>
+	<field name="act_window_id" ref="password2_list_action"/>
 	<field name="arch" type="xml">
 	<form string="Password Form">
 	    <sheet>
 		<group>
 		    <field name="user_id" />
 		    <field name="password" />
-<!--		    <button
-                                name="create1"
-                                type="object"
-                                string="Создать захешированный" 
-				/>-->
 		</group>
 	    </sheet>
 	</form>
@@ -47,15 +43,16 @@
 	    <field name="user_id" />
 	    <field name="password" password="True" default_focus="1"/>
 			<button
-                                name="create1"
+                                name="validation"
                                 type="object"
                                 string="Подписать"
 				class="oe_highlight"
-				context="{'password':password,'user_id':user_id,'nocreate':'True'}"
-                        /> 
+				context="{'password':password,'user_id':user_id,}"
+                        />
+			<button name="cancel" string="Отмена" special="cancel" class="oe_stat_button"/>
 	    </group>
 	    </sheet>
-	<!--oe_stat_button    <button name="cancel" string="Отмена" special="cancel" class="oe_link"/> -->
+
 	
 	</form>
         </field>
