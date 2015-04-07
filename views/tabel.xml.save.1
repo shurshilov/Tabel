@@ -1,0 +1,795 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+   <record model="ir.ui.view" id="password_tree_view">
+            <field name="name">password.tree</field>
+            <field name="model">tabel.password</field>
+            <field name="arch" type="xml">
+
+                <tree string="Post Tree" >
+             		  <field name="user_id"/>	
+			<field name="password" />	  
+			 
+                </tree>
+            </field>
+        </record> 
+      <record model="ir.ui.view" id="password_form_view">
+            <field name="name">password.form</field>
+            <field name="model">tabel.password</field>
+            <field name="arch" type="xml">
+                <form string="Password Form">
+                    <sheet>
+                        <group>		
+			<field name="user_id" />	
+			<field name="password" />
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+      <record model="ir.ui.view" id="my_specific_view">
+            <field name="name">password.form</field>
+            <field name="model">tabel.password</field>
+	    <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Password Form">
+                	
+			<field name="user_id" />	
+			<field name="password" password="True" default_focus="1"/>
+			<button name="create"    string="Подписать" type="object" class="oe_highlight"/>
+			
+                </form>
+            </field>
+        </record>
+
+
+
+        
+	<!-- <function model="tabel.tabel" name="action_tabel"/>-->
+        <!-- division form view -->
+        <record model="ir.ui.view" id="division_form_view">
+            <field name="name">division.form</field>
+            <field name="model">tabel.division</field>
+            <field name="arch" type="xml">
+                <form string="Division Form">
+                    <sheet>
+                        <group>		
+			<field name="id"/>
+                        <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+
+
+
+ <record id="view_password_search" model="ir.ui.view">
+                <field name="name">tabel.password.search</field>
+                <field name="model">tabel.password</field>
+                <field name="type">search</field>
+                <field name="priority" eval="8"/>
+                <field name="arch" type="xml">
+                <search string="Checker">
+                <field name="user_id" select="True"/>
+                </search>
+                </field>
+        </record>
+        <record id="model_action_id" model="ir.actions.act_window">
+                <field name="name">Password</field>
+                <field name="type">ir.actions.act_window</field>
+                <field name="res_model">tabel.password</field>
+                <field name="view_type">form</field>
+                <field name="view_mode">form</field>
+                <field name="search_view_id" ref="view_password_search"/>
+                <field name="view_id" ref="my_specific_view"/>
+                <field name="domain">[]</field>
+<!--                <field name="context">{'user_id':uid}</field> -->
+                <field name="target">new</field>
+        </record>
+
+
+
+
+
+	
+        <!-- tabel form view -->
+      <record model="ir.ui.view" id="tabel_form_view">
+            <field name="name">tabel.form</field>
+            <field name="model">tabel.tabel</field>
+            <field name="arch" type="xml">           
+                <form string="Tabel Form">
+ 		  <header>
+			<button name="action_tabel" type="object" string="Импорт сотрудников"/>		
+		   	<button name="action_tabell" type="object"  string="Импорт часов и ставок"/>
+			<button 
+				name="%(model_action_id)d" 
+				type="action" 
+				string="Аннулировать" 
+				context="{'tabel_id':active_id,'state':'draft'}"
+				states="confirmed,done,confirmed2"
+			/>
+			<button 
+				name="%(model_action_id)d" 
+				type="action" 
+				string="Подписать(Табельщик)" 
+				context="{'tabel_id':active_id,'state':'confirm'}"
+				states="draft"
+			/>
+			<button 
+				name="%(model_action_id)d" 
+				type="action" 
+				string="Подписать(Начальник)" 
+				context="{'tabel_id':active_id,'state':'confirm2'}"
+				states="confirmed"
+			/>
+			<button 
+				name="%(model_action_id)d" 
+				type="action" 
+				string="Подписать (Бухгалтер)" 
+				context="{'tabel_id':active_id,'state':'done'}"
+				states="confirmed2"
+			/>
+
+		   <!--<button name="validation"    string="Article" type="object" class="oe_highlight"/>
+		   
+			<newline/>
+                          <button name="draft" type="workflow"
+                                string="Аннулировать"
+                                states="confirmed,done,confirmed2"/>
+
+                         <button name="confirm" type="workflow"
+                                string="Подписать(Табельщик)"
+				states="draft"
+                                class="oe_highlight"/>
+
+			  <button name="confirm2" type="workflow"
+                                string="Подписать(Начальник)"
+                                states="confirmed"
+				class="oe_highlight"/>
+
+                         <button name="done" type="workflow"
+                                string="Подписать (Бухгалтер)" 
+				states="confirmed2"
+                                class="oe_highlight"/>-->
+			 
+			<field name="state" widget="statusbar"/>
+			</header>
+
+ 			 <!--   <table>-->
+			<!--    <field name="signature_tabel"/>-->
+			   
+			<group> 
+                     	    <field name="num_tabel" string="Номер табеля"/>
+			    <field name="time_start_t" string="Дата начала табеля" />
+			    <field name="time_end_t" string="Дата конца табеля" />
+			    <field name="id_ank" string="Табельщик"/>
+			    <!-- <field name="state"/>-->
+			    <field name="id_division" string="Подразделение" /> 
+			    <!-- <field name="directory" string="directory" />-->
+			</group>
+        	   
+     
+    
+
+   			 <!-- </table> -->
+                  
+                   
+                         
+			<field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}">
+                         <!--    <tree string="Demo">
+                                <field name="hours1" />
+                            </tree>
+                            <form string="Demo" version="7.0">
+                                <tabel>
+                                   <field name="hours1" />
+                                </tabel>
+                            </form>-->
+
+				</field> 
+                        
+                    
+                </form>
+            </field>
+        </record> 
+
+	<!-- tabel tree view -->
+        <record model="ir.ui.view" id="tabel_tree_view">
+            <field name="name">tabel.tree</field>
+            <field name="model">tabel.tabel</field>
+            <field name="arch" type="xml">
+ 		<tree string="Tabel List">
+			<field name="id"/>
+  			    <field name="signature_tabel" string="Подпись"/>
+   			    <field name="num_tabel" string="Номер табеля"/>
+			    <field name="time_start_t" string="Дата начала табеля"/>
+			    <field name="time_end_t" string="Дата конца табеля"/>
+			    <field name="id_ank" string="Табельщик"/>
+			    <field name="ids_string" string="Количество записей"/>
+			    <field name="state" string="Статус"/>
+		</tree>
+            </field>
+        </record>
+
+
+
+
+        <!-- string form view -->
+     <record model="ir.ui.view" id="string_form_view">
+            <field name="name">string.form</field>
+            <field name="model">tabel.string</field>
+            <field name="arch" type="xml">
+                <form string="String Form">
+                    <table>
+                        <group>
+                         <field name="id_fcac"/>
+			    <field name="id_tabel"/>
+			
+                        </group>
+			   <tr>		<field name="stqnt"/>
+					<field name="hours1"/>
+					<field name="hours2"/>
+                           		<field name="hours3"/>
+                           		<field name="hours4"/>
+                           		<field name="hours5"/>
+                           		<field name="hours6"/>
+                           		<field name="hours7"/>
+                           		<field name="hours8"/>
+                           		<field name="hours9"/>
+                           		<field name="hours10"/>
+                           		<field name="hours11"/>
+                           		<field name="hours12"/>
+                           		<field name="hours13"/>
+                           		<field name="hours14"/>
+                           		<field name="hours15"/>
+                           		
+	
+	                       		<field name="hours16"/>
+                           		<field name="hours17"/>
+                           		<field name="hours18"/>
+                           		<field name="hours19"/>
+                           		<field name="hours20"/>
+                           		<field name="hours21"/>
+                           		<field name="hours22"/>
+                           		<field name="hours23"/>
+                           		<field name="hours24"/>
+                           		<field name="hours25"/>
+                           		<field name="hours26"/>
+                           		<field name="hours27"/>
+                           		<field name="hours28"/>
+                           		<field name="hours29"/>
+                           		<field name="hours30"/>
+                           		<field name="hours31"/>
+					
+                                        <field name="days_appear"/>
+			</tr>
+                    </table>
+                </form>
+            </field>
+        </record>
+
+        <!-- string tree view -->
+     <record model="ir.ui.view" id="string_tree_view">
+            <field name="name">string.tree</field>
+            <field name="model">tabel.string</field>
+            <field name="arch" type="xml">
+                <tree string="String Tree"  editable="bottom" >
+                         	<!--	<field name="order_line"/> -->
+					<field name="id_fcac" options="{'limit': 200}"/>
+					<field name="stqnt"/>
+					<field name="hours1"/>
+					<field name="hours2"/>
+                           		<field name="hours3"/>
+                           		<field name="hours4"/>
+                           		<field name="hours5"/>
+                           		<field name="hours6"/>
+                           		<field name="hours7"/>
+                           		<field name="hours8"/>
+                           		<field name="hours9"/>
+                           		<field name="hours10"/>
+                           		<field name="hours11"/>
+                           		<field name="hours12"/>
+                           		<field name="hours13"/>
+                           		<field name="hours14"/>
+                           		<field name="hours15"/>
+                           		<field name="hours16"/>
+                           		<field name="hours17"/>
+                           		<field name="hours18"/>
+                           		<field name="hours19"/>
+                           		<field name="hours20"/>
+                           		<field name="hours21"/>
+                           		<field name="hours22"/>
+                           		<field name="hours23"/>
+                           		<field name="hours24"/>
+                           		<field name="hours25"/>
+                           		<field name="hours26"/>
+                           		<field name="hours27"/>
+                           		<field name="hours28"/>
+                           		<field name="hours29"/>
+                           		<field name="hours30"/>
+                           		<field name="hours31"/>
+					<field name="days_appear"/>
+					<field name="hours_main"/>
+					<field name="hours_internal"/>
+					<field name="hours_night"/>
+					<field name="hours_holiday"/>
+					<field name="days_absences"/>
+					<field name="days_absences_sum"/> 
+					
+                </tree>
+            </field>
+        </record> 
+
+<!-- post form view -->
+         <record model="ir.ui.view" id="post_form_view">
+            <field name="name">post.form</field>
+            <field name="model">tabel.post</field>
+            <field name="arch" type="xml">
+		<form string="Post Form">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+<!-- ank tree view -->
+	<record id="view_ank_search" model="ir.ui.view">
+		<field name="name">tabel.ank.search</field>
+		<field name="model">tabel.ank</field>
+		<field name="type">search</field>
+		<field name="arch" type="xml">
+		<search string="Checker">
+		<field name="orgbase_rn" select="True"/>
+		</search>
+		</field>
+	</record>
+     <record model="ir.ui.view" id="ank_tree_view">
+            <field name="name">ank.tree</field>
+            <field name="model">tabel.ank</field>
+            <field name="arch" type="xml">
+                <tree string="Ank Tree" >
+			<field name="id"/>
+			<field name="orgbase_rn"/> 
+			<field name="tab_num"/>
+			<field name="jobbegin"/> 
+			<field name="jobend"/>	  
+                </tree>
+            </field>
+        </record> 
+ <!-- ank form view -->
+         <record model="ir.ui.view" id="ank_form_view">
+            <field name="name">ank.form</field>
+            <field name="model">tabel.ank</field>
+            <field name="arch" type="xml">
+
+		<form string="ANK Form">
+                    <sheet>
+                        <group>
+				<field name="orgbase_rn"/> 
+				<field name="tab_num"/>
+				<field name="jobbegin"/> 
+				<field name="jobend"/>                            
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+ <!-- fcac form view -->
+         <record model="ir.ui.view" id="fcac_form_view">
+            <field name="name">fcac.form</field>
+            <field name="model">tabel.fcac</field>
+            <field name="arch" type="xml">
+		<form string="FCAC Form">
+                    <sheet>
+                        <group>
+				<field name="ank_rn"/> 
+				<field name="post_rn"/>
+				<field name="subdiv_rn"/> 
+				<field name="vidisp_rn"/>  
+				<field name="startdate"/>
+				<field name="enddate"/>                          
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+<!-- fcac tree view -->
+     <record model="ir.ui.view" id="fcac_tree_view">
+            <field name="name">fcac.tree</field>
+            <field name="model">tabel.fcac</field>
+            <field name="arch" type="xml">
+                <tree string="Fcac Tree" >
+			<field name="id"/>
+			<field name="ank_rn"/> 
+			<field name="post_rn"/>
+			<field name="subdiv_rn"/> 
+			<field name="vidisp_rn"/>  
+			<field name="startdate"/>
+			<field name="enddate"/>   
+                </tree>
+            </field>
+        </record> 
+<!-- person form view -->
+	<record id="view_person_search" model="ir.ui.view">
+		<field name="name">tabel.person.search</field>
+		<field name="model">tabel.person</field>
+		<field name="type">search</field>
+		<field name="arch" type="xml">
+		<search string="Checker">
+		<field name="surname" select="True"/>
+		</search>
+		</field>
+	</record>
+         <record model="ir.ui.view" id="person_form_view">
+            <field name="name">person.form</field>
+            <field name="model">tabel.person</field>
+            <field name="arch" type="xml">
+		<form string="PERSON Form">
+                    <sheet>
+                        <group>
+				<field name="surname"/>  
+				<field name="firstname"/>
+				<field name="secondname"/>                          
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+<!-- person tree view -->
+     <record model="ir.ui.view" id="person_tree_view">
+            <field name="name">person.tree</field>
+            <field name="model">tabel.person</field>
+            <field name="arch" type="xml">
+                <tree string="Person Tree" >
+			<field name="id"/>
+			<field name="surname"/>  
+			<field name="firstname"/>
+			<field name="secondname"/>  
+                </tree>
+            </field>
+        </record> 
+
+<!-- vidisp form view -->
+         <record model="ir.ui.view" id="vidisp_form_view">
+            <field name="name">vidisp.form</field>
+            <field name="model">tabel.vidisp</field>
+            <field name="arch" type="xml">
+		<form string="vidisp Form">
+                    <sheet>
+                        <group>
+				<field name="code"/>  
+				<field name="name"/>                    
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+<!-- vidisp tree view -->
+     <record model="ir.ui.view" id="vidisp_tree_view">
+            <field name="name">vidisp.tree</field>
+            <field name="model">tabel.vidisp</field>
+            <field name="arch" type="xml">
+                <tree string="vidisp Tree" >
+			<field name="id"/>
+			<field name="code"/>  
+			<field name="name"/>
+                </tree>
+            </field>
+        </record>
+<!-- fcacwth tree view -->
+     <record model="ir.ui.view" id="fcacwth_tree_view">
+            <field name="name">fcacwth.tree</field>
+            <field name="model">tabel.fcacwth</field>
+            <field name="arch" type="xml">
+                <tree string="vidisp Tree" >
+			<field name="id"/>
+			<field name="fcac_rn"/>  
+			<field name="date"/>
+			<field name="hourqnt"/>
+                </tree>
+            </field>
+        </record>
+<!-- fcacwtd tree view -->
+     <record model="ir.ui.view" id="fcacwtd_tree_view">
+            <field name="name">fcacwtd.tree</field>
+            <field name="model">tabel.fcacwtd</field>
+            <field name="arch" type="xml">
+                <tree string="vidisp Tree" >
+			<field name="id"/>
+			<field name="fcac_rn"/>  
+			<field name="date"/>
+			<field name="daytype_rn"/>
+                </tree>
+            </field>
+        </record>
+<!-- daytype tree view -->
+     <record model="ir.ui.view" id="daytype_tree_view">
+            <field name="name">daytype.tree</field>
+            <field name="model">tabel.daytype</field>
+            <field name="arch" type="xml">
+                <tree string="vidisp Tree" >
+			<field name="id"/>
+			<field name="nick"/>  
+			<field name="name"/>
+                </tree>
+            </field>
+        </record> 
+<!-- fcacch form view -->
+         <record model="ir.ui.view" id="fcacch_form_view">
+            <field name="name">fcacch.form</field>
+            <field name="model">tabel.fcacch</field>
+            <field name="arch" type="xml">
+		<form string="fcacch Form">
+                    <sheet>
+                        <group>
+				<field name="fcacbs_rn"/>  
+				<field name="stqnt"/>                    
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+<!-- fcacch tree view -->
+     <record model="ir.ui.view" id="fcacch_tree_view">
+            <field name="name">fcacch.tree</field>
+            <field name="model">tabel.fcacch</field>
+            <field name="arch" type="xml">
+                <tree string="fcacch Tree" >
+			<field name="id"/>
+			<field name="fcacbs_rn"/>  
+			<field name="stqnt"/>
+                </tree>
+            </field>
+        </record> 
+<!-- post tree view -->
+     <record model="ir.ui.view" id="post_tree_view">
+            <field name="name">post.tree</field>
+            <field name="model">tabel.post</field>
+            <field name="arch" type="xml">
+                <tree string="Post Tree" >
+             		<field name="name"/>	
+			<field name="id"/>			 
+                </tree>
+            </field>
+        </record> 
+<!-- ACTIONS -->    
+        <record model="ir.actions.act_window" id="string_list_action">
+            <field name="name">String</field>
+            <field name="res_model">tabel.string</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+	    <field name="limit">500</field>
+            <field name="help" type="html">
+                <p class="oe_view_nocontent_create">Create the new string
+                </p>
+            </field>
+        </record>
+
+
+	<record model="ir.actions.act_window" id="tabel_list_all_action">
+            <field name="name">Tabel All</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar</field>
+		<field name="limit">500</field>
+        </record>
+
+	
+	<record model="ir.actions.act_window" id="tabel_list_draft_action">
+            <field name="name">Tabel Draft</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+	    <field name="domain">[('state','=', 'draft')]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="tabel_list_confirmed2_action">
+            <field name="name">Tabel Confirmed2</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+	    <field name="domain">[('state','=', 'confirmed2')]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	
+ 	<record model="ir.actions.act_window" id="tabel_list_confirmed_action">
+            <field name="name">Tabel Confirmed</field>
+            <field name="res_model">tabel.tabel</field>
+	    <field name="domain">[('state','=','confirmed')]</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	
+	<record model="ir.actions.act_window" id="tabel_list_done_action">
+            <field name="name">Tabel Done</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+	    <field name="domain">[('state','=', 'done')]</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+
+	<!-- window action division-->
+ 	<record model="ir.actions.act_window" id="division_list_action">
+            <field name="name">Division</field>
+            <field name="res_model">tabel.division</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<!-- window action post-->
+	<record model="ir.actions.act_window" id="post_list_action">
+            <field name="name">Post</field>
+            <field name="res_model">tabel.post</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<!-- window action ank-->
+	<record model="ir.actions.act_window" id="ank_list_action">
+            <field name="name">Ank</field>
+            <field name="res_model">tabel.ank</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+	<!-- window action fcac-->
+	<record model="ir.actions.act_window" id="fcac_list_action">
+            <field name="name">Fcac</field>
+            <field name="res_model">tabel.fcac</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+	<!-- window action person-->
+	<record model="ir.actions.act_window" id="person_list_action">
+            <field name="name">Person</field>
+            <field name="res_model">tabel.person</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+<field name="limit">500</field>
+        </record>
+	<!-- window action vidisp-->
+	<record model="ir.actions.act_window" id="vidisp_list_action">
+            <field name="name">Vidisp</field>
+            <field name="res_model">tabel.vidisp</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+	<!-- window action fcacch-->
+	<record model="ir.actions.act_window" id="fcacch_list_action">
+            <field name="name">Fcacch</field>
+            <field name="res_model">tabel.fcacch</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+<field name="limit">500</field>
+        </record>
+	<!-- window action fcacwth-->
+	<record model="ir.actions.act_window" id="fcacwth_list_action">
+            <field name="name">Fcacwth</field>
+            <field name="res_model">tabel.fcacwth</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+<field name="limit">500</field>
+        </record>
+	<!-- window action fcacwtd-->
+	<record model="ir.actions.act_window" id="fcacwtd_list_action">
+            <field name="name">Fcacwtd</field>
+            <field name="res_model">tabel.fcacwtd</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+<field name="limit">500</field>
+        </record>
+	<!-- window action daytype-->
+	<record model="ir.actions.act_window" id="daytype_list_action">
+            <field name="name">Daytype</field>
+            <field name="res_model">tabel.daytype</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <!-- window action password OFF-->
+        <record model="ir.actions.act_window" id="password_list_action">
+            <field name="name">Password</field>
+            <field name="res_model">tabel.password</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="password_form_view"/>
+            <field name="context">{'state':'create'}</field>
+        </record>
+        <!-- window action passwd2-->
+        <record model="ir.actions.act_window" id="password2_list_action">
+            <field name="name">Password2</field>
+            <field name="res_model">tabel.password</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+	    <field name="context">{'state':'create'}</field>
+
+        </record>
+
+
+
+        <!-- top level menu: no parent -->
+        <menuitem id="main_tabel_menu" name="Tabel"/>
+
+        <menuitem id="tabel_menu" name="Управление табелями"
+                  parent="main_tabel_menu" />
+
+        <menuitem id="tabel_menu_settings" name="Настройки"
+                  parent="main_tabel_menu"/>
+<!-- 
+        <menuitem id="new_tabel_menu" name="Сотрудники"
+		  parent="tabel_menu_settings"
+                  action="employee_list_action"/> -->
+        <menuitem id="password_tabel_menu" name="Password"
+		  parent="tabel_menu_settings"
+                  action="password2_list_action"/> 
+
+        <menuitem id="ank_tabel_menu" name="Ank"
+		  parent="tabel_menu_settings"
+                  action="ank_list_action"/> 
+        <menuitem id="fcac_tabel_menu" name="Fcac"
+		  parent="tabel_menu_settings"
+                  action="fcac_list_action"/>
+        <menuitem id="person_tabel_menu" name="Person"
+		  parent="tabel_menu_settings"
+                  action="person_list_action"/>
+        <menuitem id="vidisp_tabel_menu" name="Vidisp"
+		  parent="tabel_menu_settings"
+                  action="vidisp_list_action"/>
+        <menuitem id="fcacch_tabel_menu" name="Fcacch"
+		  parent="tabel_menu_settings"
+                  action="fcacch_list_action"/>
+        <menuitem id="fcacwth_tabel_menu" name="Fcacwth"
+		  parent="tabel_menu_settings"
+                  action="fcacwth_list_action"/>
+        <menuitem id="fcacwtd_tabel_menu" name="Fcacwtd"
+		  parent="tabel_menu_settings"
+                  action="fcacwtd_list_action"/>
+        <menuitem id="daytype_tabel_menu" name="Daytype"
+		  parent="tabel_menu_settings"
+                  action="daytype_list_action"/>
+        <menuitem id="division_menu" name="Подразделения"
+                  parent="tabel_menu_settings"
+                  action="division_list_action"/>
+
+        <menuitem id="post_menu" name="Должности"
+                  parent="tabel_menu_settings"
+                  action="post_list_action"/>
+
+        <menuitem id="string_menu" name="Строки табелей"
+                  parent="tabel_menu_settings"
+                  action="string_list_action" groups="group_manager"/>
+
+        <menuitem id="tabel_menu_draft" name="На подпись табельщику"
+                  parent="tabel_menu"
+                  action="tabel_list_draft_action"/>
+
+        <menuitem id="tabel_menu_confirmed" name="На подпись начальнику"
+                  parent="tabel_menu"
+                  action="tabel_list_confirmed_action"/>
+
+        <menuitem id="tabel_menu_confirmed2" name="На подпись бухгалтеру"
+                  parent="tabel_menu"
+                  action="tabel_list_confirmed2_action"/>
+
+        <menuitem id="tabel_menu_done" name="На исполнение"
+                  parent="tabel_menu"
+                  action="tabel_list_done_action"/> 
+
+        <menuitem id="tabel_menu_all" name="Все"
+                  parent="tabel_menu"
+                  action="tabel_list_all_action"/> 
+
+
+
+
+	
+
+    </data>
+</openerp>
+
+
+

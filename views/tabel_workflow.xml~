@@ -1,0 +1,131 @@
+<openerp>
+    <data>
+        <record model="workflow" id="wkf_tabel">
+            <field name="name">Tabel workflow</field>
+    	    <field name="osv">tabel.tabel</field>
+            <field name="on_create">True</field>
+        </record>
+
+        <record model="workflow.activity" id="draft">
+            <field name="name">Draft</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+            <field name="flow_start" eval="True"/>
+            <field name="kind">function</field>
+            <field name="action">action_draft()</field>
+        </record>
+        <record model="workflow.activity" id="confirmed">
+            <field name="name">Confirmed</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+            <field name="kind">function</field>
+            <field name="action">action_confirm()</field>
+        </record>
+        <record model="workflow.activity" id="confirmed2">
+            <field name="name">Confirmed2</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+            <field name="kind">function</field>
+            <field name="action">action_confirm2()</field>
+        </record>
+        <record model="workflow.activity" id="done">
+            <field name="name">Done</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+	    <field name="flow_stop">True</field>
+            <field name="kind">function</field>
+            <field name="action">action_done()</field>
+        </record>
+
+
+
+        <record model="workflow.transition" id="session_draft_to_confirmed">
+            <field name="act_from" ref="draft"/>
+            <field name="act_to" ref="confirmed"/>
+            <field name="signal">confirm</field>
+        </record>
+        <record model="workflow.transition" id="session_confirmed_to_draft">
+            <field name="act_from" ref="confirmed"/>
+            <field name="act_to" ref="draft"/>
+            <field name="signal">draft</field>
+        </record>
+        <record model="workflow.transition" id="session_confirmed_to_confirmed2">
+            <field name="act_from" ref="confirmed"/>
+            <field name="act_to" ref="confirmed2"/>
+            <field name="signal">confirm2</field>
+        </record>
+        <record model="workflow.transition" id="session_confirmed2_to_draft">
+            <field name="act_from" ref="confirmed2"/>
+            <field name="act_to" ref="draft"/>
+            <field name="signal">draft</field>
+        </record>
+        <record model="workflow.transition" id="session_done_to_draft">
+            <field name="act_from" ref="done"/>
+            <field name="act_to" ref="draft"/>
+            <field name="signal">draft</field>
+        </record>
+        <record model="workflow.transition" id="session_confirmed2_to_done">
+            <field name="act_from" ref="confirmed2"/>
+            <field name="act_to" ref="done"/>
+            <field name="signal">done</field>
+        </record>
+
+  <!--      <record model="workflow.activity" id="draft">
+            <field name="name">Draft</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+            <field name="flow_start" eval="True"/>
+            <field name="kind">function</field>
+            <field name="action">action_draft()</field>
+        </record>
+        <record model="workflow.activity" id="signature_director">
+            <field name="name">Director</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+            <field name="kind">function</field>
+            <field name="action">action_confirm()</field>
+        </record>
+        <record model="workflow.activity" id="signature_accountant">
+            <field name="name">Accountant</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+            <field name="kind">function</field>
+            <field name="action">action_signature_accountant()</field>
+        </record>
+        <record model="workflow.activity" id="done">
+            <field name="name">Done</field>
+            <field name="wkf_id" ref="wkf_tabel"/>
+	    <field name="flow_stop">True</field>
+            <field name="kind">function</field>
+            <field name="action">action_done()</field>
+        </record>
+
+
+
+        <record model="workflow.transition" id="session_draft_to_signature_director">
+            <field name="act_from" ref="draft"/>
+            <field name="act_to" ref="signature_director"/>
+            <field name="signal">signature_director</field>
+        </record>
+        <record model="workflow.transition" id="session_signature_director_to_draft">
+            <field name="act_from" ref="signature_director"/>
+            <field name="act_to" ref="draft"/>
+            <field name="signal">draft</field>
+        </record>
+	<record model="workflow.transition" id="session_signature_accountant_to_draft">
+            <field name="act_from" ref="signature_accountant"/>
+            <field name="act_to" ref="draft"/>
+            <field name="signal">draft</field>
+        </record>
+        <record model="workflow.transition" id="session_done_to_draft">
+            <field name="act_from" ref="done"/>
+            <field name="act_to" ref="draft"/>
+            <field name="signal">draft</field>
+        </record>
+        <record model="workflow.transition" id="session_signature_accountant_to_done">
+            <field name="act_from" ref="signature_accountant"/>
+            <field name="act_to" ref="done"/>
+            <field name="signal">done</field>
+        </record>
+        <record model="workflow.transition" id="session_signature_director_to_signature_accountant">
+            <field name="act_from" ref="signature_director"/>
+            <field name="act_to" ref="signature_accountant"/>
+            <field name="signal">signature_accountant</field>
+        </record>-->
+    </data>
+</openerp>
+
+
