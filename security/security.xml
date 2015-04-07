@@ -22,8 +22,8 @@
             <field name="name">Tabel / Бухгалтер</field>
         </record>
 
-
-	<record id="change only tabel state confitmed2" model="ir.rule">
+<!--	ADMIN -->
+	<record id="admin" model="ir.rule">
             <field name="name">Only Responsible can modify Course</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('group_accountant'))]"/>
@@ -37,8 +37,9 @@
             </field>
         </record>
 
+<!--	BOSS INF -->
 	<record id="bos3" model="ir.rule">
-            <field name="name">Only Responsible can modify Course</field>
+            <field name="name">Нач. отдела инф. подписывать только своего отдела и статус 'confirmed'</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('boss_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -51,7 +52,7 @@
         </record>
 
 	<record id="bos2" model="ir.rule">
-            <field name="name">Only Responsible can modify Course</field>
+            <field name="name">Нач. отдела инф. видеть все табели своего отдела</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('boss_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -63,8 +64,9 @@
             </field>
         </record>
 
+<!--	TABEL_DIVISION_INF -->
 	<record id="inf3" model="ir.rule">
-            <field name="name">Табельщик отдела информатизации</field>
+            <field name="name">Табельщик отдела информатизации действия только с табелями своего отдела и 'draft'</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('tabel_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -77,7 +79,7 @@
         </record>
 
 	<record id="inf2" model="ir.rule">
-            <field name="name">Табельщик отдела информатизации</field>
+            <field name="name">Табельщик отдела информатизации видеть все табели своего отдела</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('tabel_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -86,6 +88,33 @@
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
                 [ ('state','in',['confirmed','confirmed2','done']),('id_division','in',[346,375]) ]
+	    </field>
+        </record>
+
+<!--	ACCOUNTANT -->
+	<record id="accountant rule 1" model="ir.rule">
+            <field name="name">Правило для бухгалтера видеть все табели</field>
+            <field name="model_id" ref="model_tabel_tabel"/>
+            <field name="groups" eval="[(4, ref('group_accountant'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+            <field name="domain_force">
+                [ ('state','in',['confirmed','draft','done']) ]
+	    </field>
+        </record>
+
+	<record id="accountant rule 2" model="ir.rule">
+            <field name="name">Правило для бухгалтера подписывать только свои табели</field>
+            <field name="model_id" ref="model_tabel_tabel"/>
+            <field name="groups" eval="[(4, ref('group_accountant'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+            <field name="domain_force">
+                [ ('state','not in',['confirmed','draft','done']) ]
 	    </field>
         </record>
 

@@ -1,0 +1,11 @@
+*.fpt
+*.ftp
+*.dbf
+*.save
+*.save.*
+*.xml~
+*.pyc
+*.py~
+*.csv~
+import/database
+orm.py
