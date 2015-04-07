@@ -3,13 +3,7 @@
 import time
 import hashlib
 from openerp import models, fields, api, exceptions
-#from dbfpy import dbf
 import datetime
-#import dbf2csv_post
-#import import_post
-#import dbf2csv_division
-#import import_division
-#import syncronize
 class Daytype(models.Model):
 	_name = 'tabel.daytype'
 	
