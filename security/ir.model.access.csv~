@@ -1,0 +1,19 @@
+id,name,model_id/id,group_id/id,perm_read,perm_write,perm_create,perm_unlink
+group_manager,admin,model_tabel_tabel,group_manager,1,1,1,1
+group_manager1,admin,model_tabel_string,group_manager,1,1,1,1
+group_manager2,admin,model_tabel_division,group_manager,1,1,1,1
+group_manager3,admin,model_tabel_ank,group_manager,1,1,1,1
+group_manager4,admin,model_tabel_fcac,group_manager,1,1,1,1
+group_manager6,admin,model_tabel_post,group_manager,1,1,1,1
+group_manager7,admin,model_tabel_person,group_manager,1,1,1,1
+group_manager8,admin,model_tabel_vidisp,group_manager,1,1,1,1
+group_manager9,admin,model_tabel_fcac,group_manager,1,1,1,1
+tabel_done_inf,tabel_done,model_tabel_tabel,done_division_inf,1,0,0,0
+tabel_manager_inf,tabel manager,model_tabel_tabel,tabel_division_inf,1,1,1,1
+tabel_string_manager_inf,tabel manager string,model_tabel_string,tabel_division_inf,1,1,1,1
+tabel_boss,boss,model_tabel_tabel,boss_division_inf,1,1,0,0
+tabel_boss_string,boss string,model_tabel_string,boss_division_inf,1,1,0,0
+accountant,accountant manager,model_tabel_tabel,group_accountant,1,1,0,0
+accountant_string,accountant string,model_tabel_string,group_accountant,1,1,0,0
+course_read_all,course all,model_tabel_tabel,,1,0,0,0
+

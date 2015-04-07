@@ -1,0 +1,85 @@
+<openerp>
+    <data>
+        <record id="group_manager" model="res.groups">
+            <field name="name">OpenAcademy / Manager</field>
+        </record>
+        <record id="boss_division_inf" model="res.groups">
+            <field name="name">Tabel / Начальник отдела информатизации</field>
+        </record>
+
+        <record id="tabel_division_inf" model="res.groups">
+            <field name="name">Tabel / Табельщик отдела информатизации</field>
+        </record>
+        <record id="done_division_inf" model="res.groups">
+            <field name="name">Tabel / Исполнитель отдела информатизации</field>
+        </record>
+        <record id="group_accountant" model="res.groups">
+            <field name="name">Tabel / Бухгалтер</field>
+        </record>
+<!--
+accountant,accountant manager,model_tabel_tabel,group_accountant,1,1,0,0
+accountant_string,accountant string,model_tabel_string,group_accountant,1,1,0,0
+-->
+	<record id="change only tabel state confitmed2" model="ir.rule">
+            <field name="name">Only Responsible can modify Course</field>
+            <field name="model_id" ref="model_tabel_tabel"/>
+            <field name="groups" eval="[(4, ref('group_accountant'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">
+                ['|', ('state','=','confirmed2'),
+                      ('state','=','confirmed2')]
+            </field>
+        </record>
+
+	<record id="change only tabel state confitmed" model="ir.rule">
+            <field name="name">Only Responsible can modify Course</field>
+            <field name="model_id" ref="model_tabel_tabel"/>
+            <field name="groups" eval="[(4, ref('boss_division_inf'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">
+                ['|', ('state','=','confirmed'),
+                      ('state','=','confirmed')]
+            </field>
+        </record>
+
+	<record id="change only tabel state draft" model="ir.rule">
+            <field name="name">Only Responsible can modify Course</field>
+            <field name="model_id" ref="model_tabel_tabel"/>
+            <field name="groups" eval="[(4, ref('tabel_division_inf'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">
+                ['|', ('state','=','draft'),
+                      ('state','=','draft')]
+            </field>
+        </record>
+
+
+<!--s
+	<record id="no change string" model="ir.rule">
+            <field name="name">Only Responsible can modify</field>
+            <field name="model_id" ref="model_tabel_string"/>
+            <field name="groups" eval="[(4, ref('group_accountant'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+            <field name="domain_force">
+                ['|', ('id_tabel','=',10),
+                      ('hours1','!=',10)]
+            </field>
+        </record>-->
+
+
+    </data>
+</openerp>
+
+
