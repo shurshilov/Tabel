@@ -73,18 +73,19 @@
 	</form>
 	</field>
     </record>
-<!--
- <record id="view_password_search" model="ir.ui.view">
-                <field name="name">tabel.password.search</field>
-                <field name="model">tabel.password</field>
-                <field name="type">search</field>
-                <field name="priority" eval="8"/>
-                <field name="arch" type="xml">
-                <search string="Checker">
-                <field name="user_id" select="True"/>
-                </search>
-                </field>
-        </record> -->
+
+    <!-- tabel search view -->
+    <record id="view_tabel_search" model="ir.ui.view">
+        <field name="name">tabel.tabel.search</field>
+        <field name="model">tabel.tabel</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Checker">
+		    <field name="id_ank" select="True"/>
+		    <field name="id" select="True"/>
+            </search>
+        </field>
+    </record>
 
     <!-- tabel form view -->
      <record model="ir.ui.view" id="tabel_form_view">
@@ -101,16 +102,16 @@
 				type="action" 
 				string="Аннулировать" 
 				context="{'tabel_id':active_id,'state':'draft'}"
-				states="confirmed,done,confirmed2"
+				states="confirmed,confirmed2"
 			/>
 
-<!--			<button
-                                name="val2"
+			<button
+                                name="validation1"
                                 type="object"
-                                string="Аннулировать"
-                                context="{'tabel_id':active_id,'state':'draft'}"
+                                string="Аннулировать123"
+                                context="{'tabel_id':active_id,'state':'draft' }"
                                 states="confirmed,done,confirmed2"
-                        /> -->
+                        /> 
 			<button 
 				name="%(model_action_id)d" 
 				type="action" 
@@ -140,7 +141,8 @@
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
 		<field name="id_ank" string="Табельщик"/>
-		<field name="id_division" string="Подразделение" /> 
+		<field name="id_division" string="Подразделение" />
+		<field name="division_user" string="Подразделения юзера"/>
 	    </group>
 	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
@@ -161,6 +163,7 @@
 	    <field name="num_tabel" string="Номер табеля"/>
 	    <field name="ids_string" string="Количество записей"/>
 	    <field name="state" string="Статус"/>
+	    <field name="division_user" string="подразделения юзера"/>
 	</tree>
 	</field>
     </record>
