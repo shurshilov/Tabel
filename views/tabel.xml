@@ -142,7 +142,6 @@
 		<field name="time_end_t" string="Дата конца табеля" />
 		<field name="id_ank" string="Табельщик"/>
 		<field name="id_division" string="Подразделение" />
-		<field name="division_user" string="Подразделения юзера"/>
 	    </group>
 	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
@@ -163,7 +162,6 @@
 	    <field name="num_tabel" string="Номер табеля"/>
 	    <field name="ids_string" string="Количество записей"/>
 	    <field name="state" string="Статус"/>
-	    <field name="division_user" string="подразделения юзера"/>
 	</tree>
 	</field>
     </record>

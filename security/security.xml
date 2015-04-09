@@ -9,14 +9,14 @@
         </record>
 
         <record id="boss_division_inf" model="res.groups">
-            <field name="name">Tabel / Начальник отдела информатизации</field>
+            <field name="name">Tabel / Начальник отдела (отделения)</field>
         </record> 
 
         <record id="tabel_division_inf" model="res.groups">
-            <field name="name">Tabel / Табельщик отдела информатизации</field>
+            <field name="name">Tabel / Табельщик отдела (отделения)</field>
         </record>
         <record id="done_division_inf" model="res.groups">
-            <field name="name">Tabel / Исполнитель отдела информатизации</field>
+            <field name="name">Tabel / Исполнитель отдела (отделения)</field>
         </record>
         <record id="group_accountant" model="res.groups">
             <field name="name">Tabel / Бухгалтер</field>
@@ -74,7 +74,7 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [('state','not in',['confirmed','confirmed2','done'])]
+                [('state','not in',['confirmed','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division])]
             </field>
         </record>
 
@@ -87,11 +87,11 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [('state','in',['confirmed','confirmed2','done']),('id_division.id','in', [( emp.id ) for emp in user.ids_division])]
-            </field>
+		 [('state','in',['confirmed','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division])]
+	    </field>
         </record>
 
-<!--	ACCOUNTANT ('state','in',['confirmed','confirmed2','done']) ,('division_user','=','yes')-->
+<!--	ACCOUNTANT              	[('id_division.id','like', user.ids_division)]    [('state','in',['confirmed','confirmed2','done']),('id_division.id','in', [( emp.id ) for emp in user.ids_division])]-->
 	<record id="accountant rule 1" model="ir.rule">
             <field name="name">Правило для бухгалтера видеть все табели</field>
             <field name="model_id" ref="model_tabel_tabel"/>

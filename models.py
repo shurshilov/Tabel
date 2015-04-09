@@ -2,34 +2,69 @@
 # -*- coding: utf-8 -*- 
 import time
 import hashlib
-from openerp import models, fields, api, exceptions,osv
+import openerp
+from openerp import models, fields
+from openerp import api, exceptions
+from openerp.osv import  osv
 import datetime
-class my_res_users(models.Model):
-    _name= 'res.users'
-    _inherit= 'res.users'
-#    ids_division = fields.Char(compute='div_default',string="Подразделения юзера",store=False)
-    ids_division = fields.Many2one('tabel.division',compute='div_default',   string="п.ю.", store=False)
-    def div_default (self):
-	mas =""
+#old api work
+class res_users(osv.osv):
+    _inherit='res.users'
+    _description = ''
+
+    def _get_emp_ids(self, cr, uid, ids, field_name, args, context=None):
+	result = {}
 	#выбираем текущего юзера
-	user = self.env['res.users'].browse(self._uid)
+	user = self.browse(cr,uid,ids,context=context)
 	#вытаскиваем его имя + пробел вначале такой формат у паруса
 	username= u' ' + user.name
 	#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
-        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,[('full_name','=',username)])
+        id_person=self.pool.get('tabel.person').search(cr,uid,[('full_name','=',username)])
 	#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
 	for i in id_person:
-		id_ank=self.pool.get('tabel.ank').search(self._cr,self._uid,[('orgbase_rn.id','=',i)])
+		id_ank=self.pool.get('tabel.ank').search(cr,uid,[('orgbase_rn.id','=',i)])
 		#ищем текущий лицевой счет сотрудника
 		for k in id_ank:
-		    id_fcac=self.pool.get('tabel.fcac').search(self._cr,self._uid,[('ank_rn.id','=',k),('enddate','=',datetime.date(8888, 12, 31))])
+		    id_fcac=self.pool.get('tabel.fcac').search(cr,uid,[('ank_rn.id','=',k),('enddate','=',datetime.date(8888, 12, 31))])
 		    #далее из модели берем ид отдела
 		    for j in id_fcac:
-			id_div = self.pool.get('tabel.fcac').browse(self._cr, self._uid, j)
+			id_div = self.pool.get('tabel.fcac').browse(cr, uid, j)
 			mas = id_div.subdiv_rn
-	for r in self:
-		r.ids_division = mas
-#	return mas
+			result[user.id]= id_div.subdiv_rn.id
+			return result
+    _columns = {
+	'ids_division': openerp.osv.fields.function(_get_emp_ids,method=True,string='Сотрудник',type='many2one',store=False,relation='tabel.division',help='Employee'),
+	}
+#odoo v8 dont work
+#class res_users(models.Model):
+#    _name= 'res.users'
+#    _inherit= 'res.users'
+#    ids_division = fields.Char( string="п.ю.")
+#    ids_divisio = fields.Char(compute='div_default',   string="п.ю.", store=False)
+#    @api.depends('ids_divisio','ids_division')
+#    def div_default (self):
+#	self._cr.execute("UPDATE res_users SET  ids_division = "+str(111)+" ;")
+#	mas =None
+#	#выбираем текущего юзера
+#	user = self.env['res.users'].browse(self._uid)
+#	#вытаскиваем его имя + пробел вначале такой формат у паруса
+#	username= u' ' + user.name
+#	#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
+#        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,[('full_name','=',username)])
+#	#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
+#	for i in id_person:
+#		id_ank=self.pool.get('tabel.ank').search(self._cr,self._uid,[('orgbase_rn.id','=',i)])
+#		#ищем текущий лицевой счет сотрудника
+#		for k in id_ank:
+#		    id_fcac=self.pool.get('tabel.fcac').search(self._cr,self._uid,[('ank_rn.id','=',k),('enddate','=',datetime.date(8888, 12, 31))])
+#		    #далее из модели берем ид отдела
+#		    for j in id_fcac:
+#			id_div = self.pool.get('tabel.fcac').browse(self._cr, self._uid, j)
+#			mas = id_div.subdiv_rn
+#			for r in self:
+#			    r.ids_divisio = str(id_div.subdiv_rn.id)
+#			    self._cr.execute("UPDATE res_users SET  ids_division="+str(id_div.subdiv_rn.id)+" WHERE  res_users.id = "+str(user.id) +" ;")
+
 
 	
 class Daytype(models.Model):
@@ -79,17 +114,6 @@ class Person(models.Model):
 	initials_first = fields.Char(compute='_compute_first',string="Инициал Имени")
 	initials_second = fields.Char(compute='_compute_second',string="Инициал Отчества")
 	full_name = fields.Char (string="Полное имя")
-#	full_name = fields.Char(compute='_compute_full',string="Полное имя", search='_search_full')
-
-#	def _search_full(self, operator, value):
-#	    if operator == 'like':
-#	        operator = 'ilike'
-#	    return [('initials_first', operator, value)]
-
-#	@api.depends('firstname','secondname','surname')
-#	def _compute_full (self):
-#		for record in self:
-#			record.full_name = record.surname+" "+record.firstname+" "+record.secondname
 
 	@api.depends('firstname')
 	def _compute_first (self):
@@ -97,7 +121,6 @@ class Person(models.Model):
 		    if type (record.firstname) != bool:
 			if len(record.firstname) >1:
 				record.initials_first = " "+record.firstname [1]+". "
-#				record.full_name = record.surname+" "+record.firstname+" "+record.secondname
 			else:
 			    record.full_name = "пусто"
 		    else:
@@ -110,18 +133,6 @@ class Person(models.Model):
 		    if type (record.secondname) != bool:
 			if len (record.secondname) >1:
 				record.initials_second = record.secondname [1]+". "
-
-#	def name_get(self, cr, uid, ids, context={}):
-#         
-#        	if not len(ids):
-#        	    return []
-#
-#        	res=[]
-#
-#        	for emp in self.browse(cr, uid, ids,context=context):
-#			res.append((emp.id,emp.surname+" "+emp.firstname+" "+emp.secondname))
-#	        return res
-
 
 class Ank(models.Model):
 	_name = 'tabel.ank'
@@ -143,13 +154,6 @@ class Fcac(models.Model):
 	vidisp_rn = fields.Many2one('tabel.vidisp', ondelete='cascade', string="vidisp_rn")
 	startdate = fields.Date(string="time begin of fcac")
 	enddate = fields.Date(string="time end of fcac")
-	#stqnt = fields.Many2one('tabel.fcacch', 'fcacbs_rn', ondelete='cascade', string="stavka_rn")
-	#@api.one
-	#def _compute_name(self):
-	#	self.name= str(self.ank_rn)+str(self.post_rn)+str(self.vidisp_rn)
-	#
-	#obj = self.pool.get('res.partner')
-#    ids = obj.search(cr, uid, [('supplier','=',True), ('is_company','=',True)])
 	def name_get(self, cr, uid, ids, context):         
         	if not len(ids):
         	    return []
@@ -242,6 +246,7 @@ class String(models.Model):
                 i.order_line = prev + 1
                 prev = i.order_line
 	for record in self:
+		
 		record.days_absences_sum = 0
 		record.days_absences = " "
 		record.days_appear = "0"
@@ -398,39 +403,18 @@ class Tabel(models.Model):
 		#выбираем текущего юзера
 		user = self.env['res.users'].browse(self._uid)
 		#вытаскиваем его имя + пробел вначале такой формат у паруса
-#		raise exceptions.ValidationError(user.group_ids)
+		#raise exceptions.ValidationError(user.group_ids)
 		username= u' ' + user.name
 		#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
 	        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,[('full_name','=',username)])
 		#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
 		for i in id_person:
-#			raise exceptions.ValidationError("ВОТ ИД"+str(i))
 			id_ank=self.pool.get('tabel.ank').search(self._cr,self._uid,[('orgbase_rn.id','=',i)])
 			#как только нашли ид ank то сразу возвращаем его
 			for j in id_ank:
 				    return j
 
-    signature_tabel =  fields.Char(string="signature")
-    num_tabel = fields.Integer(string="number of Tabel", required=True)
-    time_start_t = fields.Date(string="time start of tabel", default = time_first)
-    time_end_t = fields.Date(string="time end of tabel", default = time_last)
-    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default, order ='surname')
-    ids_string = fields.One2many('tabel.string', 'id_tabel', string="string",  limit = 500)
-    state = fields.Selection([
-         ('draft', "Не подписанный"),
-         ('confirmed', "Подписанный табельщиком"),
-	 ('confirmed2', "Подписанный нач.отдела"),
-         ('done', "На исполнение"),
-    ])
-    store =	    fields.Boolean(string ="подразделения текущего юзер")
-    division_user = fields.Boolean(compute='div_default',string ="подразделения текущего юзер")
-
-    id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="division_id", required=True)
-#    directory = fields.Char(string="directory of DBF and CSV")
-
-    api.depends('state','num_tabel','time_start_t','time_end_t','id_ank','ids_string')
     def div_default (self):
-		mas =""
 		#выбираем текущего юзера
 		user = self.env['res.users'].browse(self._uid)
 		#вытаскиваем его имя + пробел вначале такой формат у паруса
@@ -446,44 +430,30 @@ class Tabel(models.Model):
 			    #далее из модели берем ид отдела
 			    for j in id_fcac:
 				id_div = self.pool.get('tabel.fcac').browse(self._cr, self._uid, j)
-			#	if flag == False:
-			#	    return id_div.subdiv_rn
-				mas = mas+" "+ str(id_div.subdiv_rn)
-#после того как получили список ид подразделений, проверяем текущее подразделение есть ли в этом если да то тру
-		for r in self:
-			#r.division_user = mas
-			def is_mychar(x):
-				return x.isdigit()
-			d="".join((x for x in str(r.id_division) if is_mychar(x)))
-		#	raise exceptions.ValidationError(d+"|" +mas)
-			if mas.find(d) >= 0:
-				r.division_user=True
-				r.store =True
-			else:
-				r.division_user=False
-				r.store=False
+				return id_div.subdiv_rn
 
-		
-			#    return mas
 
-#    def create(self, cr, uid, values, context):
-#		return super(Tabel, self).create(cr, uid, values, context)
-#		raise exceptions.ValidationError("ВОТ ИД"+str(values['time_end_t']))
-#		@api.one
-#		def action_tabel(self):
-#			def is_mychar(x):
-#				return x.isdigit()
-#			d="".join((x for x in str(self.id_division) if is_mychar(x)))
-#			self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+d+"   )  ;")
-#		action_tabel(self,cr,uid,values)
-#		return super(Tabel, self).create(cr, uid, values, context)
+
+    signature_tabel =  fields.Char(string="signature")
+    num_tabel = fields.Integer(string="number of Tabel", required=True)
+    time_start_t = fields.Date(string="time start of tabel", default = time_first)
+    time_end_t = fields.Date(string="time end of tabel", default = time_last)
+    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default, order ='surname')
+    ids_string = fields.One2many('tabel.string', 'id_tabel', string="string",  limit = 500)
+    state = fields.Selection([
+         ('draft', "Не подписанный"),
+         ('confirmed', "Подписанный табельщиком"),
+	 ('confirmed2', "Подписанный нач.отдела"),
+         ('done', "На исполнение"),
+    ])
+    id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="division_id", required=True,default= div_default)
 
 
 
     @api.one
     def action_tabel(self):
-	user = self.env['res.users'].browse(self._uid)
-	raise exceptions.ValidationError(str(user.ids_division.id) +"|"+str(self.id_division.id))
+#	user = self.env['res.users'].browse(self._uid)
+#	raise exceptions.ValidationError("user.ids_division.id="+str(user.ids_division) +"|self.id_division.id="+str(self.id_division.id)+"user.ids_divisio.id="+str(user.ids_divisio))
 	#улучшить парсер т.кid_division дает не ид а строку типа tabel.division(40881,)
 	def is_mychar(x):
 		return x.isdigit()
