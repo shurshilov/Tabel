@@ -94,7 +94,7 @@
 	<field name="arch" type="xml">           
 	<form string="Tabel Form">
 	     <header>
-			<button name="action_tabel" type="object" string="Импорт сотрудников" groups="Tabel.group_import"    states="draft"/>	
+			<button name="action_tabel" type="object" string="Импорт сотрудников" groups="Tabel.group_import"    />	
 <!--			<button name="validation" type="object" string="validation(o/>-->
 		   	<button name="action_tabell" type="object"  string="Импорт часов и ставок" groups="Tabel.group_import"  attrs="{'invisible':[('state','!=','draft')],}" />
 			<button 

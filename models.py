@@ -7,8 +7,8 @@ import datetime
 class my_res_users(models.Model):
     _name= 'res.users'
     _inherit= 'res.users'
-    ids_division = fields.Char(compute='div_default',string="Подразделения юзера",store=False)
-
+#    ids_division = fields.Char(compute='div_default',string="Подразделения юзера",store=False)
+    ids_division = fields.Many2one('tabel.division',compute='div_default',   string="п.ю.", store=False)
     def div_default (self):
 	mas =""
 	#выбираем текущего юзера
@@ -26,10 +26,10 @@ class my_res_users(models.Model):
 		    #далее из модели берем ид отдела
 		    for j in id_fcac:
 			id_div = self.pool.get('tabel.fcac').browse(self._cr, self._uid, j)
-			mas = mas+" "+ str(id_div.subdiv_rn)
+			mas = id_div.subdiv_rn
 	for r in self:
 		r.ids_division = mas
-	return mas
+#	return mas
 
 	
 class Daytype(models.Model):
@@ -482,6 +482,8 @@ class Tabel(models.Model):
 
     @api.one
     def action_tabel(self):
+	user = self.env['res.users'].browse(self._uid)
+	raise exceptions.ValidationError(str(user.ids_division.id) +"|"+str(self.id_division.id))
 	#улучшить парсер т.кid_division дает не ид а строку типа tabel.division(40881,)
 	def is_mychar(x):
 		return x.isdigit()

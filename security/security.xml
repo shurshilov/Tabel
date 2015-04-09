@@ -74,7 +74,7 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [('state','not in',['draft','confirmed2','done']),('id_division','like',user.ids_division)]
+                [('state','not in',['confirmed','confirmed2','done'])]
             </field>
         </record>
 
@@ -87,7 +87,7 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [('state','in',['draft','confirmed2','done']),('id_division','like',user.ids_division)]
+                [('state','in',['confirmed','confirmed2','done']),('id_division.id','in', [( emp.id ) for emp in user.ids_division])]
             </field>
         </record>
 
