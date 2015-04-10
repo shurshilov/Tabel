@@ -227,7 +227,6 @@ class String(models.Model):
     hours_night = fields.Char(string="Ноч")
     hours_holiday = fields.Char(string="Пра")
     hours_internal = fields.Char(string="Вну",compute='_compute_days_appear')
-    order_line = fields.Integer(compute='_compute_days_appear')
     days_absences = fields.Char (string="Неяв")
     days_absences_sum = fields.Integer (string="Сум")
     counter = fields.Integer (string = "Счет", default = 0)
@@ -238,50 +237,53 @@ class String(models.Model):
     def _compute_counter (self):
 	self.counter = self.counter + 1
 
+    #функция вычисляющая количетсво дней неявок,явок,отработанных часов и т.д.
     @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15')
     @api.depends('hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
     def _compute_days_appear(self):
-	prev = 0
-        for i in self:
-                i.order_line = prev + 1
-                prev = i.order_line
+#	prev = 0
+#        for i in self:
+#                i.order_line = prev + 1
+#                prev = i.order_line
 	for record in self:
-		
-		record.days_absences_sum = 0
-		record.days_absences = " "
-		record.days_appear = "0"
-		record.hours_main = "0.0"
-		record.hours_internal= "0.0"
-		d_abse = {u'В': 0,u'Н': 0,u'Г': 0,u'О': 0,u'Б': 0,u'Р': 0,u'С': 0,u'П': 0,u'К': 0,u'А': 0,u'ВУ': 0,u'ОУ': 0,u'РП': 0,u'Ф': 0,u'НН': 0,u'Дк': 0,u'Сп': 0,u'Об': 0}
+		record.days_absences_sum = 0#количество дней неявок в сумме
+		record.days_absences = " "#строка неявок в формате (код/кол-во;)
+		record.days_appear = "0"#дни явок в сумме
+		record.hours_main = "0.0"#количество основных отработанных часов
+		record.hours_internal= "0.0"#количество внутренних(совместительство) отработанных часов
+	        id_emp_sec=self.pool.get('tabel.daytype').search(self._cr,self._uid,[('nick','!=','')])#получаем ид всех строк из таблице daytype где есть ник
+		model_daytype= self.pool.get('tabel.daytype').browse(self._cr, self._uid, id_emp_sec)
+		d_abse ={}#заполняем словарь из кодов неявок для дальнейшего подсчета
+		for r in model_daytype:
+		    a = r.nick.replace (' ','')
+		    d_abse[a] = 0
 		vidisp = record.id_fcac.vidisp_rn.name
-                vidisp1 = u' Внутренний совместитель'
+                vidisp1 = u' Внутренний совместитель'#если внутренний совместитель то считаются часы не основные а внутренние
 		def sum (a):
 			
 			if a:
 				a=a.replace(' ', '')
-				try:
+				try:#проверяем если в поле число значит считаем часы
 					float(a)
 					float(record.hours_main)
 					float(record.hours_internal)
 					flag = 1
 					for i in range ( 0,  min ( len (vidisp), len (vidisp1) ) ):
 						if vidisp[i] != vidisp1[i] :
-							record.hours_main = str (float(record.hours_main)+ float(a))	               	                                
+							record.hours_main = str (float(record.hours_main)+ float(a))
 							flag =0
 							break	
-					if flag == 1:									
+					if flag == 1:#считаем внутренние
 						record.hours_internal = str (float(record.hours_internal)+ float(a))
 						
-					record.days_appear = str (int(record.days_appear) + 1)
-				except ValueError:
-					d_abse[a]=d_abse[a]+1
-					record.days_absences_sum= record.days_absences_sum+1 
-					record.days_absences = " " 
+					record.days_appear = str (int(record.days_appear) + 1)#в любом случае это явка
+				except ValueError:#если встретили код
+					d_abse[a]=d_abse[a]+1#добавляем в словарь кода 1
+					record.days_absences_sum= record.days_absences_sum+1#добавляем неявку
+					record.days_absences = " "#пересчитываем строку кодов. т.к. может быть добавлен еще код
 					for i in d_abse:
 						if d_abse[i]>0:
-							record.days_absences=record.days_absences+ i+u' '+str(d_abse[i]).decode('utf-8')
-					
-					print "find dont float"
+							record.days_absences=record.days_absences+ i+u'/'+str(d_abse[i]).decode('utf-8')+u'; '
 
 		sum (record.hours1)
                 sum (record.hours2)
@@ -318,13 +320,13 @@ class String(models.Model):
 class Password(models.Model):
 
 	_name = 'tabel.password' 
-
+	#функция для дефаулта юзера (идет во вьюху с валидацией простой подписи)
 	def user(self):
         	return self._uid
 
 	user_id = fields.Many2one('res.users','Пользователь',default = user)
 	password = fields.Char(string="password")
-
+	#перед тем как сохранить пароль берем от него хеш и сохраняем не сам пароль а хеш
 	def create(self, cr, uid, values, context):
 		if  context['state']=='create':
 			context = {}
@@ -339,13 +341,10 @@ class Password(models.Model):
 			vals ['password']=h.hexdigest()
 			id = super(Password, self).create(cr, uid, vals, context=None)
 			return id
-		
-		#super(Password, self).unlink(cr, uid, ids, context)
+
 		id = super(Password, self).create(cr, uid, values)
-		#super(Password, self).unlink(cr, uid, id)
 		return id
-#	
-	
+	#функция проверки существует ли такой пароль у такого юзера в базе (проверка идет похешу)	
 	def validation(self, cr, uid, values, context):
 		code_private=context['password']
 		user_id=context['user_id']
@@ -384,8 +383,8 @@ class Password(models.Model):
 
 class Tabel(models.Model):
     _name = 'tabel.tabel'
-#    _rec_name = 'id_ank'
-#    _order = 'id_ank'
+    #_rec_name = 'id_ank'
+    #_order = 'id_ank'
 
     #первый день текущего месяца
     def time_first (self):
@@ -452,26 +451,24 @@ class Tabel(models.Model):
 
     @api.one
     def action_tabel(self):
-#	user = self.env['res.users'].browse(self._uid)
-#	raise exceptions.ValidationError("user.ids_division.id="+str(user.ids_division) +"|self.id_division.id="+str(self.id_division.id)+"user.ids_divisio.id="+str(user.ids_divisio))
 	#улучшить парсер т.кid_division дает не ид а строку типа tabel.division(40881,)
 	def is_mychar(x):
 		return x.isdigit()
 	d="".join((x for x in str(self.id_division) if is_mychar(x)))
-#	Нужно сделать через промежуточную таблицу апдейт
+
+	#Нужно сделать через промежуточную таблицу апдейт
  	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+d+"   )  ;")
 
     @api.one 
     def action_tabell(self):
 	#Обновляем данные по ставкам, в текущем табеле
 	
-	
 	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
 	
-        #тоже самое с часами        #тоже самое с часами
+        #тоже самое с часами
         self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, HRTYPE_RN int, HOURQNT double precision, DATE date);")
         a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
-#        self.directory=str(len(self))
+	#self.directory=str(len(self))
         for i in self.ids_string:
                 def is_mychar(x):
                         return x.isdigit()
@@ -493,10 +490,10 @@ class Tabel(models.Model):
 
 
 
-	#Обновляем данные по дням, создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем часам и обновляем
+	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем часам и обновляем
 	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, DAYTYPE_RN int, DATE date);") 
 	a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
-#	self.directory=str(len(self))
+	#self.directory=str(len(self))
 	for i in self.ids_string:
 		def is_mychar(x):
 			return x.isdigit()
@@ -509,6 +506,9 @@ class Tabel(models.Model):
 		i+=1	
 	self._cr.execute("DROP TABLE tmp_z;")
 
+
+
+    #функция start workflow
     @api.one
     def action_draft(self):
         self.state = 'draft'
