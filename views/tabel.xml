@@ -94,14 +94,15 @@
 	<field name="arch" type="xml">           
 	<form string="Tabel Form">
 	     <header>
-			<button name="action_tabel" type="object" string="Импорт сотрудников" groups="Tabel.group_import"   states="draft" />	
-		   	<button name="action_tabell" type="object"  string="Импорт часов и ставок" groups="Tabel.group_import"  attrs="{'invisible':[('state','!=','draft')],}" />
+	    <!--	<button name="action_tabel" type="object" string="Импорт сотрудников" groups="Tabel.group_import"   states="draft" />	-->
+		   	<button name="action_tabell" type="object"  string="Импорт данных из Паруса" groups="Tabel.group_import"  attrs="{'invisible':[('state','!=','draft')],}" class="oe_kanban_action_button"  />
 			<button 
 				name="%(model_action_id)d" 
 				type="action" 
 				string="Аннулировать" 
 				context="{'tabel_id':active_id,'state':'draft'}"
 				states="confirmed,confirmed2"
+				class="oe_highlight"
 			/>
 <!--
 			<button
@@ -117,6 +118,8 @@
 				string="Подписать(Табельщик)" 
 				context="{'tabel_id':active_id,'state':'confirm'}"
 				states="draft"
+				class="oe_group_button"
+				
 			/>
 			<button 
 				name="%(model_action_id)d" 
@@ -133,14 +136,16 @@
 				states="confirmed2"
 			/>
 		<!--	<field name="state" widget="statusbar" statusbar_colors='{"draft":"red","done":"green","confirmed":"green" }'/> -->
+
 			<field name="state" widget="statusbar"/> 
 	    </header>
+
 	    <group> 
-        	<field name="num_tabel" string="Номер табеля"/>
+        <!--	<field name="num_tabel" string="Номер табеля"/> -->
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
 		<field name="id_ank" string="Табельщик"/>
-		<field name="id_division" string="Подразделение" />
+	-	<field name="id_division" string="Подразделение" />
 	    </group>
 	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
@@ -158,7 +163,7 @@
 	    <field name="time_start_t" string="Дата начала табеля"/>
 	    <field name="time_end_t" string="Дата конца табеля"/>
 	    <field name="signature_tabel" string="Подпись"/>
-	    <field name="num_tabel" string="Номер табеля"/>
+<!--	    <field name="num_tabel" string="Номер табеля"/> -->
 	    <field name="ids_string" string="Количество записей"/>
 	    <field name="state" string="Статус"/>
 	</tree>

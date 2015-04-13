@@ -16,10 +16,15 @@ class res_users(osv.osv):
 	result = {}
 	#выбираем текущего юзера
 	user = self.browse(cr,uid,ids,context=context)
-	#вытаскиваем его имя + пробел вначале такой формат у паруса
+	#вытаскиваем его имя + пробел вначале такой формат у паруса, для Ldap  фио в другом порядке
+	fio = user.name.split(' ')
+	surname = fio [0]
+	firstname = fio [1]
+	secondname = fio [2]
 	username= u' ' + user.name
+	reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
 	#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
-        id_person=self.pool.get('tabel.person').search(cr,uid,[('full_name','=',username)])
+        id_person=self.pool.get('tabel.person').search(cr,uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
 	#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
 	for i in id_person:
 		id_ank=self.pool.get('tabel.ank').search(cr,uid,[('orgbase_rn.id','=',i)])
@@ -383,6 +388,7 @@ class Password(models.Model):
 
 class Tabel(models.Model):
     _name = 'tabel.tabel'
+    
     #_rec_name = 'id_ank'
     #_order = 'id_ank'
 
@@ -403,9 +409,15 @@ class Tabel(models.Model):
 		user = self.env['res.users'].browse(self._uid)
 		#вытаскиваем его имя + пробел вначале такой формат у паруса
 		#raise exceptions.ValidationError(user.group_ids)
+		fio = user.name.split(' ')
+		surname = fio [0]
+		firstname = fio [1]
+		secondname = fio [2]
 		username= u' ' + user.name
+		reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
+#		raise exceptions.ValidationError(reverse_username)
 		#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
-	        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,[('full_name','=',username)])
+	        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
 		#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
 		for i in id_person:
 			id_ank=self.pool.get('tabel.ank').search(self._cr,self._uid,[('orgbase_rn.id','=',i)])
@@ -417,9 +429,14 @@ class Tabel(models.Model):
 		#выбираем текущего юзера
 		user = self.env['res.users'].browse(self._uid)
 		#вытаскиваем его имя + пробел вначале такой формат у паруса
+		fio = user.name.split(' ')
+		surname = fio [0]
+		firstname = fio [1]
+		secondname = fio [2]
 		username= u' ' + user.name
+		reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
 		#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
-	        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,[('full_name','=',username)])
+	        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
 		#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
 		for i in id_person:
 			id_ank=self.pool.get('tabel.ank').search(self._cr,self._uid,[('orgbase_rn.id','=',i)])
@@ -432,9 +449,9 @@ class Tabel(models.Model):
 				return id_div.subdiv_rn
 
 
-
+    name = fields.Char ( string = "имя",default = "КГБУЗ ККОКБ им. П.Г. Макарова" )
     signature_tabel =  fields.Char(string="signature")
-    num_tabel = fields.Integer(string="number of Tabel", required=True)
+    num_tabel = fields.Integer(string="number of Tabel")
     time_start_t = fields.Date(string="time start of tabel", default = time_first)
     time_end_t = fields.Date(string="time end of tabel", default = time_last)
     id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default, order ='surname')
@@ -449,18 +466,25 @@ class Tabel(models.Model):
 
 
 
-    @api.one
-    def action_tabel(self):
-	#улучшить парсер т.кid_division дает не ид а строку типа tabel.division(40881,)
+#    @api.one
+#    def action_tabel(self):
+#	#улучшить парсер т.кid_division дает не ид а строку типа tabel.division(40881,)
+#	def is_mychar(x):
+#		return x.isdigit()
+#	d="".join((x for x in str(self.id_division) if is_mychar(x)))
+#
+#	#Нужно сделать через промежуточную таблицу апдейт
+#	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+d+"   )  ;")
+
+    @api.one 
+    def action_tabell(self):
 	def is_mychar(x):
 		return x.isdigit()
 	d="".join((x for x in str(self.id_division) if is_mychar(x)))
 
 	#Нужно сделать через промежуточную таблицу апдейт
- 	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+d+"   )  ;")
+	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+d+"   )  ;")
 
-    @api.one 
-    def action_tabell(self):
 	#Обновляем данные по ставкам, в текущем табеле
 	
 	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
