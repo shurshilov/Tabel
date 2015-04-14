@@ -39,7 +39,7 @@
 
 <!--	BOSS INF -->
 	<record id="bos3" model="ir.rule">
-            <field name="name">Нач. отдела инф. подписывать только своего отдела и статус 'confirmed'</field>
+            <field name="name">Нач. отдела подписывать только своего отдела и статус 'confirmed'</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('boss_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -47,12 +47,12 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [ ('state','not in',['draft','confirmed2','done']),('id_division','in',[346,375])  ]
+                [ ('state','not in',['draft','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division]) ]
             </field>
         </record>
 
 	<record id="bos2" model="ir.rule">
-            <field name="name">Нач. отдела инф. видеть все табели своего отдела</field>
+            <field name="name">Нач. отдела видеть все табели своего отдела</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('boss_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -60,7 +60,7 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [ ('state','in',['draft','confirmed2','done']),('id_division','in',[346,375]) ]
+                [ ('state','in',['draft','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division]) ]
             </field>
         </record>
 

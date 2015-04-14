@@ -144,8 +144,9 @@
         <!--	<field name="num_tabel" string="Номер табеля"/> -->
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик"/>
-	-	<field name="id_division" string="Подразделение" />
+		<field name="id_ank" string="Табельщик" readonly= "True"/>
+	-	<field name="id_division" string="Подразделение" readonly= "True"/>
+		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
 	    </group>
 	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
@@ -159,11 +160,16 @@
 	<field name="arch" type="xml">
 	<tree string="Tabel List">
 <!--	    <field name="id"/>  -->
-	    <field name="id_ank" string="Табельщик"/>
+	    <field name="id_ank" string="Подпись табельщика"/>
+	    <field name="ank_signature_boss" string="Подпись начальства"/>
+	    <field name="ank_signature_accountant" string="Подпись бухгалтера"/>
+
 	    <field name="time_start_t" string="Дата начала табеля"/>
 	    <field name="time_end_t" string="Дата конца табеля"/>
-	    <field name="signature_tabel" string="Подпись"/>
-<!--	    <field name="num_tabel" string="Номер табеля"/> -->
+	    <field name="signature_tabel" string="Подпись1"/>
+	    <field name="signature_boss" string="Подпись2"/>
+	    <field name="signature_accountant" string="Подпись3"/>
+<!--	    <field name="num_tabel" string="Номер табеля"/>  -->
 	    <field name="ids_string" string="Количество записей"/>
 	    <field name="state" string="Статус"/>
 	</tree>

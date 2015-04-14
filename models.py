@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
+import compute_hash
 import time
 import hashlib
 import openerp
@@ -11,32 +12,32 @@ import datetime
 class res_users(osv.osv):
     _inherit='res.users'
     _description = ''
-
     def _get_emp_ids(self, cr, uid, ids, field_name, args, context=None):
 	result = {}
-	#выбираем текущего юзера
-	user = self.browse(cr,uid,ids,context=context)
-	#вытаскиваем его имя + пробел вначале такой формат у паруса, для Ldap  фио в другом порядке
-	fio = user.name.split(' ')
-	surname = fio [0]
-	firstname = fio [1]
-	secondname = fio [2]
-	username= u' ' + user.name
-	reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
-	#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
-        id_person=self.pool.get('tabel.person').search(cr,uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
-	#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
-	for i in id_person:
-		id_ank=self.pool.get('tabel.ank').search(cr,uid,[('orgbase_rn.id','=',i)])
-		#ищем текущий лицевой счет сотрудника
-		for k in id_ank:
-		    id_fcac=self.pool.get('tabel.fcac').search(cr,uid,[('ank_rn.id','=',k),('enddate','=',datetime.date(8888, 12, 31))])
-		    #далее из модели берем ид отдела
-		    for j in id_fcac:
-			id_div = self.pool.get('tabel.fcac').browse(cr, uid, j)
-			mas = id_div.subdiv_rn
-			result[user.id]= id_div.subdiv_rn.id
-			return result
+	for user in self.browse(cr, uid, ids, context=context):
+		#выбираем текущего юзера
+		user = self.browse(cr,uid,ids,context=context)
+		#вытаскиваем его имя + пробел вначале такой формат у паруса, для Ldap  фио в другом порядке
+		fio = user.name.split(' ')
+		surname = fio [0]
+		firstname = fio [1]
+		secondname = fio [2]
+		username= u' ' + user.name
+		reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
+		#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
+	        id_person=self.pool.get('tabel.person').search(cr,uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
+		#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
+		for i in id_person:
+			id_ank=self.pool.get('tabel.ank').search(cr,uid,[('orgbase_rn.id','=',i)])
+			#ищем текущий лицевой счет сотрудника
+			for k in id_ank:
+			    id_fcac=self.pool.get('tabel.fcac').search(cr,uid,[('ank_rn.id','=',k),('enddate','=',datetime.date(8888, 12, 31))])
+			    #далее из модели берем ид отдела
+			    for j in id_fcac:
+				id_div = self.pool.get('tabel.fcac').browse(cr, uid, j)
+				mas = id_div.subdiv_rn
+				result[user.id]= id_div.subdiv_rn.id
+				return result
     _columns = {
 	'ids_division': openerp.osv.fields.function(_get_emp_ids,method=True,string='Сотрудник',type='many2one',store=False,relation='tabel.division',help='Employee'),
 	}
@@ -233,7 +234,7 @@ class String(models.Model):
     hours_holiday = fields.Char(string="Пра")
     hours_internal = fields.Char(string="Вну",compute='_compute_days_appear')
     days_absences = fields.Char (string="Неяв")
-    days_absences_sum = fields.Integer (string="Сум")
+    days_absences_sum = fields.Integer (string="Сум")	
     counter = fields.Integer (string = "Счет", default = 0)
 
 #   поле используемое для вычисления изменений в строке, если они есть то counter > 0
@@ -405,42 +406,31 @@ class Tabel(models.Model):
 	return now_date
 
     def ank_default (self):
-		#выбираем текущего юзера
-		user = self.env['res.users'].browse(self._uid)
-		#вытаскиваем его имя + пробел вначале такой формат у паруса
-		#raise exceptions.ValidationError(user.group_ids)
-		fio = user.name.split(' ')
-		surname = fio [0]
-		firstname = fio [1]
-		secondname = fio [2]
-		username= u' ' + user.name
-		reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
-#		raise exceptions.ValidationError(reverse_username)
-		#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
-	        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
-		#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
-		for i in id_person:
+	for user in self.env['res.users'].browse(self._uid):
+	    fio = user.name.split(' ')
+	    surname = fio [0]
+	    firstname = fio [1]
+	    secondname = fio [2]
+	    username= u' ' + user.name
+	    reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
+	    id_person=self.pool.get('tabel.person').search(self._cr,self._uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
+	    for i in id_person:
 			id_ank=self.pool.get('tabel.ank').search(self._cr,self._uid,[('orgbase_rn.id','=',i)])
 			#как только нашли ид ank то сразу возвращаем его
 			for j in id_ank:
 				    return j
 
     def div_default (self):
-		#выбираем текущего юзера
-		user = self.env['res.users'].browse(self._uid)
-		#вытаскиваем его имя + пробел вначале такой формат у паруса
-		fio = user.name.split(' ')
-		surname = fio [0]
-		firstname = fio [1]
-		secondname = fio [2]
-		username= u' ' + user.name
-		reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
-		#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
-	        id_person=self.pool.get('tabel.person').search(self._cr,self._uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
-		#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
-		for i in id_person:
+	for user in self.env['res.users'].browse(self._uid):
+	    fio = user.name.split(' ')
+	    surname = fio [0]
+	    firstname = fio [1]
+	    secondname = fio [2]
+	    username= u' ' + user.name
+	    reverse_username = u' ' + fio[2]+u' '+fio[0]+u' '+fio[1]
+	    id_person=self.pool.get('tabel.person').search(self._cr,self._uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
+	    for i in id_person:
 			id_ank=self.pool.get('tabel.ank').search(self._cr,self._uid,[('orgbase_rn.id','=',i)])
-			#ищем текущий лицевой счет сотрудника
 			for k in id_ank:
 			    id_fcac=self.pool.get('tabel.fcac').search(self._cr,self._uid,[('ank_rn.id','=',k),('enddate','=',datetime.date(8888, 12, 31))])
 			    #далее из модели берем ид отдела
@@ -449,8 +439,16 @@ class Tabel(models.Model):
 				return id_div.subdiv_rn
 
 
-    name = fields.Char ( string = "имя",default = "КГБУЗ ККОКБ им. П.Г. Макарова" )
-    signature_tabel =  fields.Char(string="signature")
+    name = fields.Char ('КГБУЗ ККОКБ им. П.Г. Макарова',default="КГБУЗ ККОКБ им. П.Г. Макарова" )
+
+    signature_tabel      =  fields.Char(string="signature tabel")
+    signature_boss       =  fields.Char(string="signature boss")
+    signature_accountant =  fields.Char(string="signature accountant")
+    check_signature = fields.Boolean(string="проверка подписи",default=True)#для пользователей сырой документ считается валидным.
+#    ank_signature_tabel      = fields.Many2one('tabel.ank', string="имя сотрудника подписи (табельщик)")
+    ank_signature_boss       = fields.Many2one('res.users', string="имя сотрудника подписи (нач.отдела)")
+    ank_signature_accountant = fields.Many2one('res.users', string="имя сотрудника подписи (бухгалтер)")
+
     num_tabel = fields.Integer(string="number of Tabel")
     time_start_t = fields.Date(string="time start of tabel", default = time_first)
     time_end_t = fields.Date(string="time end of tabel", default = time_last)
@@ -530,96 +528,58 @@ class Tabel(models.Model):
 		i+=1	
 	self._cr.execute("DROP TABLE tmp_z;")
 
-
-
     #функция start workflow
     @api.one
     def action_draft(self):
+	self.signature_boss = ""
+	self.signature_tabel = ""
+	self.signature_accountant = ""
+	self.ank_signature_boss = 0
+	self.ank_signature_accountant = 0
         self.state = 'draft'
 
     #Функция хеширования табеля, хэширует весь документ(т.е. каждое поле)
     @api.one
     def action_confirm(self):
-	h = hashlib.sha256()
-	h.update(str(self.num_tabel))
-	h.update(self.time_start_t)
-	h.update(self.time_end_t)
-	h.update(str(self.id_ank))
-	h.update(str(self.id_division))
-	for r in self.ids_string:
-		if r.hours1:
-			h.update(r.hours1.encode('utf8'))
-                if r.hours2:
-                        h.update(r.hours2.encode('utf8'))
-                if r.hours3:
-                        h.update(r.hours3.encode('utf8'))
-                if r.hours4:
-                        h.update(r.hours4.encode('utf8'))
-                if r.hours5:
-                        h.update(r.hours5.encode('utf8'))
-                if r.hours6:
-                        h.update(r.hours6.encode('utf8'))
-                if r.hours7:
-                        h.update(r.hours7.encode('utf8'))
-                if r.hours8:
-                        h.update(r.hours8.encode('utf8'))
-                if r.hours9:
-                        h.update(r.hours9.encode('utf8'))
-                if r.hours10:
-                        h.update(r.hours10.encode('utf8'))
-                if r.hours11:
-                        h.update(r.hours11.encode('utf8'))
-                if r.hours12:
-                        h.update(r.hours12.encode('utf8'))
-                if r.hours13:
-                        h.update(r.hours13.encode('utf8'))
-                if r.hours14:
-                        h.update(r.hours14.encode('utf8'))
-                if r.hours15:
-                        h.update(r.hours15.encode('utf8'))
-                if r.hours16:
-                        h.update(r.hours16.encode('utf8'))
-                if r.hours17:
-                        h.update(r.hours17.encode('utf8'))
-                if r.hours18:
-                        h.update(r.hours18.encode('utf8'))
-                if r.hours19:
-                        h.update(r.hours19.encode('utf8'))
-                if r.hours20:
-                        h.update(r.hours20.encode('utf8'))
-                if r.hours21:
-                        h.update(r.hours21.encode('utf8'))
-                if r.hours22:
-                        h.update(r.hours22.encode('utf8'))
-                if r.hours23:
-                        h.update(r.hours23.encode('utf8'))
-                if r.hours24:
-                        h.update(r.hours24.encode('utf8'))
-                if r.hours25:
-                        h.update(r.hours25.encode('utf8'))
-                if r.hours26:
-                        h.update(r.hours26.encode('utf8'))
-                if r.hours27:
-                        h.update(r.hours27.encode('utf8'))
-                if r.hours28:
-                        h.update(r.hours28.encode('utf8'))
-                if r.hours29:
-                        h.update(r.hours29.encode('utf8'))
-                if r.hours30:
-                        h.update(r.hours30.encode('utf8'))
-                if r.hours31:
-                        h.update(r.hours31.encode('utf8'))
-
-
-	self.signature_tabel=h.hexdigest()
+	#считаем хеш документа, меняем статус, поле кто подписал(табельщик) уже заполнено автоматически при создании табеля
+	self.signature_tabel = compute_hash.compute_hash(self)
         self.state = 'confirmed'
 
     @api.one
     def action_confirm2(self):
+	if self.signature_tabel != compute_hash.compute_hash(self):
+		self.check_signature = False
+		raise exceptions.ValidationError("Ошибка при валидации подписи нач.отдела")
+
+	#делаем новую подпись на основе старого хеш (валидного) + новый сотрудник
+	h = hashlib.sha256()
+	h.update(self.signature_tabel)
+	self.ank_signature_boss = self._uid
+	h.update(str(self.ank_signature_boss))
+	self.signature_boss =  h.hexdigest()
         self.state = 'confirmed2'
+
     @api.one
     def action_done(self):
+	h = hashlib.sha256()
+	h.update(compute_hash.compute_hash(self))
+	h.update(str(self.ank_signature_boss))
+#	raise exceptions.ValidationError(h.hexdigest()+"|"+self.signature_boss)
+	if self.signature_boss != h.hexdigest():
+		self.check_signature = False
+		raise exceptions.ValidationError("Ошибка при валидации подписи (бухгалтера)")
+
+	#делаем новую подпись на основе старого хеш (валидного) + новый сотрудник
+	h = hashlib.sha256()
+	h.update(self.signature_boss)
+	self.ank_signature_accountant = self._uid
+	h.update(str(self.ank_signature_accountant))
+	self.signature_accountant =  h.hexdigest()
         self.state = 'done'
+
+
+
+
     #Всплывающее окошко валидации
     def validation1(self,cr,uid,ids,context):
         if context is None:
@@ -638,9 +598,6 @@ class Tabel(models.Model):
 	    'res_id': False,
 	    'create':False,
 	}
-#    def action_valid2(self,cr,uid,values,context):
-#	my_model = self.pool.get('tabel.password')
-#	my_model.action_valid(self,cr,uid,values)
 
 
 
