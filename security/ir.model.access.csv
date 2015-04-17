@@ -8,6 +8,8 @@ group_manager_post,admin,model_tabel_post,group_manager,1,1,1,1
 group_manager_person,admin,model_tabel_person,group_manager,1,1,1,1
 group_manager_vidisp,admin,model_tabel_vidisp,group_manager,1,1,1,1
 group_manger_daytype,admin,model_tabel_daytype,group_manager,1,1,0,0
+group_manger_password,admin,model_tabel_password,group_manager,1,1,1,1
+group_manger_temp,admin,model_tabel_temp,group_manager,1,1,1,1
 tabel_tabel,admin,model_tabel_tabel,tabel_division_inf,1,1,1,1
 tabel_string,admin,model_tabel_string,tabel_division_inf,1,1,1,1
 tabel_division,admin,model_tabel_division,tabel_division_inf,1,1,1,1

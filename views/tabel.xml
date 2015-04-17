@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
 <data>
-
     <!-- password tree view-->
     <record model="ir.ui.view" id="password_tree_view">
 	<field name="name">password.tree</field>
 	<field name="model">tabel.password</field>
 	<field name="arch" type="xml">
-	<tree string="Post Tree" >
+	<tree string="Password Tree" >
 	    <field name="user_id"/>
 	    <field name="password" />
 	</tree>
@@ -18,7 +17,7 @@
     <record model="ir.ui.view" id="password_form_view">
 	<field name="name">password.form</field>
 	<field name="model">tabel.password</field>
-	<field name="act_window_id" ref="password2_list_action"/>
+<!--	<field name="act_window_id" ref="password2_list_action"/> -->
 	<field name="arch" type="xml">
 	<form string="Password Form">
 	    <sheet>
@@ -31,10 +30,21 @@
 	</field>
     </record>
 
-    <!-- password validation form-->
+    <!-- temp tree view-->
+    <record model="ir.ui.view" id="temp_tree_view">
+	<field name="name">temp.tree</field>
+	<field name="model">tabel.temp</field>
+	<field name="arch" type="xml">
+	<tree string="Temp Tree" >
+	    <field name="user_id"/>
+	    <field name="password" />
+	</tree>
+	</field>
+    </record> 
+    <!-- temp validation form-->
     <record model="ir.ui.view" id="my_specific_view">
 	<field name="name">password.form2</field>
-	<field name="model">tabel.password</field>
+	<field name="model">tabel.temp</field>
 	<field name="act_window_id" ref="model_action_id"/>
 	<field name="arch" type="xml">
 	<form string="Password Form Validation">
@@ -144,9 +154,10 @@
         <!--	<field name="num_tabel" string="Номер табеля"/> -->
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик" readonly= "True"/>
-	-	<field name="id_division" string="Подразделение" readonly= "True"/>
+		<field name="id_ank" string="Табельщик" />
+	-	<field name="id_division" string="Подразделение" />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
+		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)"/>
 	    </group>
 	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
@@ -160,16 +171,16 @@
 	<field name="arch" type="xml">
 	<tree string="Tabel List">
 <!--	    <field name="id"/>  -->
-	    <field name="id_ank" string="Подпись табельщика"/>
-	    <field name="ank_signature_boss" string="Подпись начальства"/>
-	    <field name="ank_signature_accountant" string="Подпись бухгалтера"/>
+	    <field name="id_ank" string="Табельщик"/>
+	    <field name="ank_signature_boss" string="Начальник"/>
+	    <field name="ank_signature_accountant" string="Бухгалтер"/>
 
 	    <field name="time_start_t" string="Дата начала табеля"/>
 	    <field name="time_end_t" string="Дата конца табеля"/>
-	    <field name="signature_tabel" string="Подпись1"/>
+<!--	    <field name="signature_tabel" string="Подпись1"/>
 	    <field name="signature_boss" string="Подпись2"/>
 	    <field name="signature_accountant" string="Подпись3"/>
-<!--	    <field name="num_tabel" string="Номер табеля"/>  -->
+	    <field name="num_tabel" string="Номер табеля"/>  -->
 	    <field name="ids_string" string="Количество записей"/>
 	    <field name="state" string="Статус"/>
 	</tree>
@@ -538,7 +549,7 @@
             <field name="name">String</field>
             <field name="res_model">tabel.string</field>
             <field name="view_type">form</field>
-            <field name="view_mode">form,tree</field>
+            <field name="view_mode">tree,form</field>
 	    <field name="limit">500</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the new string
@@ -658,7 +669,7 @@
             <field name="res_model">tabel.fcacwtd</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-<field name="limit">500</field>
+	    <field name="limit">500</field>
         </record>
 	<!-- window action daytype-->
 	<record model="ir.actions.act_window" id="daytype_list_action">
@@ -667,29 +678,29 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-        <!-- window action password OFF-->
-<!--        <record model="ir.actions.act_window" id="password_list_action">
-            <field name="name">Password</field>
-            <field name="res_model">tabel.password</field>
+
+	<!-- window action temp-->
+	<record model="ir.actions.act_window" id="temp_list_action">
+            <field name="name">Temp</field>
+            <field name="res_model">tabel.temp</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="password_form_view"/>
-            <field name="context">{'state':'create'}</field>
-        </record>-->
+        </record>
+
         <!-- window action passwd2-->
         <record model="ir.actions.act_window" id="password2_list_action">
             <field name="name">Password2</field>
             <field name="res_model">tabel.password</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-	    <field name="view_id" ref="password_form_view"/>
+	    <field name="view_id" ref="password_tree_view"/>
 	    <field name="context">{'state':'create'}</field>
 
         </record>
         <record id="model_action_id" model="ir.actions.act_window">
                 <field name="name">Валидация пароля</field>
                 <field name="type">ir.actions.act_window</field> 
-                <field name="res_model">tabel.password</field>
+                <field name="res_model">tabel.temp</field>
                 <field name="view_type">form</field>
                 <field name="view_mode">form</field>
 <!--                <field name="search_view_id" ref="view_password_search"/> -->
@@ -748,6 +759,10 @@
         <menuitem id="post_menu" name="Должности"
                   parent="tabel_menu_settings"
                   action="post_list_action"/>
+
+        <menuitem id="temp_menu" name="временная таблица паролей"
+                  parent="tabel_menu_settings"
+                  action="temp_list_action"/>
 
         <menuitem id="string_menu" name="Строки табелей"
                   parent="tabel_menu_settings"
