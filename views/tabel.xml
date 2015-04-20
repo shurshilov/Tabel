@@ -104,8 +104,9 @@
 	<field name="arch" type="xml">           
 	<form string="Tabel Form">
 	     <header>
-	    <!--	<button name="action_tabel" type="object" string="Импорт сотрудников" groups="Tabel.group_import"   states="draft" />	-->
+	    <!--	<button name="action_tabel" type="object" string="Импорт сотрудников" groups="Tabel.group_import"   states="draft" />-->
 		   	<button name="action_tabell" type="object"  string="Импорт данных из Паруса" groups="Tabel.group_import"  attrs="{'invisible':[('state','!=','draft')],}" class="oe_kanban_action_button"  />
+			<button name="time_button" type="object" string="Формат (часы/десятые)" colors="red:format == True"/>
 			<button 
 				name="%(model_action_id)d" 
 				type="action" 
@@ -154,10 +155,10 @@
         <!--	<field name="num_tabel" string="Номер табеля"/> -->
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик" />
-	-	<field name="id_division" string="Подразделение" />
+		<field name="id_ank" string="Табельщик"  />
+	-	<field name="id_division" string="Подразделение"  />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
-		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)"/>
+		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True"/> 
 	    </group>
 	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
@@ -243,7 +244,9 @@
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
 	<tree string="String Tree" colors="red:counter != 0"  editable="bottom" toolbar="1" >
-		<field name="id_fcac" options="{'limit': 200}" string="ФИО,должность,л/c"/>
+					<field name="id_fcac" options="{'limit': 200}" string="ФИО,должность,л/c"/>
+					<field name="id_post"/>
+					<field name="id_vidisp"/>
 					<field name="stqnt" string="кол-во ст."/>
 					<field name="hours1"/>
 					<field name="hours2"/>
@@ -284,6 +287,7 @@
 					<field name="days_absences"/>
 					<field name="days_absences_sum"/> 
 					<field name="counter" invisible="True"/> 
+					<field name="percent"/>
 					
 	</tree>
 	</field>
