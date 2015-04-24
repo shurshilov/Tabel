@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
+import math
 import compute_hash
 import time_format
 import time
@@ -136,7 +137,7 @@ class Fcacwth(models.Model):
 	_name = 'tabel.fcacwth'
 	_rec_name = 'hourqnt'
 
-	fcac_rn = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id", index = True)
+	fcac_rn = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
 	hrtype_rn = fields.Integer(string="HRTYPE_RN")
 	hourqnt = fields.Float(string="chasi hourqnt")
 	date =  fields.Date(string="time of hour tabel", index = True)
@@ -201,11 +202,12 @@ class Fcac(models.Model):
 	_rec_name = 'ank_rn'
 	_order = 'ank_rn'
 	ank_rn = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_rn")
-	post_rn = fields.Many2one('tabel.post',  ondelete='cascade', string="post_rn")
+	post_rn = fields.Many2one('tabel.post',  ondelete='cascade', string="post_rn",index=True)
 	subdiv_rn = fields.Many2one('tabel.division',  ondelete='cascade', string="subdiv_rn")
-	vidisp_rn = fields.Many2one('tabel.vidisp', ondelete='cascade', string="vidisp_rn")
+	vidisp_rn = fields.Many2one('tabel.vidisp', ondelete='cascade', string="vidisp_rn",index =True)
 	startdate = fields.Date(string="time begin of fcac")
 	enddate = fields.Date(string="time end of fcac")
+#	stqnt = fields.One2many ('tabel.fcacch',)
 	def name_get(self, cr, uid, ids, context):         
         	if not len(ids):
         	    return []
@@ -240,8 +242,8 @@ class String(models.Model):
 #    _defaults = {'order_line': lambda obj, cr, uid, context: '/',}
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
     id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id")
-    id_post = fields.Char(string="должность",store=True,related='id_fcac.post_rn.name')
-    id_vidisp = fields.Char(string="вид л.с.",store=True,related='id_fcac.vidisp_rn.code')
+    id_post = fields.Char(string="должность")
+    id_vidisp = fields.Char(string="вид л.с.")
     stqnt = fields.Float(string="ставка")
 
     hours1 = fields.Char(string="1")
@@ -286,17 +288,16 @@ class String(models.Model):
     counter = fields.Integer (string = "Счет", default = 0)
     percent = fields.Char (string = "Прц")
 
-    @api.depends('id_fcac')
-    @api.one
-    def _compute_some(self):
-	self.id_post=self.id_fcac.post_rn
-	self.id_vidisp=self.id_fcac.vidisp_rn
 #   поле используемое для вычисления изменений в строке, если они есть то counter > 0
     @api.onchange('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31','stqnt','id_fcac','hours_night','hours_holiday')
     @api.one
     def _compute_counter (self):
 	self.counter = self.counter + 1
-
+    @api.one
+    @api.depends('id_fcac')
+    def _compute_post_vidisp (self):
+	self.id_post=self.id_fcac.post_rn.name
+	self.id_vidisp=self.id_fcac.vidisp_rn.code
     #функция вычисляющая количетсво дней неявок,явок,отработанных часов и т.д.
     @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15')
     @api.depends('hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
@@ -304,13 +305,12 @@ class String(models.Model):
 
 	def floatToTime (a):#перевод из десятичного в часы:минуты
 	    a = float(a)*60
-	    a = int (a)
-	    minutes = int (a%60)
-	    hours = int (a/60)
+	    minutes = a%60
+	    hours =  a/60
 	    if minutes < 10:
-		return str(hours)+":0"+str(minutes)
+		return str(int(hours))+":0"+str(int(round (minutes)))
 	    else:
-		return str(hours)+":"+str(minutes)
+		return str(int(hours))+":"+str(int(round(minutes)))
 
 	def timeToFloat (a):#перевод из часы:минуты в десятичное
 	    time= a.split(':')
@@ -318,7 +318,15 @@ class String(models.Model):
 	    minutes = float (time[1])
 	    t = hours*60.0 + minutes
 	    t = t/60
-	    return round(t,2)
+	    return round(t,3)
+
+	def timeToFloat2 (a):#перевод из часы:минуты в десятичное
+	    time= a.split(',')
+	    hours = float (time[0])
+	    minutes = float (time[1])
+	    t = hours*60.0 + minutes*6.0
+	    t = t/60
+	    return round(t,3)
 
         id_emp_sec=self.pool.get('tabel.daytype').search(self._cr,self._uid,[('nick','!=','')])#получаем ид всех строк из таблице daytype где есть ник
 	model_daytype= self.pool.get('tabel.daytype').browse(self._cr, self._uid, id_emp_sec)
@@ -336,20 +344,25 @@ class String(models.Model):
 		    a = r.nick.replace (' ','')
 		    d_abse[a] = 0
 		vidisp = record.id_fcac.vidisp_rn.name
-                vidisp1 = u' Внутренний совместитель'#если внутренний совместитель то считаются часы не основные а внутренние
-		current_model = self.pool.get('tabel.tabel').browse(self._cr, self._uid, record.id_tabel.id,self._context)
-		global flag#флаг который показывает какие часы считать внутренние или основные
-		flag =1 
-		for i in range ( 0,  min ( len (vidisp), len (vidisp1) ) ):
-			if vidisp[i] != vidisp1[i] :
-				flag =0
-				break
-		def summ (a):
-		    global flag
-		    flagEx = False
-		    if a:
-			    if a.find(':')>=0:
-				a = timeToFloat(a)
+		if vidisp:
+            	    vidisp1 = u' Внутренний совместитель'#если внутренний совместитель то считаются часы не основные а внутренние
+		    current_model = self.pool.get('tabel.tabel').browse(self._cr, self._uid, record.id_tabel.id,self._context)
+		    global flag#флаг который показывает какие часы считать внутренние или основные
+		    flag =1 
+		    for i in range ( 0,  min ( len (vidisp), len (vidisp1) ) ):
+			    if vidisp[i] != vidisp1[i] :
+				    flag =0
+				    break
+		    def summ (a):
+			global flag
+			flagEx = False
+			if a:
+			    if a.find(':')>=0 or a.find(',')>=0:
+				if a.find(':')>=0:
+				    a =timeToFloat(a)
+				else:
+				    a = timeToFloat2(a)
+			    
 			    try:#проверяем если в поле число значит считаем часы
 				float(a)
 			    except ValueError:#если встретили код
@@ -385,45 +398,45 @@ class String(models.Model):
 
 
 
-		summ (record.hours1)
-                summ (record.hours2)
-                summ (record.hours3)
-                summ (record.hours4)
-                summ (record.hours5)
-		summ (record.hours6)
-                summ (record.hours7)
-                summ (record.hours8)
-                summ (record.hours9)
-                summ (record.hours10)
-                summ (record.hours11)
-                summ (record.hours12)
-                summ (record.hours13)
-                summ (record.hours14)
-                summ (record.hours15)
-                summ (record.hours16)
-                summ (record.hours17)
-                summ (record.hours18)
-                summ (record.hours19)
-                summ (record.hours20)
-                summ (record.hours21)
-                summ (record.hours22)
-                summ (record.hours23)
-                summ (record.hours24)
-                summ (record.hours25)
-                summ (record.hours26)
-                summ (record.hours27)
-                summ (record.hours28)
-                summ (record.hours29)
-                summ (record.hours30)
-		summ (record.hours31)
+		    summ (record.hours1)
+            	    summ (record.hours2)
+            	    summ (record.hours3)
+            	    summ (record.hours4)
+            	    summ (record.hours5)
+		    summ (record.hours6)
+            	    summ (record.hours7)
+            	    summ (record.hours8)
+            	    summ (record.hours9)
+            	    summ (record.hours10)
+            	    summ (record.hours11)
+            	    summ (record.hours12)
+            	    summ (record.hours13)
+            	    summ (record.hours14)
+            	    summ (record.hours15)
+            	    summ (record.hours16)
+            	    summ (record.hours17)
+            	    summ (record.hours18)
+            	    summ (record.hours19)
+            	    summ (record.hours20)
+            	    summ (record.hours21)
+            	    summ (record.hours22)
+            	    summ (record.hours23)
+            	    summ (record.hours24)
+            	    summ (record.hours25)
+            	    summ (record.hours26)
+            	    summ (record.hours27)
+            	    summ (record.hours28)
+            	    summ (record.hours29)
+            	    summ (record.hours30)
+		    summ (record.hours31)
 
-		if record.days_absences_sum == "0":
+		    if record.days_absences_sum == "0":
 			    record.days_absences_sum = " "
-		if record.days_appear == "0":
+		    if record.days_appear == "0":
 			     record.days_appear = " "
-		if record.hours_main == "0.0":
+		    if record.hours_main == "0.0":
 			    record.hours_main = " "
-		if record.hours_internal == "0.0":
+		    if record.hours_internal == "0.0":
 			    record.hours_internal = " "
 class Password(models.Model):
 
@@ -543,13 +556,19 @@ class Tabel(models.Model):
 
     @api.one 
     def action_tabell(self):
+#	self._cr.execute("ALTER TABLE tabel_string DROP COLUMN id_post;")
+#	self._cr.execute("ALTER TABLE tabel_string ADD COLUMN id_post text;")
+#	self._cr.execute("ALTER TABLE tabel_string DROP COLUMN id_vidisp;")
 	#Нужно сделать через промежуточную таблицу апдейт
 	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
-
+#	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
 	#Обновляем данные по ставкам, в текущем табеле
 	
 	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
-	
+	#Обновляем должности и вид л.с.
+	self._cr.execute("UPDATE tabel_string SET  id_post = tabel_post.name  FROM tabel_post WHERE  tabel_post.id = (SELECT tabel_fcac.post_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
+	self._cr.execute("UPDATE tabel_string SET  id_vidisp = tabel_vidisp.code  FROM tabel_vidisp WHERE  tabel_vidisp.id = (SELECT tabel_fcac.vidisp_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
+
         #тоже самое с часами
         self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, HRTYPE_RN int, HOURQNT double precision, DATE date);")
         a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
@@ -577,10 +596,12 @@ class Tabel(models.Model):
 		self._cr.execute("INSERT INTO tmp_z (id, fcac_rn, daytype_rn, date) SELECT T.id, T.FCAC_RN, T.DAYTYPE_RN, T.DATE FROM tabel_fcacwtd AS T  WHERE T.FCAC_RN = "+str(i.id_fcac.id)+" and T.date::date <='"+str(self.time_end_t)+"' and T.date::date >= '"+str(self.time_start_t)+"' ;")
 	i = 1
 	while i < 32:
-		self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = P.nick FROM tabel_daytype AS P WHERE P.id =  (SELECT tmp_z.DAYTYPE_RN  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+" and tmp_z.date::date ='"+a.strftime('%Y-%m-%d')+"') ;")
+		self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = P.nick FROM tabel_daytype AS P WHERE P.id   IN (SELECT tmp_z.DAYTYPE_RN  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and "+str(self.id)+" =tabel_string.id_tabel  and tmp_z.date::date ='"+a.strftime('%Y-%m-%d')+"') ;")
 		a+=datetime.timedelta(days=1)
 		i+=1	
 	self._cr.execute("DROP TABLE tmp_z;")
+#	self.format = True
+#	time_format.time_format (self)
 #	if self.format:
 #		self.format = False
 #	else:

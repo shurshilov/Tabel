@@ -3,13 +3,13 @@
 def time_format (self):
 	def floatToTime (a):#перевод из десятичного в часы:минуты
 	    a = float(a)*60
-	    a= int(a)
-	    minutes = int (a%60)
-	    hours = int (a/60)
+#	    a= int(a)
+	    minutes =  a%60
+	    hours =  a/60
 	    if minutes < 10:
-		return str(hours)+":0"+str(minutes)
+		return str(int(hours))+":0"+str(int(round(minutes)))
 	    else:
-		return str(hours)+":"+str(minutes)
+		return str(int(hours))+":"+str(int(round(minutes)))
 
 	def timeToFloat (a):#перевод из часы:минуты в десятичное
 	    time= a.split(':')
@@ -17,13 +17,24 @@ def time_format (self):
 	    minutes = float (time[1])
 	    t = hours*60.0 + minutes
 	    t = t/60
-	    return round(t, 2)
+	    return round(t, 3)
+
+	def timeToFloat2 (a):#перевод из часы:минуты в десятичное
+	    time= a.split(',')
+	    hours = float (time[0])
+	    minutes = float (time[1])
+	    t = hours*60.0 + minutes*6.0
+	    t = t/60
+	    return round(t,3)
 
 	for record in self:
 		def summ (a,cnt,parent):
 		    if a:
-			if a.find(':')>=0:
-			    a = timeToFloat(a)
+			if a.find(':')>=0 or a.find(',')>=0:
+				if a.find(':')>=0:
+				    a =timeToFloat(a)
+				else:
+				    a = timeToFloat2(a)
 			try:#проверяем если в поле число значит считаем часы
 			    float(a)
 #			    if type(inNumber) == float :

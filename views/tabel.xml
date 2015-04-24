@@ -244,7 +244,7 @@
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
 	<tree string="String Tree" colors="red:counter != 0"  editable="bottom" toolbar="1" >
-					<field name="id_fcac" options="{'limit': 200}" string="ФИО,должность,л/c"/>
+					<field name="id_fcac" options="{'limit': 200}" string="ФИО"/>
 					<field name="id_post"/>
 					<field name="id_vidisp"/>
 					<field name="stqnt" string="кол-во ст."/>
