@@ -6,7 +6,7 @@ def time_format (self):
 #	    a= int(a)
 	    minutes =  a%60
 	    hours =  a/60
-	    if minutes < 10:
+	    if int(round(minutes)) < 10:
 		return str(int(hours))+":0"+str(int(round(minutes)))
 	    else:
 		return str(int(hours))+":"+str(int(round(minutes)))

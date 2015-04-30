@@ -150,15 +150,16 @@
 
 			<field name="state" widget="statusbar"/> 
 	    </header>
-
 	    <group> 
+		
         <!--	<field name="num_tabel" string="Номер табеля"/> -->
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
 		<field name="id_ank" string="Табельщик"  />
 	-	<field name="id_division" string="Подразделение"  />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
-		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True"/> 
+		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True"/>
+		<field name="dayall" />
 	    </group>
 	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
@@ -188,51 +189,103 @@
 	</field>
     </record>
 
+    <!-- tabel calendar view -->
+    <record model="ir.ui.view" id="tabel_calendar_view">
+	<field name="name">tabel.calendar</field>
+        <field name="model">tabel.tabel</field>
+	<field name="arch" type="xml">
+	<calendar date_start="time_start_t" date_stop="time_end_t" string="Tasks" color="time_end_t">
+		<!--<field name="time_start_t" string="Дата начала табеля" />-->
+		<field name="time_end_t" string="Дата конца табеля" />
+	</calendar>
+	</field>
+    </record>
+
     <!-- string form view -->
     <record model="ir.ui.view" id="string_form_view">
 	<field name="name">string.form</field>
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
 	<form string="String Form">
-	    <table>
+	    
 		<group>
-		    <field name="id_fcac" string="ФИОб должностьб л/с"/>
-		    <field name="id_tabel"/>
+		<tr>
+		    <td><field name="id_tabel" string="Название организации" readonly= "True"/>
+		    <field name="id_fcac" string="ФИО" readonly= "True"/>
+		    <field name="id_vidisp" string="вид л.с." readonly= "True"/>
+		    <field name="id_post" string="должность" readonly= "True"/>
+		    <field name="stqnt" string="кол-во ст." readonly= "True"/></td>
+		
+		
+		    <td><field name="days_appear" string ="сумма дней"/>
+		    <field name="hours_main" string="Основные часы"/>
+		    <field name="hours_internal" string="Внутренние часы"/>
+		    <field name="days_absences" string="Неявки"/>
+		    <field name="days_absences_sum" string="Сумма Неявок"/> </td>
+		
+		
+		    <td><field name="counter" invisible="True"/>
+		    <field name="percent"/>
+		    <field name="hours_night"/>
+		    <field name="hours_holiday"/></td>
+		</tr>
 		</group>
-			   <tr>		<field name="stqnt" string="кол-во ст."/>
-					<field name="hours1"/>
-					<field name="hours2"/>
-                           		<field name="hours3"/>
-                           		<field name="hours4"/>
-                           		<field name="hours5"/>
-                           		<field name="hours6"/>
-                           		<field name="hours7"/>
-                           		<field name="hours8"/>
-                           		<field name="hours9"/>
-                           		<field name="hours10"/>
-                           		<field name="hours11"/>
-                           		<field name="hours12"/>
-                           		<field name="hours13"/>
-                           		<field name="hours14"/>
-                           		<field name="hours15"/>
-					<field name="hours16"/>
-                           		<field name="hours17"/>
-                           		<field name="hours18"/>
-                           		<field name="hours19"/>
-                           		<field name="hours20"/>
-                           		<field name="hours21"/>
-                           		<field name="hours22"/>
-                           		<field name="hours23"/>
-                           		<field name="hours24"/>
-                           		<field name="hours25"/>
-                           		<field name="hours26"/>
-                           		<field name="hours27"/>
-                           		<field name="hours28"/>
-                           		<field name="hours29"/>
-                           		<field name="hours30"/>
-                           		<field name="hours31"/>
-                                        <field name="days_appear"/>
-			</tr>
+
+		<table>
+			    <tr>
+			    <th>Понедельник</th>
+			    <th>Вторник</th>
+			    <th>Среда</th>
+			    <th>Четверг</th>
+			    <th>Пятница</th>
+			    <th>Суббота</th>
+			    <th>Воскресенье</th>
+			    </tr>
+
+			   <tr>	
+					<td><field name="hours1" /></td>
+					<td><field name="hours2"/></td>
+                           		<td><field name="hours3"/></td>
+                           		<td><field name="hours4"/></td>
+                           		<td><field name="hours5"/></td>
+                           		<td><field name="hours6"/></td>
+                           		<td><field name="hours7"/></td>
+			    </tr>
+			    <tr>
+                           		<td><field name="hours8"/></td>
+                           		<td><field name="hours9"/></td>
+                           		<td><field name="hours10"/></td>
+                           		<td><field name="hours11"/></td>
+                           		<td><field name="hours12"/></td>
+                           		<td><field name="hours13"/></td>
+                           		<td><field name="hours14"/></td>
+			    </tr>
+			    <tr>
+                           		<td><field name="hours15"/></td>
+					<td><field name="hours16"/></td>
+                           		<td><field name="hours17"/></td>
+                           		<td><field name="hours18"/></td>
+                           		<td><field name="hours19"/></td>
+                           		<td><field name="hours20"/></td>
+                           		<td><field name="hours21"/></td>
+			    </tr>
+			    <tr>
+                           		<td><field name="hours22"/></td>
+                           		<td><field name="hours23"/></td>
+                           		<td><field name="hours24"/></td>
+                           		<td><field name="hours25"/></td>
+                           		<td><field name="hours26"/></td>
+                           		<td><field name="hours27"/></td>
+                           		<td><field name="hours28"/></td>
+			    </tr>
+			    <tr>
+                           		<td><field name="hours29"/></td>
+                           		<td><field name="hours30"/></td>
+                           		<td><field name="hours31"/></td>
+			    </tr>
+			    
+		    
+			
 	    </table>
         </form>
         </field>
@@ -243,7 +296,7 @@
 	<field name="name">string.tree</field>
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
-	<tree string="String Tree" colors="red:counter != 0"  editable="bottom" toolbar="1" >
+	<tree string="String Tree" colors="red:counter != 0" editable="bottom"  toolbar="1" >
 					<field name="id_fcac" options="{'limit': 200}" string="ФИО"/>
 					<field name="id_post"/>
 					<field name="id_vidisp"/>
@@ -279,15 +332,16 @@
                            		<field name="hours29"/>
                            		<field name="hours30"/>
                            		<field name="hours31"/>
+					<field name="percent"/>
+					<field name="hours_night"/>
+					<field name="hours_holiday"/>
 					<field name="days_appear"/>
 					<field name="hours_main"/>
 					<field name="hours_internal"/>
-					<field name="hours_night"/>
-					<field name="hours_holiday"/>
 					<field name="days_absences"/>
 					<field name="days_absences_sum"/> 
 					<field name="counter" invisible="True"/> 
-					<field name="percent"/>
+
 					
 	</tree>
 	</field>
@@ -533,6 +587,7 @@
                 <tree string="fcacch Tree" >
 			<field name="id"/>
 			<field name="fcacbs_rn"/>
+			<field name="grrbdc_rn"/>
 			<field name="stqnt"/>
                 </tree>
             </field>
@@ -545,6 +600,51 @@
                 <tree string="Post Tree" >
              		<field name="name"/>
 			<field name="id"/>
+                </tree>
+            </field>
+        </record>
+<!-- grday tree view -->
+     <record model="ir.ui.view" id="grday_tree_view">
+            <field name="name">grday.tree</field>
+            <field name="model">tabel.grday</field>
+            <field name="arch" type="xml">
+                <tree string="Grday Tree" >
+			<field name="id"/>
+			<field name="monthday"/>
+			<field name="hourinday"/>
+			<field name="grmonth_rn"/>
+                </tree>
+            </field>
+        </record>
+<!-- grmonth tree view -->
+     <record model="ir.ui.view" id="grmonth_tree_view">
+            <field name="name">grmonth.tree</field>
+            <field name="model">tabel.grmonth</field>
+            <field name="arch" type="xml">
+                <tree string="Grmonth Tree" >
+			<field name="id"/>
+			<field name="grrbdc_rn"/>
+			<field name="year"/>
+			<field name="month"/>
+			<field name="dayall"/>
+			<field name="hourall"/>
+                </tree>
+            </field>
+        </record>
+<!-- grrbdc tree view -->
+     <record model="ir.ui.view" id="grrbdc_tree_view">
+            <field name="name">grrbdc.tree</field>
+            <field name="model">tabel.grrbdc</field>
+            <field name="arch" type="xml">
+                <tree string="Grrbdc Tree" >
+			<field name="id"/>
+			<field name="code"/>
+			<field name="name"/>
+			<field name="daysmean"/>
+			<field name="hourmean"/>
+			<field name="workweek"/>
+			<field name="daysmin"/>
+			<field name="hourmin"/>
                 </tree>
             </field>
         </record>
@@ -618,6 +718,30 @@
 	<record model="ir.actions.act_window" id="post_list_action">
             <field name="name">Post</field>
             <field name="res_model">tabel.post</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<!-- window action grday-->
+	<record model="ir.actions.act_window" id="grday_list_action">
+            <field name="name">Grday</field>
+            <field name="res_model">tabel.grday</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<!-- window action grmonth-->
+	<record model="ir.actions.act_window" id="grmonth_list_action">
+            <field name="name">Grmonth</field>
+            <field name="res_model">tabel.grmonth</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<!-- window action grrbdc-->
+	<record model="ir.actions.act_window" id="grrbdc_list_action">
+            <field name="name">Grrbdc</field>
+            <field name="res_model">tabel.grrbdc</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -732,39 +856,47 @@
 		  parent="tabel_menu_settings"
                   action="password2_list_action"/> 
 
-        <menuitem id="ank_tabel_menu" name="Ank"
+        <menuitem id="ank_tabel_menu" name="Сотрудники"
 		  parent="tabel_menu_settings"
                   action="ank_list_action"/> 
-        <menuitem id="fcac_tabel_menu" name="Fcac"
+        <menuitem id="fcac_tabel_menu" name="Лицевые счета"
 		  parent="tabel_menu_settings"
                   action="fcac_list_action"/>
-        <menuitem id="person_tabel_menu" name="Person"
+        <menuitem id="person_tabel_menu" name="Персоны(ФИО)"
 		  parent="tabel_menu_settings"
                   action="person_list_action"/>
-        <menuitem id="vidisp_tabel_menu" name="Vidisp"
+        <menuitem id="vidisp_tabel_menu" name="Виды лицевых счетов"
 		  parent="tabel_menu_settings"
                   action="vidisp_list_action"/>
-        <menuitem id="fcacch_tabel_menu" name="Fcacch"
+        <menuitem id="fcacch_tabel_menu" name="Ставки"
 		  parent="tabel_menu_settings"
                   action="fcacch_list_action"/>
-        <menuitem id="fcacwth_tabel_menu" name="Fcacwth"
+        <menuitem id="fcacwth_tabel_menu" name="Отработанные часы"
 		  parent="tabel_menu_settings"
                   action="fcacwth_list_action"/>
-        <menuitem id="fcacwtd_tabel_menu" name="Fcacwtd"
+        <menuitem id="fcacwtd_tabel_menu" name="Отработанные дни"
 		  parent="tabel_menu_settings"
                   action="fcacwtd_list_action"/>
-        <menuitem id="daytype_tabel_menu" name="Daytype"
+        <menuitem id="daytype_tabel_menu" name="Виды неявок"
 		  parent="tabel_menu_settings"
                   action="daytype_list_action"/>
         <menuitem id="division_menu" name="Подразделения"
                   parent="tabel_menu_settings"
                   action="division_list_action"/>
-
+        <menuitem id="grday_menu" name="График дни"
+                  parent="tabel_menu_settings"
+                  action="grday_list_action"/>
+        <menuitem id="grmonth_menu" name="График месяцы"
+                  parent="tabel_menu_settings"
+                  action="grmonth_list_action"/>
+        <menuitem id="grrbdc_menu" name="Графики работы"
+                  parent="tabel_menu_settings"
+                  action="grrbdc_list_action"/>
         <menuitem id="post_menu" name="Должности"
                   parent="tabel_menu_settings"
                   action="post_list_action"/>
 
-        <menuitem id="temp_menu" name="временная таблица паролей"
+        <menuitem id="temp_menu" name="временная таблица"
                   parent="tabel_menu_settings"
                   action="temp_list_action"/>
 

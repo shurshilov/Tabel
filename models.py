@@ -119,7 +119,34 @@ class Temp(models.TransientModel):
                         raise exceptions.ValidationError("Не правильный пароль(Повторите ввод)!")
 
 
+class Grday (models.Model):
+	_name = 'tabel.grday'
+
+	grmonth_rn = fields.Many2one('tabel.grmonth', ondelete='cascade',string="GRMONTH_RN")
+	monthday = fields.Integer(string="MONTHDAY")
+	hourinday = fields.Float(string="HOUR IN DAY")
+
+class Grmonth (models.Model):
+	_name = 'tabel.grmonth'
+	_rec_name = 'grrbdc_rn'
 	
+	grrbdc_rn = fields.Many2one('tabel.grrbdc', ondelete='cascade',string="GRRBDC_RN")
+	year = fields.Integer(string="YAER")
+	month = fields.Integer(string="MONTH")
+	dayall = fields.Integer(string="DAYALL")
+	hourall = fields.Float(string="HOURALL")
+
+class Grrbdc (models.Model):
+	_name = 'tabel.grrbdc'
+
+	code = fields.Char(string="CODE")
+	name = fields.Char(string="NAME")
+	daysmean = fields.Float(string="DAYSMEAN")
+	hourmean = fields.Float(string="HOURMEAN")
+	workweek = fields.Integer(string="WORKWEEK")
+	daysmin = fields.Float(string="DAYSMIN")
+	hourmin = fields.Float(string="HOURMIN")
+
 class Daytype(models.Model):
 	_name = 'tabel.daytype'
 	
@@ -147,6 +174,7 @@ class Fcacch(models.Model):
 	_rec_name = 'stqnt'
 	stqnt = fields.Float(string="stavka stqnt", required=True)
 	fcacbs_rn = fields.Integer(string="FCACBS_RN")
+	grrbdc_rn = fields.Integer(string="GRRBDC_RN")
     
 class Vidisp(models.Model):
 	_name = 'tabel.vidisp'
@@ -307,7 +335,7 @@ class String(models.Model):
 	    a = float(a)*60
 	    minutes = a%60
 	    hours =  a/60
-	    if minutes < 10:
+	    if int(round(minutes)) < 10:
 		return str(int(hours))+":0"+str(int(round (minutes)))
 	    else:
 		return str(int(hours))+":"+str(int(round(minutes)))
@@ -367,13 +395,14 @@ class String(models.Model):
 				float(a)
 			    except ValueError:#если встретили код
 				a=a.replace(' ', '')
-				d_abse[a]=d_abse[a]+1#добавляем в словарь кода 1
-				record.days_absences_sum= str(int(record.days_absences_sum)+1)#добавляем неявку
-				record.days_absences = " "#пересчитываем строку кодов. т.к. может быть добавлен еще код
 				flagEx = True#показываем что уже был посчитан код
-				for i in d_abse:#генерируем строку неявок код/число неявок
-				    if d_abse[i]>0:
-					record.days_absences=record.days_absences+ i+u'/'+str(d_abse[i]).decode('utf-8')+u'; '
+				if a in d_abse:
+				    d_abse[a]=d_abse[a]+1#добавляем в словарь кода 1
+				    record.days_absences_sum= str(int(record.days_absences_sum)+1)#добавляем неявку
+				    record.days_absences = " "#пересчитываем строку кодов. т.к. может быть добавлен еще код
+				    for i in d_abse:#генерируем строку неявок код/число неявок
+					if d_abse[i]>0:
+					    record.days_absences=record.days_absences+ i+u'/'+str(d_abse[i]).decode('utf-8')+u'; '
 
 			    if flagEx==False:#если у нас число то пересчитываем основные или внутренние часы. переводим в числа.
 
@@ -392,7 +421,6 @@ class String(models.Model):
 					record.hours_main = floatToTime (float(record.hours_main)+ float(a))
 				    else:
 			    		record.hours_main = str (float(record.hours_main)+ float(a))
-			    
 				record.days_appear = str (int(record.days_appear) + 1)#в любом случае это явка
 
 
@@ -438,6 +466,9 @@ class String(models.Model):
 			    record.hours_main = " "
 		    if record.hours_internal == "0.0":
 			    record.hours_internal = " "
+		    if record.percent:
+			record.days_appear= " "
+
 class Password(models.Model):
 
 	_name = 'tabel.password' 
@@ -540,6 +571,7 @@ class Tabel(models.Model):
          ('done', "На исполнение"),
     ])
     id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="division_id", required=True,default= div_default)
+    dayall = fields.Integer(string="Количество рабочих дней в месяце")
 
     @api.one
     def time_button (self):
@@ -565,7 +597,33 @@ class Tabel(models.Model):
 	#Обновляем данные по ставкам, в текущем табеле
 	
 	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
-	#Обновляем должности и вид л.с.
+	year =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().year
+	month =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().month
+	id_string=self.pool.get('tabel.string').search(self._cr,self._uid,[('id','in', [(emp.id) for emp in self.ids_string])]   )
+	for i in id_string:
+			string = self.pool.get('tabel.string').browse(self._cr, self._uid, i)
+			id_fcacch=self.pool.get('tabel.fcacch').search(self._cr,self._uid,[('fcacbs_rn','=',string.id_fcac.id)])
+			for j in id_fcacch:
+			    fcacch=string = self.pool.get('tabel.fcacch').browse(self._cr, self._uid, j)
+			    id_grrbdc=self.pool.get('tabel.grrbdc').search(self._cr,self._uid,[('id','=',fcacch.grrbdc_rn)])
+			    for k in id_grrbdc:
+				id_grmonth=self.pool.get('tabel.grmonth').search(self._cr,self._uid,[('grrbdc_rn','=',k),('month','=',month),('year','=',year)])
+				for l in id_grmonth:
+				    grmonth=self.pool.get('tabel.grmonth').browse(self._cr, self._uid, l)
+				    self.dayall=grmonth.dayall
+				    break
+				break
+			    break
+			break
+
+#	self._cr.execute("UPDATE tabel_tabel SET  dayall = tabel_grmonth.dayall  FROM tabel_grmonth WHERE grrbdc_rn IN (SELECT tabel_fcacch.grrbdc_rn FROM tabel_fcacch WHERE tabel_fcacch.fcacbs_rn IN (select id_fcac from tabel_string where tabel_string.id = tabel_tabel.ids_string ) and year ="+str(year)+" and month = "+str(month)+" and tabel_tabel.id = "+str(self.id)+"  ;")
+#Обновляем должности и вид л.с.
+#        id_emp_sec=self.pool.get('tabel.string').search(self._cr,self._uid,[('id_tabel','=',self.id)])#получаем ид всех строк из таблице daytype где есть ник
+#	for i in id_emp_sec:
+#		model_string= self.pool.get('tabel.string').browse(self._cr, self._uid, i)
+#		model_string.id_post=model_string.id_fcac.post_rn.name
+#		model_string.id_vidisp=model_string.id_fcac.vidisp_rn.code
+#тоже самое только на sql запросах
 	self._cr.execute("UPDATE tabel_string SET  id_post = tabel_post.name  FROM tabel_post WHERE  tabel_post.id = (SELECT tabel_fcac.post_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
 	self._cr.execute("UPDATE tabel_string SET  id_vidisp = tabel_vidisp.code  FROM tabel_vidisp WHERE  tabel_vidisp.id = (SELECT tabel_fcac.vidisp_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
 

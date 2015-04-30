@@ -11,10 +11,11 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 	f_ank.write ("ID; FCACBS_RN; STQNT\n")
 	#print len(ank)
 	for i in ank:
-		if i.deleted or i["FCACBS_RN"] == None or i["STQNT"] == None:
+		if i.deleted or i["FCACBS_RN"] == None or i["STQNT"] == None or i["FCACBS_RN"] == None or i["GRRBDC_RN"] == None:
 			continue
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACCH_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACBS_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
+		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["GRRBDC_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
 		f_ank.write ( str ( i ["STQNT"]).decode('cp1251').encode('utf-8')+"\n")
 	f_ank.close()
 	print "zfcacch.dbf to zfcacch.csv [ ok ]"
@@ -27,15 +28,15 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 	my_file = open(directory+'fcacch.csv')
 
 	#CREATE TEMP TABLE
-	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCACBS_RN int, STQNT double precision);") 
+	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCACBS_RN int, GRRBDC_RN int, STQNT double precision);") 
 	cur.copy_expert("COPY tmp_z FROM STDIN WITH DELIMITER ';' CSV HEADER;", my_file)
 	#cur.execute ("DELETE from tabel_fcac;")
 	#UPDATE DATA
-	cur.execute("UPDATE tabel_fcacch SET  FCACBS_RN=tmp_z.FCACBS_RN, STQNT=tmp_z.STQNT FROM tmp_z WHERE  tabel_fcacch.id = tmp_z.id;")
+	cur.execute("UPDATE tabel_fcacch SET  FCACBS_RN=tmp_z.FCACBS_RN, GRRBDC_RN=tmp_z.GRRBDC_RN, STQNT=tmp_z.STQNT FROM tmp_z WHERE  tabel_fcacch.id = tmp_z.id;")
 
 	#cur.execute("SELECT G.id, G.ANK_RN, G.POST_RN, G.SUBDIV_RN, G.VIDISP_RN, G.STARTDATE, G.ENDDATE FROM (SELECT T.id, T.ANK_RN, T.POST_RN, T.SUBDIV_RN, T.VIDISP_RN, T.STARTDATE, T.ENDDATE FROM tmp_z AS T LEFT JOIN tabel_fcac AS P  ON T.id = P.id WHERE P.id IS NULL) AS G, tabel_ank AS H where G.ank_rn = H.id  ;")
 	#INSERT DATA add something which lacks
-	cur.execute("INSERT INTO tabel_fcacch (id, fcacbs_rn, stqnt) SELECT T.id, T.FCACBS_RN, T.STQNT FROM tmp_z AS T LEFT JOIN tabel_fcacch AS P  ON T.id = P.id WHERE P.id IS NULL ;")
+	cur.execute("INSERT INTO tabel_fcacch (id, fcacbs_rn, grrbdc_rn, stqnt) SELECT T.id, T.FCACBS_RN, T.GRRBDC_RN, T.STQNT FROM tmp_z AS T LEFT JOIN tabel_fcacch AS P  ON T.id = P.id WHERE P.id IS NULL ;")
 	
 	#rows = cur.fetchall()
 	#for i in rows:
