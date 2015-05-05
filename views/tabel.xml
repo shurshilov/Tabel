@@ -56,10 +56,12 @@
                                 name="validation"
                                 type="object"
                                 string="Подписать"
-				class="oe_highlight"
 				context="{'password':password,'user_id':user_id,}"
+				class="oe_inline oe_stat_button" 
+				icon="fa-check-circle-o"
+				
                         />
-			<button name="cancel" string="Отмена" special="cancel" class="oe_stat_button"/>
+			<button name="cancel" string="Отмена" special="cancel" class="oe_inline oe_stat_button" icon="fa-stop"/>
 	    </group>
 	    </sheet>
 
@@ -101,43 +103,87 @@
      <record model="ir.ui.view" id="tabel_form_view">
 	<field name="name">tabel.form</field>
 	<field name="model">tabel.tabel</field>
-	<field name="arch" type="xml">           
+	<field name="arch" type="xml">
 	<form string="Tabel Form">
 	     <header>
-	    <!--	<button name="action_tabel" type="object" string="Импорт сотрудников" groups="Tabel.group_import"   states="draft" />-->
-		   	<button name="action_tabell" type="object"  string="Импорт данных из Паруса" groups="Tabel.group_import"  attrs="{'invisible':[('state','!=','draft')],}" class="oe_kanban_action_button"  />
-			<button name="time_button" type="object" string="Формат (часы/десятые)" colors="red:format == True"/>
+			<field name="state" widget="statusbar"/> 
+	    </header>
+<table>
+    <tr>
+    <td>
+	<group>    
+		<field name="time_start_t" string="Дата начала табеля" />
+		<field name="time_end_t" string="Дата конца табеля" />
+		<field name="id_ank" string="Табельщик"  />
+		<field name="id_division" string="Подразделение"/>
+		<field name="dayall" readonly= "True" />
+		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
+		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True"/>
+		
+	</group>
+    </td>
+    <td>
+	<table>
+	    <tr>
+		<td>
+			<button
+				name="action_tabel"
+				type="object"
+				string="Обновить данные из приказов"
+				groups="Tabel.group_import"
+				attrs="{'invisible':[('state','!=','draft')],}"
+				class="oe_inline oe_stat_button"
+				icon="fa-file-o"
+				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
+			/>
+			<button
+				name="action_tabell"
+				type="object"
+				string="Импорт данных из Паруса"
+				groups="Tabel.group_import"
+				attrs="{'invisible':[('state','!=','draft')],}"
+				class="oe_inline oe_stat_button"
+				icon="fa-download"
+				confirm="Вы уверены что хотите загрузить данные из паруса?Данные будут перезаписаны."
+			/>
+		</td>
+	    </tr>
+	    <tr>
+		<td>
+			<button
+				name="time_button"
+				type="object"
+				string="Формат (минуты/десятые доли)"
+				colors="red:format == True"
+				class="oe_inline oe_stat_button"
+				icon="fa-clock-o"
+			/>
 			<button 
 				name="%(model_action_id)d" 
 				type="action" 
 				string="Аннулировать" 
 				context="{'tabel_id':active_id,'state':'draft'}"
 				states="confirmed,confirmed2"
-				class="oe_highlight"
+				class="oe_inline oe_stat_button" 
+				icon="fa-check-square-o"
 			/>
-<!--
-			<button
-                                name="validation1"
-                                type="object"
-                                string="Аннулировать123"
-                                context="{'tabel_id':active_id,'state':'draft' }"
-                                states="confirmed,done,confirmed2"
-                        /> -->
 			<button 
 				name="%(model_action_id)d" 
 				type="action" 
 				string="Подписать(Табельщик)" 
 				context="{'tabel_id':active_id,'state':'confirm'}"
 				states="draft"
-				class="oe_group_button"
-				
+				class="oe_inline oe_stat_button" 
+				icon="fa-pencil"
 			/>
 			<button 
 				name="%(model_action_id)d" 
-				type="action" 
+				type="action"
 				string="Подписать(Начальник)" 
 				context="{'tabel_id':active_id,'state':'confirm2'}"
 				states="confirmed"
+				class="oe_inline oe_stat_button" 
+				icon="fa-pencil"
 			/>
 			<button 
 				name="%(model_action_id)d" 
@@ -145,23 +191,16 @@
 				string="Подписать (Бухгалтер)" 
 				context="{'tabel_id':active_id,'state':'done'}"
 				states="confirmed2"
+				class="oe_inline oe_stat_button" 
+				icon="fa-pencil"
 			/>
-		<!--	<field name="state" widget="statusbar" statusbar_colors='{"draft":"red","done":"green","confirmed":"green" }'/> -->
-
-			<field name="state" widget="statusbar"/> 
-	    </header>
-	    <group> 
-		
-        <!--	<field name="num_tabel" string="Номер табеля"/> -->
-		<field name="time_start_t" string="Дата начала табеля" />
-		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик"  />
-	-	<field name="id_division" string="Подразделение"  />
-		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
-		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True"/>
-		<field name="dayall" />
-	    </group>
-	    <field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
+		</td>
+	    </tr>
+	</table>
+    </td>
+</tr>
+</table>
+	<field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
 	</form>
 	</field>
     </record> 
@@ -291,12 +330,12 @@
         </field>
     </record>
 
-    <!-- string tree view -->
+    <!-- string tree view  editable="bottom"-->
     <record model="ir.ui.view" id="string_tree_view">
 	<field name="name">string.tree</field>
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
-	<tree string="String Tree" colors="red:counter != 0" editable="bottom"  toolbar="1" >
+	<tree string="String Tree" colors="red:counter != 0"   toolbar="1" >
 					<field name="id_fcac" options="{'limit': 200}" string="ФИО"/>
 					<field name="id_post"/>
 					<field name="id_vidisp"/>
@@ -431,6 +470,7 @@
 				<field name="vidisp_rn"/>
 				<field name="startdate"/>
 				<field name="enddate"/>
+				<field name="fcacch_rn"/>
                         </group>
                     </sheet>
                 </form>

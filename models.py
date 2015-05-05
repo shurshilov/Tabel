@@ -122,17 +122,17 @@ class Temp(models.TransientModel):
 class Grday (models.Model):
 	_name = 'tabel.grday'
 
-	grmonth_rn = fields.Many2one('tabel.grmonth', ondelete='cascade',string="GRMONTH_RN")
-	monthday = fields.Integer(string="MONTHDAY")
+	grmonth_rn = fields.Many2one('tabel.grmonth', ondelete='cascade',string="GRMONTH_RN",index=True)
+	monthday = fields.Integer(string="MONTHDAY",index=True)
 	hourinday = fields.Float(string="HOUR IN DAY")
 
 class Grmonth (models.Model):
 	_name = 'tabel.grmonth'
 	_rec_name = 'grrbdc_rn'
 	
-	grrbdc_rn = fields.Many2one('tabel.grrbdc', ondelete='cascade',string="GRRBDC_RN")
-	year = fields.Integer(string="YAER")
-	month = fields.Integer(string="MONTH")
+	grrbdc_rn = fields.Many2one('tabel.grrbdc', ondelete='cascade',string="GRRBDC_RN",index=True)
+	year = fields.Integer(string="YEAR",index=True)
+	month = fields.Integer(string="MONTH",index=True)
 	dayall = fields.Integer(string="DAYALL")
 	hourall = fields.Float(string="HOURALL")
 
@@ -173,8 +173,8 @@ class Fcacch(models.Model):
 	_name = 'tabel.fcacch'
 	_rec_name = 'stqnt'
 	stqnt = fields.Float(string="stavka stqnt", required=True)
-	fcacbs_rn = fields.Integer(string="FCACBS_RN")
-	grrbdc_rn = fields.Integer(string="GRRBDC_RN")
+	fcacbs_rn = fields.Integer(string="FCACBS_RN",index=True)
+	grrbdc_rn = fields.Integer(string="grrbdc_rn")
     
 class Vidisp(models.Model):
 	_name = 'tabel.vidisp'
@@ -229,6 +229,7 @@ class Fcac(models.Model):
 	#name = fields.Char(compute='_compute_name')
 	_rec_name = 'ank_rn'
 	_order = 'ank_rn'
+	fcacch_rn =fields.One2many('tabel.fcacch', 'fcacbs_rn', string="fcacch_rn")
 	ank_rn = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_rn")
 	post_rn = fields.Many2one('tabel.post',  ondelete='cascade', string="post_rn",index=True)
 	subdiv_rn = fields.Many2one('tabel.division',  ondelete='cascade', string="subdiv_rn")
@@ -322,7 +323,7 @@ class String(models.Model):
     def _compute_counter (self):
 	self.counter = self.counter + 1
     @api.one
-    @api.depends('id_fcac')
+    @api.depends('id_fcac','post_rn','vidisp_rn')
     def _compute_post_vidisp (self):
 	self.id_post=self.id_fcac.post_rn.name
 	self.id_vidisp=self.id_fcac.vidisp_rn.code
@@ -412,14 +413,14 @@ class String(models.Model):
 				    record.hours_main = timeToFloat (record.hours_main)
 
 				if flag == 1:#считаем внутренние
-				    if current_model.format:#сморим какой нужен формат вывода
-					record.hours_internal = floatToTime (float(record.hours_internal)+ float(a))
-				    else:
+				#    if current_model.format:#сморим какой нужен формат вывода
+				#	record.hours_internal = floatToTime (float(record.hours_internal)+ float(a))
+				#    else:
 					record.hours_internal = str (float(record.hours_internal)+ float(a))
 				else:
-				    if current_model.format:#сморим какой нужен формат вывода
-					record.hours_main = floatToTime (float(record.hours_main)+ float(a))
-				    else:
+				#    if current_model.format:#сморим какой нужен формат вывода
+				#	record.hours_main = floatToTime (float(record.hours_main)+ float(a))
+				#    else:
 			    		record.hours_main = str (float(record.hours_main)+ float(a))
 				record.days_appear = str (int(record.days_appear) + 1)#в любом случае это явка
 
@@ -581,75 +582,12 @@ class Tabel(models.Model):
 		self.format = True
 	time_format.time_format (self)
 
-#    @api.one
-#    def action_tabel(self):
-#	#Нужно сделать через промежуточную таблицу апдейт
-#	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
-
-    @api.one 
-    def action_tabell(self):
-#	self._cr.execute("ALTER TABLE tabel_string DROP COLUMN id_post;")
-#	self._cr.execute("ALTER TABLE tabel_string ADD COLUMN id_post text;")
-#	self._cr.execute("ALTER TABLE tabel_string DROP COLUMN id_vidisp;")
-	#Нужно сделать через промежуточную таблицу апдейт
-	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
-#	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
-	#Обновляем данные по ставкам, в текущем табеле
-	
-	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
-	year =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().year
-	month =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().month
-	id_string=self.pool.get('tabel.string').search(self._cr,self._uid,[('id','in', [(emp.id) for emp in self.ids_string])]   )
-	for i in id_string:
-			string = self.pool.get('tabel.string').browse(self._cr, self._uid, i)
-			id_fcacch=self.pool.get('tabel.fcacch').search(self._cr,self._uid,[('fcacbs_rn','=',string.id_fcac.id)])
-			for j in id_fcacch:
-			    fcacch=string = self.pool.get('tabel.fcacch').browse(self._cr, self._uid, j)
-			    id_grrbdc=self.pool.get('tabel.grrbdc').search(self._cr,self._uid,[('id','=',fcacch.grrbdc_rn)])
-			    for k in id_grrbdc:
-				id_grmonth=self.pool.get('tabel.grmonth').search(self._cr,self._uid,[('grrbdc_rn','=',k),('month','=',month),('year','=',year)])
-				for l in id_grmonth:
-				    grmonth=self.pool.get('tabel.grmonth').browse(self._cr, self._uid, l)
-				    self.dayall=grmonth.dayall
-				    break
-				break
-			    break
-			break
-
-#	self._cr.execute("UPDATE tabel_tabel SET  dayall = tabel_grmonth.dayall  FROM tabel_grmonth WHERE grrbdc_rn IN (SELECT tabel_fcacch.grrbdc_rn FROM tabel_fcacch WHERE tabel_fcacch.fcacbs_rn IN (select id_fcac from tabel_string where tabel_string.id = tabel_tabel.ids_string ) and year ="+str(year)+" and month = "+str(month)+" and tabel_tabel.id = "+str(self.id)+"  ;")
-#Обновляем должности и вид л.с.
-#        id_emp_sec=self.pool.get('tabel.string').search(self._cr,self._uid,[('id_tabel','=',self.id)])#получаем ид всех строк из таблице daytype где есть ник
-#	for i in id_emp_sec:
-#		model_string= self.pool.get('tabel.string').browse(self._cr, self._uid, i)
-#		model_string.id_post=model_string.id_fcac.post_rn.name
-#		model_string.id_vidisp=model_string.id_fcac.vidisp_rn.code
-#тоже самое только на sql запросах
-	self._cr.execute("UPDATE tabel_string SET  id_post = tabel_post.name  FROM tabel_post WHERE  tabel_post.id = (SELECT tabel_fcac.post_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
-	self._cr.execute("UPDATE tabel_string SET  id_vidisp = tabel_vidisp.code  FROM tabel_vidisp WHERE  tabel_vidisp.id = (SELECT tabel_fcac.vidisp_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
-
-        #тоже самое с часами
-        self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, HRTYPE_RN int, HOURQNT double precision, DATE date);")
-        a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
-	#self.directory=str(len(self))
-        for i in self.ids_string:
-                self._cr.execute("INSERT INTO tmp_z (id, fcac_rn, hrtype_rn, hourqnt, date) SELECT T.id, T.FCAC_RN, T.HRTYPE_RN, T.HOURQNT, T.DATE FROM tabel_fcacwth AS T  WHERE T.FCAC_RN ="+str(i.id_fcac.id)+" and T.date::date <='"+str(self.time_end_t)+"' and T.date::date >= '"+str(self.time_start_t)+"' ;")
-        i = 1
-        while i < 32:
-		self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = NULL  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and tabel_string.id_tabel ="+str(self.id)+" ;")
-                self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = tmp_z.HOURQNT  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and tabel_string.id_tabel ="+str(self.id)+" and tmp_z.date::date ='"+a.strftime('%Y-%m-%d')+"' ;")
-                a+=datetime.timedelta(days=1)
-                i+=1
-	#ставим счетчик =0 положение когда в табеле ничего не изменено.
-	for r in self.ids_string:
-		r.counter = 0
-		r.hours_night = ""
-		r.hours_holiday = ""
-        self._cr.execute("DROP TABLE tmp_z;")
-
-	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем часам и обновляем
+    #Обновить данные по пропускам(приказам)
+    @api.one
+    def action_tabel(self):
+	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем дням и обновляем
 	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, DAYTYPE_RN int, DATE date);") 
 	a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
-	#self.directory=str(len(self))
 	for i in self.ids_string:
 		self._cr.execute("INSERT INTO tmp_z (id, fcac_rn, daytype_rn, date) SELECT T.id, T.FCAC_RN, T.DAYTYPE_RN, T.DATE FROM tabel_fcacwtd AS T  WHERE T.FCAC_RN = "+str(i.id_fcac.id)+" and T.date::date <='"+str(self.time_end_t)+"' and T.date::date >= '"+str(self.time_start_t)+"' ;")
 	i = 1
@@ -658,14 +596,81 @@ class Tabel(models.Model):
 		a+=datetime.timedelta(days=1)
 		i+=1	
 	self._cr.execute("DROP TABLE tmp_z;")
-#	self.format = True
-#	time_format.time_format (self)
-#	if self.format:
-#		self.format = False
-#	else:
-#		self.format = True
-#	time.sleep(0.5)
-#	time_format.time_format (self)
+
+    @api.one 
+    def action_tabell(self):
+	#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
+	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
+
+	#Обновляем данные по ставкам
+	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
+
+	#обновляем данные вдолжности и виды л.с.
+	self._cr.execute("UPDATE tabel_string SET  id_post = tabel_post.name  FROM tabel_post WHERE  tabel_post.id = (SELECT tabel_fcac.post_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
+	self._cr.execute("UPDATE tabel_string SET  id_vidisp = tabel_vidisp.code  FROM tabel_vidisp WHERE  tabel_vidisp.id = (SELECT tabel_fcac.vidisp_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
+
+#"""
+#Вариант 1
+#Если бухгалтерия не формирует часы зараннее, то нужно их импортировать из графиков
+#Причем в графике указано количество часов за конкретный день для определенного графика работы
+#Например для 7.7 часов в день или 8.0 и т.д.
+#Обновляем данные по часам"""
+	year =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().year
+	month =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().month
+	for i in self.ids_string:
+		    id_month=self.pool.get('tabel.grmonth').search(self._cr,self._uid,[('month','=',month),('year','=',year),('grrbdc_rn.id','=',i.id_fcac.fcacch_rn.grrbdc_rn)])
+		    for j in id_month:
+			month_model= self.pool.get('tabel.grmonth').browse(self._cr, self._uid, j)
+			self.dayall=month_model.dayall
+			c = 1
+			while c < 32:
+			    id_day= self.pool.get('tabel.grday').search(self._cr,self._uid,[('monthday','=',c),('grmonth_rn','=',month_model.id)])
+			    self._cr.execute("UPDATE tabel_string SET  hours"+str(c)+" = NULL  where  tabel_string.id="+str(i.id)+" ;")
+			    for k in id_day:
+				day= self.pool.get('tabel.grday').browse(self._cr, self._uid, k)
+				norma = day.hourinday*i.stqnt
+				self._cr.execute("UPDATE tabel_string SET  hours"+str(c)+" = "+str(norma)+" where  tabel_string.id="+str(i.id)+" ;")
+				break
+			    c+=1
+			break
+#"""
+#Вариант 2
+#Есди бухгалтерия формирует часы, то можно загружать данные из готовых(сформированных) таблиц. 
+#В которых есть данные на каждый конкретный день и час для каждого конкретного сотрудника (лицевого счета)
+#Очень большая таблица порядка 1.5М строк но работает довольно быстро если проиндексировать
+#обновляем данные по часам (если они уже сформированны)
+#"""
+#        self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, HRTYPE_RN int, HOURQNT double precision, DATE date);")
+#        a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
+#        for i in self.ids_string:
+#		self._cr.execute("INSERT INTO tmp_z (id, fcac_rn, hrtype_rn, hourqnt, date) SELECT T.id, T.FCAC_RN, T.HRTYPE_RN, T.HOURQNT, T.DATE FROM tabel_fcacwth AS T  WHERE T.FCAC_RN ="+str(i.id_fcac.id)+" and T.date::date <='"+str(self.time_end_t)+"' and T.date::date >= '"+str(self.time_start_t)+"' ;")
+#        i = 1
+#        while i < 32:
+#		self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = NULL  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and tabel_string.id_tabel ="+str(self.id)+" ;")
+#                self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = tmp_z.HOURQNT  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and tabel_string.id_tabel ="+str(self.id)+" and tmp_z.date::date ='"+a.strftime('%Y-%m-%d')+"' ;")
+#                a+=datetime.timedelta(days=1)
+#                i+=1
+#        self._cr.execute("DROP TABLE tmp_z;")
+
+
+
+	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем дням и обновляем
+	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, DAYTYPE_RN int, DATE date);") 
+	a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
+	for i in self.ids_string:
+		self._cr.execute("INSERT INTO tmp_z (id, fcac_rn, daytype_rn, date) SELECT T.id, T.FCAC_RN, T.DAYTYPE_RN, T.DATE FROM tabel_fcacwtd AS T  WHERE T.FCAC_RN = "+str(i.id_fcac.id)+" and T.date::date <='"+str(self.time_end_t)+"' and T.date::date >= '"+str(self.time_start_t)+"' ;")
+	i = 1
+	while i < 32:
+		self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = P.nick FROM tabel_daytype AS P WHERE P.id   IN (SELECT tmp_z.DAYTYPE_RN  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and "+str(self.id)+" =tabel_string.id_tabel  and tmp_z.date::date ='"+a.strftime('%Y-%m-%d')+"') ;")
+		a+=datetime.timedelta(days=1)
+		i+=1	
+	self._cr.execute("DROP TABLE tmp_z;")
+
+	#ставим счетчик =0 положение когда в табеле ничего не изменено.
+	for r in self.ids_string:
+		r.counter = 0
+		r.hours_night = ""
+		r.hours_holiday = ""
 
     #функция start workflow
     @api.one
