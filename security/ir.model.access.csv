@@ -19,6 +19,10 @@ tabel_post,admin,model_tabel_post,tabel_division_inf,1,1,1,1
 tabel_person,admin,model_tabel_person,tabel_division_inf,1,1,1,1
 tabel_vidisp,admin,model_tabel_vidisp,tabel_division_inf,1,1,1,1
 tabel_password,admin,model_tabel_password,tabel_division_inf,1,1,1,1
+tabel_grday,admin,model_tabel_grday,tabel_division_inf,1,1,1,1
+tabel_grmonth,admin,model_tabel_grmonth,tabel_division_inf,1,1,1,1
+tabel_grrbdc,admin,model_tabel_grrbdc,tabel_division_inf,1,1,1,1
+tabel_fcacch,admin,model_tabel_fcacch,tabel_division_inf,1,1,1,1
 tabel_daytype,admin,model_tabel_daytype,tabel_division_inf,1,1,0,0
 boss_tabel,admin,model_tabel_tabel,boss_division_inf,1,1,0,0
 boss_string,admin,model_tabel_string,boss_division_inf,1,1,0,0
@@ -29,7 +33,11 @@ boss_post,admin,model_tabel_post,boss_division_inf,1,1,0,0
 boss_person,admin,model_tabel_person,boss_division_inf,1,1,0,0
 boss_vidisp,admin,model_tabel_vidisp,boss_division_inf,1,1,0,0
 boss_password,admin,model_tabel_password,boss_division_inf,1,1,1,0
+boss_grday,admin,model_tabel_grday,boss_division_inf,1,1,0,0
+boss_grmonth,admin,model_tabel_grmonth,boss_division_inf,1,1,0,0
+boss_grrbdc,admin,model_tabel_grrbdc,boss_division_inf,1,1,0,0
 boss_daytype,admin,model_tabel_daytype,boss_division_inf,1,1,0,0
+boss_fcacch,admin,model_tabel_fcacch,boss_division_inf,1,1,0,0
 acount_tabel,admin,model_tabel_tabel,group_accountant,1,1,0,0
 acount_string,admin,model_tabel_string,group_accountant,1,1,0,0
 acount_division,admin,model_tabel_division,group_accountant,1,1,0,0
@@ -39,5 +47,9 @@ acount_post,admin,model_tabel_post,group_accountant,1,1,0,0
 acount_person,admin,model_tabel_person,group_accountant,1,1,0,0
 acount_vidisp,admin,model_tabel_vidisp,group_accountant,1,1,0,0
 acount_password,admin,model_tabel_password,group_accountant,1,1,1,0
+acount_grday,admin,model_tabel_grday,group_accountant,1,1,0,0
+acount_grmonth,admin,model_tabel_grmonth,group_accountant,1,1,0,0
+acount_grrbdc,admin,model_tabel_grrbdc,group_accountant,1,1,0,0
+acount_fcacch,admin,model_tabel_fcacch,group_accountant,1,1,0,0
 acount_daytype,admin,model_tabel_daytype,group_accountant,1,1,0,0
 

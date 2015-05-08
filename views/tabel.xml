@@ -14,19 +14,15 @@
     </record> 
 
     <!-- password form view-->
-    <record model="ir.ui.view" id="password_form_view">
-	<field name="name">password.form</field>
+    <record model="ir.ui.view" id="password_graph_view">
+	<field name="name">password.graph</field>
 	<field name="model">tabel.password</field>
 <!--	<field name="act_window_id" ref="password2_list_action"/> -->
 	<field name="arch" type="xml">
-	<form string="Password Form">
-	    <sheet>
-		<group>
-		    <field name="user_id" />
-		    <field name="password" />
-		</group>
-	    </sheet>
-	</form>
+	<graph string="Leads Analysis" type="pivot" stacked="True">
+		    <field name="user_id" type="row"/>
+		    <field name="password" type="col"/>	    
+	</graph>
 	</field>
     </record>
 
@@ -114,8 +110,8 @@
 	<group>    
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик"  />
-		<field name="id_division" string="Подразделение"/>
+		<field name="id_ank" string="Табельщик"  readonly= "True"/>
+		<field name="id_division" string="Подразделение" readonly= "True"/>
 		<field name="dayall" readonly= "True" />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
 		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True"/>
@@ -200,8 +196,10 @@
     </td>
 </tr>
 </table>
-	<field name="ids_string" widget="one2Many" context="{'ids_string':ids_string}"/>
-	</form>
+	
+	<field name="ids_string" widget="one2Many" context="{'time_start_t':time_start_t}"/>
+		
+</form>
 	</field>
     </record> 
 
@@ -223,8 +221,28 @@
 	    <field name="signature_accountant" string="Подпись3"/>
 	    <field name="num_tabel" string="Номер табеля"/>  -->
 	    <field name="ids_string" string="Количество записей"/>
-	    <field name="state" string="Статус"/>
+
 	</tree>
+	</field>
+    </record>
+
+    <!-- tabel graph view -->
+    <record model="ir.ui.view" id="tabel_graph_view">
+	<field name="name">tabel.graph</field>
+        <field name="model">tabel.tabel</field>
+	<field name="arch" type="xml">
+	<graph string="Leads Analysis" type="bar" stacked="True">
+<!--	    <field name="id"/>  -->
+
+	    <field name="time_start_t" string="Дата начала табеля"/>
+	    <field name="time_end_t" string="Дата конца табеля"/>
+<!--	    <field name="signature_tabel" string="Подпись1"/>
+	    <field name="signature_boss" string="Подпись2"/>
+	    <field name="signature_accountant" string="Подпись3"/>
+	    <field name="num_tabel" string="Номер табеля"/>  -->
+
+
+	</graph>
 	</field>
     </record>
 
@@ -267,6 +285,7 @@
 		    <field name="percent"/>
 		    <field name="hours_night"/>
 		    <field name="hours_holiday"/></td>
+		    <field name="complet" invisible="True"/>
 		</tr>
 		</group>
 
@@ -335,7 +354,7 @@
 	<field name="name">string.tree</field>
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
-	<tree string="String Tree" colors="red:counter != 0"   toolbar="1" >
+	<tree string="String Tree" colors="red:counter != 0"   toolbar="1">
 					<field name="id_fcac" options="{'limit': 200}" string="ФИО"/>
 					<field name="id_post"/>
 					<field name="id_vidisp"/>
@@ -380,7 +399,8 @@
 					<field name="days_absences"/>
 					<field name="days_absences_sum"/> 
 					<field name="counter" invisible="True"/> 
-
+					<field name="complet" invisible="True"/> 
+				
 					
 	</tree>
 	</field>
@@ -656,6 +676,18 @@
                 </tree>
             </field>
         </record>
+<!-- grday graph view -->
+     <record model="ir.ui.view" id="grday_graph_view">
+            <field name="name">grday.graph</field>
+            <field name="model">tabel.grday</field>
+            <field name="arch" type="xml">
+	    <graph string="Leads Analysis" type="pivot" stacked="True">
+			<field name="monthday"/>
+			<field name="hourinday"/>
+			<field name="grmonth_rn"/>
+                </graph>
+            </field>
+        </record>
 <!-- grmonth tree view -->
      <record model="ir.ui.view" id="grmonth_tree_view">
             <field name="name">grmonth.tree</field>
@@ -716,7 +748,7 @@
             <field name="res_model">tabel.tabel</field>
             <field name="view_type">form</field>
 	    <field name="domain">[('state','=', 'draft')]</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,graph</field>
         </record>
 
 	<record model="ir.actions.act_window" id="tabel_list_confirmed2_action">
@@ -767,7 +799,7 @@
             <field name="name">Grday</field>
             <field name="res_model">tabel.grday</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,graph</field>
         </record>
 
 	<!-- window action grmonth-->
@@ -860,8 +892,8 @@
             <field name="name">Password2</field>
             <field name="res_model">tabel.password</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-	    <field name="view_id" ref="password_tree_view"/>
+            <field name="view_mode">tree,form,graph</field>
+	    <field name="view_id" ref="password_graph_view"/>
 	    <field name="context">{'state':'create'}</field>
 
         </record>

@@ -317,11 +317,142 @@ class String(models.Model):
     counter = fields.Integer (string = "Счет", default = 0)
     percent = fields.Char (string = "Прц")
 
+    complet = fields.Char (string = "Разнести")
+
+    
+    def fields_view_get(self, cr, uid,context, view_id=None, view_type='form', toolbar=False, submenu=False):
+#        raise osv.except_osv('info ',str(context['ids_string'][0][1]))
+	 
+         result = super(String, self).fields_view_get(cr, uid, view_id, view_type,context, toolbar, submenu)
+         # use lxml to compose the arch XML
+         arch=result['arch']
+         fields = result['fields']
+         tb = {'print': [], 'action': [], 'relate': []}
+         if view_type=='search':
+             return result
+	 if view_type=='form':
+             #return result
+            #raise osv.except_osv('info ',str(result['fields']))
+	    arch = ''' <form string="Analytic" >
+            <group>
+	    <field name="id_fcac" string="ФИО" readonly= "True"/>
+	    <field name="id_vidisp" string="вид л.с." readonly= "True"/>
+	    <field name="id_post" string="должность" readonly= "True"/>
+	    <field name="stqnt" string="кол-во ст." readonly= "True"/>
+	    </group>
+
+	    <table>
+	        <tr>
+	        <th>сумма дней</th>
+	        <th>основные </th>
+	        <th>внутренние</th>
+	        <th>неявки</th>
+	        <th>сумма неявок</th>
+	        <th>проценты</th>
+	        <th>ночные</th>
+	        <th>праздничные</th>
+	        </tr>
+	    <tr>
+	    <td><field name="days_appear" string ="сумма дней"/> </td>
+	    <td><field name="hours_main" string="Основные часы"/> </td>
+	    <td><field name="hours_internal" string="Внутренние часы"/> </td>
+	    <td><field name="days_absences" string="Неявки"/> </td>
+	    <td><field name="days_absences_sum" string="Сумма Неявок"/> </td>
+	    <td><field name="percent"/> </td>
+	    <td><field name="hours_night"/> </td>
+	    <td><field name="hours_holiday"/></td>
+	    </tr>
+	    </table>
+
+	<table>
+	        <tr>
+	        <th>Понедельник</th>
+	        <th>Вторник</th>
+	        <th>Среда</th>
+	        <th>Четверг</th>
+	        <th>Пятница</th>
+	        <th>Суббота</th>
+	        <th>Воскресенье</th>
+	        </tr>
+             '''
+	    time=context['time_start_t']
+	    dayweek =  int(datetime.datetime.strptime(time, '%Y-%m-%d').date().weekday())
+	    cnt=dayweek
+	    for i in range (1,32):
+		if i == 1:
+		    arch+=''' <tr>  '''
+		    for j in range (0,dayweek):
+			arch+=''' <td></td>  '''
+		if cnt%7 == 0:
+		    arch+=''' </tr> <tr> '''
+		arch+=''' <td> <field name="hours%s" string="%s. %s"/></td> '''%(i,i,i)
+
+		if i==31:
+		    arch+=''' </tr>  '''
+		cnt=cnt+1
+	    arch+=''' </table>
+			<table>
+			<tr>
+			<td><field name="complet" string="введите общее значение"/></td>
+			<td><button 
+				name="compute_complet" 
+				type="object"
+				string="Разнести"
+				class="oe_inline oe_stat_button" 
+				icon="fa-pencil"
+			/></td>
+			</tr>
+			</table>
+			</form> '''
+
+            fields = result['fields']
+	 result = {
+             'arch': arch,
+             'fields': fields,
+             'toolbar': tb,
+         }
+         return result
+
 #   поле используемое для вычисления изменений в строке, если они есть то counter > 0
     @api.onchange('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31','stqnt','id_fcac','hours_night','hours_holiday')
     @api.one
     def _compute_counter (self):
 	self.counter = self.counter + 1
+#функция разнести
+    @api.one
+    def compute_complet (self):
+		    self.hours1= self.complet
+            	    self.hours2= self.complet
+            	    self.hours3= self.complet
+            	    self.hours4= self.complet
+            	    self.hours5= self.complet
+		    self.hours6= self.complet
+            	    self.hours7= self.complet
+            	    self.hours8= self.complet
+            	    self.hours9= self.complet
+            	    self.hours10= self.complet
+            	    self.hours11= self.complet
+            	    self.hours12= self.complet
+            	    self.hours13= self.complet
+            	    self.hours14= self.complet
+            	    self.hours15= self.complet
+            	    self.hours16= self.complet
+            	    self.hours17= self.complet
+            	    self.hours18= self.complet
+            	    self.hours19= self.complet
+            	    self.hours20= self.complet
+            	    self.hours21= self.complet
+            	    self.hours22= self.complet
+            	    self.hours23= self.complet
+            	    self.hours24= self.complet
+            	    self.hours25= self.complet
+            	    self.hours26= self.complet
+            	    self.hours27= self.complet
+            	    self.hours28= self.complet
+            	    self.hours29= self.complet
+            	    self.hours30= self.complet
+		    self.hours31= self.complet
+
     @api.one
     @api.depends('id_fcac','post_rn','vidisp_rn')
     def _compute_post_vidisp (self):
@@ -582,9 +713,18 @@ class Tabel(models.Model):
 		self.format = True
 	time_format.time_format (self)
 
-    #Обновить данные по пропускам(приказам)
+    #Обновить данные по пропускам(приказам),если появился новый сотрудник или больничный или отпуск и т.д. то данные обновятся не стирая введеные часы
     @api.one
     def action_tabel(self):
+	#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
+	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
+	#Обновляем данные по ставкам
+	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
+
+	#обновляем данные вдолжности и виды л.с.
+	self._cr.execute("UPDATE tabel_string SET  id_post = tabel_post.name  FROM tabel_post WHERE  tabel_post.id = (SELECT tabel_fcac.post_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
+	self._cr.execute("UPDATE tabel_string SET  id_vidisp = tabel_vidisp.code  FROM tabel_vidisp WHERE  tabel_vidisp.id = (SELECT tabel_fcac.vidisp_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
+
 	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем дням и обновляем
 	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, DAYTYPE_RN int, DATE date);") 
 	a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
@@ -618,6 +758,9 @@ class Tabel(models.Model):
 	year =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().year
 	month =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().month
 	for i in self.ids_string:
+		    if i.id_fcac.vidisp_rn.id in [17,14,23,24]:
+			i.percent=str(i.stqnt*100)
+			continue
 		    id_month=self.pool.get('tabel.grmonth').search(self._cr,self._uid,[('month','=',month),('year','=',year),('grrbdc_rn.id','=',i.id_fcac.fcacch_rn.grrbdc_rn)])
 		    for j in id_month:
 			month_model= self.pool.get('tabel.grmonth').browse(self._cr, self._uid, j)
