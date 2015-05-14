@@ -365,7 +365,7 @@ class String(models.Model):
         </tr>
         </table>
 
-	<table border="3" bordercolor="#7C7BAD">
+	<table border="3" bordercolor="#7C7BAD" style="margin-top: 30px;">
 	<tr>
 	<th><p align="center">Понедельник</p></th>
         <th><p align="center">Вторник</p></th>
@@ -394,7 +394,7 @@ class String(models.Model):
 		    arch+=''' </tr>  '''
 		cnt=cnt+1
 	    arch+=''' </table>
-			<table>
+			<table style="margin-top: 20px;">
 			<tr>
 			<td><field name="complet" string="введите общее значение"/></td>
 			<td><button

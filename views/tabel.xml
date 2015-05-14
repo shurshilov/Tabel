@@ -107,7 +107,7 @@
 	<field name="arch" type="xml">
 	<form string="Tabel Form">
 	     <header>
-			<field name="state" widget="statusbar"/> 
+
 	    </header>
 <table>
     <tr>
@@ -120,7 +120,7 @@
 		<field name="dayall" readonly= "True" />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
 		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True" invisible="True"/>
-		
+		<field name="state" widget="statusbar" string="статус документа"/>
 	</group>
     </td>
     <td>
