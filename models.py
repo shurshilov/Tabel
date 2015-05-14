@@ -319,61 +319,62 @@ class String(models.Model):
 
     complet = fields.Char (string = "Разнести")
 
-    
     def fields_view_get(self, cr, uid,context, view_id=None, view_type='form', toolbar=False, submenu=False):
+#	 for i in self:
+#	    i.counter=1
 #        raise osv.except_osv('info ',str(context['ids_string'][0][1]))
 	 
-         result = super(String, self).fields_view_get(cr, uid, view_id, view_type,context, toolbar, submenu)
+	 result = super(String, self).fields_view_get(cr, uid, view_id, view_type,context, toolbar, submenu)
          # use lxml to compose the arch XML
          arch=result['arch']
          fields = result['fields']
          tb = {'print': [], 'action': [], 'relate': []}
          if view_type=='search':
              return result
-	 if view_type=='form':
+         if view_type=='form':
              #return result
             #raise osv.except_osv('info ',str(result['fields']))
 	    arch = ''' <form string="Analytic" >
             <group>
-	    <field name="id_fcac" string="ФИО" readonly= "True"/>
-	    <field name="id_vidisp" string="вид л.с." readonly= "True"/>
-	    <field name="id_post" string="должность" readonly= "True"/>
-	    <field name="stqnt" string="кол-во ст." readonly= "True"/>
-	    </group>
+        <field name="id_fcac" string="ФИО" readonly= "True"/>
+        <field name="id_vidisp" string="вид л.с." readonly= "True"/>
+        <field name="id_post" string="должность" readonly= "True"/>
+        <field name="stqnt" string="кол-во ст." readonly= "True"/>
+        </group>
+        <table>
+            <tr>
+            <th>сумма дней</th>
+            <th>основные </th>
+            <th>внутренние</th>
+            <th>неявки</th>
+            <th>сумма неявок</th>
+            <th>проценты</th>
+            <th>ночные</th>
+            <th>праздничные</th>
+            </tr>
+        <tr>
+        <td><field name="days_appear" string ="сумма дней"/> </td>
+        <td><field name="hours_main" string="Основные часы"/> </td>
+        <td><field name="hours_internal" string="Внутренние часы"/> </td>
+        <td><field name="days_absences" string="Неявки"/> </td>
 
-	    <table>
-	        <tr>
-	        <th>сумма дней</th>
-	        <th>основные </th>
-	        <th>внутренние</th>
-	        <th>неявки</th>
-	        <th>сумма неявок</th>
-	        <th>проценты</th>
-	        <th>ночные</th>
-	        <th>праздничные</th>
-	        </tr>
-	    <tr>
-	    <td><field name="days_appear" string ="сумма дней"/> </td>
-	    <td><field name="hours_main" string="Основные часы"/> </td>
-	    <td><field name="hours_internal" string="Внутренние часы"/> </td>
-	    <td><field name="days_absences" string="Неявки"/> </td>
-	    <td><field name="days_absences_sum" string="Сумма Неявок"/> </td>
-	    <td><field name="percent"/> </td>
-	    <td><field name="hours_night"/> </td>
-	    <td><field name="hours_holiday"/></td>
-	    </tr>
-	    </table>
+        <td><field name="days_absences_sum" string="Сумма Неявок"/> </td>
+        <td><field name="percent"/> </td>
+        <td><field name="hours_night"/> </td>
+        <td><field name="hours_holiday"/></td>
+        </tr>
+        </table>
 
-	<table>
-	        <tr>
-	        <th>Понедельник</th>
-	        <th>Вторник</th>
-	        <th>Среда</th>
-	        <th>Четверг</th>
-	        <th>Пятница</th>
-	        <th>Суббота</th>
-	        <th>Воскресенье</th>
-	        </tr>
+	<table border="3" bordercolor="#7C7BAD">
+	<tr>
+	<th><p align="center">Понедельник</p></th>
+        <th><p align="center">Вторник</p></th>
+        <th><p align="center">Среда</p></th>
+        <th><p align="center">Четверг</p></th>
+        <th><p align="center">Пятница</p></th>
+        <th><p align="center">Суббота</p></th>
+        <th><p align="center">Воскресенье</p></th>
+        </tr>
              '''
 	    time=context['time_start_t']
 	    dayweek =  int(datetime.datetime.strptime(time, '%Y-%m-%d').date().weekday())
@@ -385,8 +386,10 @@ class String(models.Model):
 			arch+=''' <td></td>  '''
 		if cnt%7 == 0:
 		    arch+=''' </tr> <tr> '''
-		arch+=''' <td> <field name="hours%s" string="%s. %s"/></td> '''%(i,i,i)
-
+		if cnt%7 == 6 or cnt%7 == 5:
+		    arch+=''' <td bgcolor="#EADEE0"><p align="center"><b><font color="#7C7BAD">''' +str(i)+'''</font></b></p>  <field name="hours%s" string="%s. %s" /></td> '''%(i,i,i)
+		else:
+		    arch+=''' <td><p align="center"><b><font color="#7C7BAD">''' +str(i)+'''</font></b></p>  <field name="hours%s" string="%s. %s" /></td> '''%(i,i,i)
 		if i==31:
 		    arch+=''' </tr>  '''
 		cnt=cnt+1
@@ -394,11 +397,11 @@ class String(models.Model):
 			<table>
 			<tr>
 			<td><field name="complet" string="введите общее значение"/></td>
-			<td><button 
-				name="compute_complet" 
+			<td><button
+				name="compute_complet"
 				type="object"
 				string="Разнести"
-				class="oe_inline oe_stat_button" 
+				class="oe_inline oe_stat_button"
 				icon="fa-pencil"
 			/></td>
 			</tr>
@@ -414,7 +417,7 @@ class String(models.Model):
          return result
 
 #   поле используемое для вычисления изменений в строке, если они есть то counter > 0
-    @api.onchange('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31','stqnt','id_fcac','hours_night','hours_holiday')
+    @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31','stqnt','id_fcac','hours_night','hours_holiday')
     @api.one
     def _compute_counter (self):
 	self.counter = self.counter + 1

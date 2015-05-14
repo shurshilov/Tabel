@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
 <data>
+    <template id="assets_backend" name="tabel assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" href="/Tabel/static/src/css/tabel.css"/>
+            </xpath>
+        </template>
     <!-- password tree view-->
     <record model="ir.ui.view" id="password_tree_view">
 	<field name="name">password.tree</field>
@@ -114,7 +119,7 @@
 		<field name="id_division" string="Подразделение" readonly= "True"/>
 		<field name="dayall" readonly= "True" />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
-		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True"/>
+		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True" invisible="True"/>
 		
 	</group>
     </td>
@@ -725,7 +730,7 @@
             <field name="name">String</field>
             <field name="res_model">tabel.string</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree</field>
 	    <field name="limit">500</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the new string

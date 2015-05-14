@@ -1,0 +1,89 @@
+.openerp .oe_stat_button {
+  font-weight: normal;
+  width: 240px !important; /*мой код*/
+  height: 40px;
+  color: #666;
+  margin: 0px -1px -1px 0px;
+  padding: 0;
+  border: 1px solid #dddddd;
+  border-radius: 0;
+  box-shadow: none;
+  background: white;
+}
+.openerp .oe_leftbar {
+  display: none;
+  width: 220px;
+  background: #ffffff; /*мой код*/
+  border-right: 1px solid #afafb6;
+  text-shadow: none;
+}
+.openerp .oe_view_manager table.oe_view_manager_header h2 {
+  font-size: 18px;
+  margin: 0;
+  float: left;
+  line-height: 0px;
+}
+.openerp a.button:link, .openerp a.button:visited, .openerp button, .openerp .oe_button, .openerp input[type='submit'] {
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  color: #4c4c4c;
+  margin: 0;
+  padding: 3px 12px;
+  font-size: 13px;
+  text-align: center;
+  background-color: #ffffff; /*мой код*/
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#efefef), to(#d8d8d8));
+  background-image: -webkit-linear-gradient(top, #efefef, #d8d8d8);
+  background-image: -moz-linear-gradient(top, #efefef, #d8d8d8);
+  background-image: -ms-linear-gradient(top, #efefef, #d8d8d8);
+  background-image: -o-linear-gradient(top, #efefef, #d8d8d8);
+  background-image: linear-gradient(to bottom, #ffffff, #ffffff); /*мой код*/
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  -moz-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+  -webkit-box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(255, 255, 255, 0.8) inset;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.5);
+  -webkit-font-smoothing: antialiased;
+  outline: none;
+}
+.openerp .oe_list_content td, .openerp .oe_list_content th {
+  padding: 3px 6px;
+  line-height: 18px;
+  border-left: 1px solid #dfdfdf; /*мой код*/
+}
+.switch {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  width: 56px;
+  height: 20px;
+  padding: 3px;
+  background-color: white;
+  border-radius: 18px;
+  box-shadow: inset 0 -1px white, inset 0 1px 1px rgba(0, 0, 0, 0.05);
+  cursor: pointer;
+  background-image: -webkit-linear-gradient(top, #eeeeee, white 25px);
+  background-image: -moz-linear-gradient(top, #eeeeee, white 25px);
+  background-image: -o-linear-gradient(top, #eeeeee, white 25px);
+  background-image: linear-gradient(to bottom, #eeeeee, white 25px);
+}
+.switch-label {
+  position: relative;
+  display: block;
+  height: inherit;
+  font-size: 10px;
+  text-transform: uppercase;
+  background: #eceeef;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12), inset 0 0 2px rgba(0, 0, 0, 0.15);
+  -webkit-transition: 0.15s ease-out;
+  -moz-transition: 0.15s ease-out;
+  -o-transition: 0.15s ease-out;
+  transition: 0.15s ease-out;
+  -webkit-transition-property: opacity background;
+  -moz-transition-property: opacity background;
+  -o-transition-property: opacity background;
+  transition-property: opacity background;
+}
