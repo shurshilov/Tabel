@@ -42,6 +42,7 @@
 }
 .oe_im_chatview .oe_im_chatview_from {
   margin: 0 0px 10px 120px;
+  width: 250px;
 }
 .oe_im_chatview .oe_im_chatview_bubble_item {
   margin: 0 0 2px 120px;
@@ -75,4 +76,13 @@ padding-bottom: 8px;
 }
 .openerp ul.oe_form_status li:first-child > .label, .openerp ul.oe_form_status_clickable li:first-child > .label {
   border-left: 0px solid #cacaca; 
+}
+/*уменьшаем клетки таблицы*/
+.openerp .oe_list_content > tbody > tr > td.oe_list_field_cell {
+  padding: 3px 0px;
+  white-space: pre-line;
+}
+
+.mytable {
+margin-left:200px;
 }

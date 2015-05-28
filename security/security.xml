@@ -71,12 +71,14 @@
             <field name="groups" eval="[(4, ref('tabel_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
             <field name="perm_write" eval="1"/>
-            <field name="perm_create" eval="0"/>
-            <field name="perm_unlink" eval="0"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
             <field name="domain_force">
-                [('state','not in',['confirmed','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division])]
+		[('state','not in',['confirmed','confirmed2','done']),('create_uid' ,'in',[user.id,0])]
+<!--                [('state','not in',['confirmed','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division])] -->
             </field>
         </record>
+
 
 	<record id="inf2" model="ir.rule">
             <field name="name">Нач. отдела инф. видеть все табели своего отдела</field>
@@ -87,23 +89,12 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-		 [('state','in',['confirmed','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division])]
+		[('state','in',['confirmed','confirmed2','done']),('create_uid' ,'in',[user.id,0])]
+	<!--	 [('state','in',['confirmed','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division])] -->
 	    </field>
         </record>
 
 <!--	ACCOUNTANT              	[('id_division.id','like', user.ids_division)]    [('state','in',['confirmed','confirmed2','done']),('id_division.id','in', [( emp.id ) for emp in user.ids_division])]-->
-	<record id="accountant rule 1" model="ir.rule">
-            <field name="name">Правило для бухгалтера видеть все табели</field>
-            <field name="model_id" ref="model_tabel_tabel"/>
-            <field name="groups" eval="[(4, ref('group_accountant'))]"/>
-            <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="0"/>
-            <field name="perm_create" eval="0"/>
-            <field name="perm_unlink" eval="0"/>
-            <field name="domain_force">
-                [ ('state','in',['confirmed','draft','done']) ]
-	    </field>
-        </record>
 
 	<record id="accountant rule 2" model="ir.rule">
             <field name="name">Правило для бухгалтера подписывать только свои табели</field>
@@ -114,9 +105,23 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [ ('state','not in',['confirmed','draft','done']) ]
+                [ ('state','not in',['confirmed','done']) ]
 	    </field>
         </record>
+	<record id="accountant rule 1" model="ir.rule">
+           <field name="name">Правило для бухгалтера видеть все табели</field>
+            <field name="model_id" ref="model_tabel_tabel"/>
+            <field name="groups" eval="[(4, ref('group_accountant'))]"/>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+            <field name="domain_force">
+                [ ('state','in',['confirmed','done']) ]
+	    </field>
+        </record>
+
+
 
     </data>
 </openerp>

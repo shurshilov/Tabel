@@ -8,13 +8,16 @@ import parus_id_to_odoo
 def person_func(directory,dbname,userr,pas,hostt,portt):
 	ank = dbf.Dbf(directory+"zsubdiv.dbf")
 	f_ank = open(directory+'subdiv.csv', 'w')
-	f_ank.write ("ID; NAME\n")
+	f_ank.write ("ID; ENDDATE; STARTDATE; NAME\n")
 	#print len(ank)
 	for i in ank:
-		if i.deleted or i["NAME"] == None :
+		if i.deleted or i["NAME"] == None or i["ENDDATE"] == None or i["STARTDATE"] == None:
 			continue
+#		if  i ["NAME"].find(';')>0:
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["SUBDIV_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write (i ["NAME"].decode('cp1251').encode('utf-8')  +"\n")
+		f_ank.write (str(i["ENDDATE"]) + "; ")
+		f_ank.write (str(i["STARTDATE"]) + "; ")
+		f_ank.write ("\""+i ["NAME"].decode('cp1251').encode('utf-8')  +"\"\n")
 	f_ank.close()
 	print "zsubdiv.dbf to subdiv.csv [ ok ]"
 	#CONNECT TO DATABASE
@@ -26,15 +29,15 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 	my_file = open(directory+'subdiv.csv')
 
 	#CREATE TEMP TABLE
-	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, NAME  text);") 
+	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, ENDDATE date, STARTDATE date, NAME  text);") 
 	cur.copy_expert("COPY tmp_z FROM STDIN WITH DELIMITER ';' CSV HEADER;", my_file)
 	#cur.execute ("DELETE from tabel_fcac;")
 	#UPDATE DATA
-	cur.execute("UPDATE tabel_division SET  NAME=tmp_z.NAME FROM tmp_z WHERE  tabel_division.id = tmp_z.id;")
+	cur.execute("UPDATE tabel_division SET  ENDDATE=tmp_z.ENDDATE, STARTDATE=tmp_z.STARTDATE, NAME=tmp_z.NAME FROM tmp_z WHERE  tabel_division.id = tmp_z.id;")
 
 	#cur.execute("SELECT G.id, G.ANK_RN, G.POST_RN, G.SUBDIV_RN, G.VIDISP_RN, G.STARTDATE, G.ENDDATE FROM (SELECT T.id, T.ANK_RN, T.POST_RN, T.SUBDIV_RN, T.VIDISP_RN, T.STARTDATE, T.ENDDATE FROM tmp_z AS T LEFT JOIN tabel_fcac AS P  ON T.id = P.id WHERE P.id IS NULL) AS G, tabel_ank AS H where G.ank_rn = H.id  ;")
 	#INSERT DATA add something which lacks
-	cur.execute("INSERT INTO tabel_division (id, name) SELECT T.id, T.NAME FROM tmp_z AS T LEFT JOIN tabel_division AS P  ON T.id = P.id WHERE P.id IS NULL ;")
+	cur.execute("INSERT INTO tabel_division (id, enddate, startdate, name) SELECT T.id, T.ENDDATE, T.STARTDATE, T.NAME FROM tmp_z AS T LEFT JOIN tabel_division AS P  ON T.id = P.id WHERE P.id IS NULL ;")
 	
 	#rows = cur.fetchall()
 	#for i in rows:

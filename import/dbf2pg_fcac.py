@@ -8,14 +8,20 @@ import parus_id_to_odoo
 def pfcac_func(directory,dbname,userr,pas,hostt,portt):
 	ank = dbf.Dbf(directory+"zfcac.dbf")
 	f_ank = open(directory+'fcac.csv', 'w')
-	f_ank.write ("ID; ANK_RN; POST_RN; SUBDIV_RN; VIDISP_RN; STARTDATE; ENDDATE\n")
+	f_ank.write ("ID; TIPDOL_RN; KATPER_RN; ANK_RN; POST_RN; SUBDIV_RN; VIDISP_RN; STARTDATE; ENDDATE\n")
 	#print len(ank)
 	for i in ank:
-		if i.deleted or i["STARTDATE"] == None or i["ENDDATE"] == None or i ["ANK_RN"] == None or i ["POST_RN"] == None or i ["SUBDIV_RN"] == None or i ["VIDISP_RN"] == None or  i ["FCAC_RN"] == None  :
+		if i.deleted or i["STARTDATE"] == None or i["ENDDATE"] == None or i ["ANK_RN"] == None or i ["POST_RN"] == None or i ["SUBDIV_RN"] == None:
 			continue
-		if(i ["POST_RN"].decode('cp1251').encode('utf-8') == "" ):
+		if(i ["POST_RN"].decode('cp1251').encode('utf-8') == "" ) or (i ["FCAC_NUM"].decode('cp1251').encode('utf-8') == "" ):
+			continue
+		if  i ["VIDISP_RN"] == None or  i ["FCAC_RN"] == None  or  i ["TIPDOL_RN"] == None or  i ["TIPDOL_RN"] == 0:
+			continue
+		if parus_id_to_odoo.parusIndexToOdoo ( i ["TIPDOL_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ) == 0:
 			continue
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCAC_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
+		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["TIPDOL_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
+		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["KATPER_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ANK_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["POST_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["SUBDIV_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
@@ -31,15 +37,15 @@ def pfcac_func(directory,dbname,userr,pas,hostt,portt):
 	my_file = open(directory+'fcac.csv')
 
 	#CREATE TEMP TABLE
-	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, ANK_RN  int, POST_RN int, SUBDIV_RN int, VIDISP_RN int, STARTDATE date, ENDDATE date);") 
+	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, TIPDOL_RN int, KATPER_RN int, ANK_RN  int, POST_RN int, SUBDIV_RN int, VIDISP_RN int, STARTDATE date, ENDDATE date);") 
 	cur.copy_expert("COPY tmp_z FROM STDIN WITH DELIMITER ';' CSV HEADER;", my_file)
 	
 	#UPDATE DATA
-	cur.execute("UPDATE tabel_fcac SET  ANK_RN=tmp_z.ANK_RN, POST_RN=tmp_z.POST_RN, SUBDIV_RN=tmp_z.SUBDIV_RN, VIDISP_RN=tmp_z.VIDISP_RN, STARTDATE=tmp_z.STARTDATE, ENDDATE=tmp_z.ENDDATE FROM tmp_z WHERE  tabel_fcac.id = tmp_z.id;")
+	cur.execute("UPDATE tabel_fcac SET  TIPDOL_RN=tmp_z.TIPDOL_RN, KATPER_RN=tmp_z.KATPER_RN, ANK_RN=tmp_z.ANK_RN, POST_RN=tmp_z.POST_RN, SUBDIV_RN=tmp_z.SUBDIV_RN, VIDISP_RN=tmp_z.VIDISP_RN, STARTDATE=tmp_z.STARTDATE, ENDDATE=tmp_z.ENDDATE FROM tmp_z WHERE  tabel_fcac.id = tmp_z.id;")
 
 	#cur.execute("SELECT G.id, G.ANK_RN, G.POST_RN, G.SUBDIV_RN, G.VIDISP_RN, G.STARTDATE, G.ENDDATE FROM (SELECT T.id, T.ANK_RN, T.POST_RN, T.SUBDIV_RN, T.VIDISP_RN, T.STARTDATE, T.ENDDATE FROM tmp_z AS T LEFT JOIN tabel_fcac AS P  ON T.id = P.id WHERE P.id IS NULL) AS G, tabel_ank AS H where G.ank_rn = H.id  ;")
 	#INSERT DATA add something which lacks
-	cur.execute("INSERT INTO tabel_fcac (id, ank_rn, post_rn, subdiv_rn, vidisp_rn, startdate, enddate) SELECT G.id, G.ANK_RN, G.POST_RN, G.SUBDIV_RN, G.VIDISP_RN, G.STARTDATE, G.ENDDATE FROM (SELECT T.id, T.ANK_RN, T.POST_RN, T.SUBDIV_RN, T.VIDISP_RN, T.STARTDATE, T.ENDDATE FROM tmp_z AS T LEFT JOIN tabel_fcac AS P  ON T.id = P.id WHERE P.id IS NULL) AS G, tabel_ank AS H where G.ank_rn = H.id  ;")
+	cur.execute("INSERT INTO tabel_fcac (id, tipdol_rn, katper_rn, ank_rn, post_rn, subdiv_rn, vidisp_rn, startdate, enddate) SELECT G.id, G.TIPDOL_RN, G.KATPER_RN, G.ANK_RN, G.POST_RN, G.SUBDIV_RN, G.VIDISP_RN, G.STARTDATE, G.ENDDATE FROM (SELECT T.id, T.TIPDOL_RN, T.KATPER_RN, T.ANK_RN, T.POST_RN, T.SUBDIV_RN, T.VIDISP_RN, T.STARTDATE, T.ENDDATE FROM tmp_z AS T LEFT JOIN tabel_fcac AS P  ON T.id = P.id WHERE P.id IS NULL) AS G, tabel_ank AS H where G.ank_rn = H.id  ;")
 	
 	#rows = cur.fetchall()
 	#for i in rows:

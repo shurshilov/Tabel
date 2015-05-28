@@ -5,7 +5,16 @@
             <xpath expr="." position="inside">
                 <link rel="stylesheet" href="/Tabel/static/src/css/tabel.css"/>
             </xpath>
-        </template>
+    </template>
+
+        <record id="model_action_id" model="ir.actions.act_window">
+                <field name="name">Валидация пароля</field>
+                <field name="type">ir.actions.act_window</field> 
+                <field name="res_model">tabel.temp</field>
+                <field name="view_type">form</field>
+                <field name="view_mode">form</field>
+            <!--    <field name="view_id" ref="my_specific_view"/> -->
+        </record>
     <!-- password tree view-->
     <record model="ir.ui.view" id="password_tree_view">
 	<field name="name">password.tree</field>
@@ -16,17 +25,16 @@
 	    <field name="password" />
 	</tree>
 	</field>
-    </record> 
+    </record>
 
     <!-- password form view-->
     <record model="ir.ui.view" id="password_graph_view">
 	<field name="name">password.graph</field>
 	<field name="model">tabel.password</field>
-<!--	<field name="act_window_id" ref="password2_list_action"/> -->
 	<field name="arch" type="xml">
 	<graph string="Leads Analysis" type="pivot" stacked="True">
 		    <field name="user_id" type="row"/>
-		    <field name="password" type="col"/>	    
+		    <field name="password" type="col"/>
 	</graph>
 	</field>
     </record>
@@ -41,7 +49,8 @@
 	    <field name="password" />
 	</tree>
 	</field>
-    </record> 
+    </record>
+
     <!-- temp validation form-->
     <record model="ir.ui.view" id="my_specific_view">
 	<field name="name">password.form2</field>
@@ -60,13 +69,10 @@
 				context="{'password':password,'user_id':user_id,}"
 				class="oe_inline oe_stat_button" 
 				icon="fa-check-circle-o"
-				
                         />
 			<button name="cancel" string="Отмена" special="cancel" class="oe_inline oe_stat_button" icon="fa-stop"/>
 	    </group>
 	    </sheet>
-
-	
 	</form>
         </field>
     </record>
@@ -81,11 +87,26 @@
 		<group>
 		    <field name="id"/>
 		    <field name="name"/>
+		    <field name="enddate"/>
+		    <field name="startdate"/>
 		</group>
 	    </sheet>
 	</form>
 	</field>
     </record>
+<!-- division tree view -->
+     <record model="ir.ui.view" id="division_tree_view">
+            <field name="name">division.tree</field>
+            <field name="model">tabel.division</field>
+            <field name="arch" type="xml">
+                <tree string="Post Tree" >
+			<field name="id" />
+             		<field name="name"/> 
+			<field name="enddate"/>
+			<field name="startdate"/>
+                </tree>
+            </field>
+        </record>
 
     <!-- tabel search view -->
     <record id="view_tabel_search" model="ir.ui.view">
@@ -106,24 +127,16 @@
 	<field name="model">tabel.tabel</field>
 	<field name="arch" type="xml">
 	<form string="Tabel Form">
-	     <header>
-
-	    </header>
-<table>
-    <tr>
-    <td>
-	<group>    
+	    <group>
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик"  readonly= "True"/>
-		<field name="id_division" string="Подразделение" readonly= "True"/>
+		<field name="id_ank" string="Табельщик"  />
+		<field name="id_division" string="Подразделение" domain="[('enddate','&gt;=',time_start_t),('startdate','&lt;=',time_end_t)  ]"/>
 		<field name="dayall" readonly= "True" />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
 		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True" invisible="True"/>
 		<field name="state" widget="statusbar" string="статус документа"/>
-	</group>
-    </td>
-    <td>
+	    </group>
 	<table>
 	    <tr>
 		<td>
@@ -137,6 +150,8 @@
 				icon="fa-file-o"
 				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
 			/>
+		</td>
+		<td>
 			<button
 				name="action_tabell"
 				type="object"
@@ -148,9 +163,7 @@
 				confirm="Вы уверены что хотите загрузить данные из паруса?Данные будут перезаписаны."
 			/>
 		</td>
-	    </tr>
-	    <tr>
-		<td>
+	    	<td>
 			<button
 				name="time_button"
 				type="object"
@@ -159,6 +172,8 @@
 				class="oe_inline oe_stat_button"
 				icon="fa-clock-o"
 			/>
+		</td>
+		<td>
 			<button 
 				name="%(model_action_id)d" 
 				type="action" 
@@ -198,15 +213,10 @@
 		</td>
 	    </tr>
 	</table>
-    </td>
-</tr>
-</table>
-	
-	<field name="ids_string" widget="one2Many" context="{'time_start_t':time_start_t}"/>
-		
-</form>
+	<field name="ids_string" widget="one2Many" context="{'time_start_t':time_start_t,'time_end_t':time_end_t}"/>
+	</form>
 	</field>
-    </record> 
+    </record>
 
     <!-- tabel tree view -->
     <record model="ir.ui.view" id="tabel_tree_view">
@@ -216,6 +226,8 @@
 	<tree string="Tabel List">
 <!--	    <field name="id"/>  -->
 	    <field name="id_ank" string="Табельщик"/>
+	    <field name="id_division" string="Подразделение" />
+	    <field name="create_date" string="дата создания" />
 	    <field name="ank_signature_boss" string="Начальник"/>
 	    <field name="ank_signature_accountant" string="Бухгалтер"/>
 
@@ -274,6 +286,8 @@
 		<tr>
 		    <td><field name="id_tabel" string="Название организации" readonly= "True"/>
 		    <field name="id_fcac" string="ФИО" readonly= "True"/>
+		    <field name="id_person" string="ФИО" readonly= "True"/>
+		    <field name="id_tipdol" string="должность" readonly= "True"/>
 		    <field name="id_vidisp" string="вид л.с." readonly= "True"/>
 		    <field name="id_post" string="должность" readonly= "True"/>
 		    <field name="stqnt" string="кол-во ст." readonly= "True"/></td>
@@ -359,9 +373,11 @@
 	<field name="name">string.tree</field>
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
-	<tree string="String Tree" colors="red:counter != 0"   toolbar="1">
-					<field name="id_fcac" options="{'limit': 200}" string="ФИО"/>
-					<field name="id_post"/>
+	<tree string="String Tree" colors="blue:counter != 0"   toolbar="1">
+					<field name="id_fcac" string="ФИО" />
+					<field name="id_person" string="ФИО" invisible="True"/>
+					<field name="id_post" invisible="True"/>
+					<field name="id_tipdol"/>
 					<field name="id_vidisp"/>
 					<field name="stqnt" string="кол-во ст."/>
 					<field name="hours1"/>
@@ -402,14 +418,43 @@
 					<field name="hours_main"/>
 					<field name="hours_internal"/>
 					<field name="days_absences"/>
-					<field name="days_absences_sum"/> 
-					<field name="counter" invisible="True"/> 
-					<field name="complet" invisible="True"/> 
+					<field name="days_absences_sum"/>
+					<field name="counter" invisible="True"/>
+					<field name="complet" invisible="True"/>
 				
 					
 	</tree>
 	</field>
     </record>
+<!-- tipdol form view -->
+         <record model="ir.ui.view" id="tipdol_form_view">
+            <field name="name">tipdol.form</field>
+            <field name="model">tabel.tipdol</field>
+            <field name="arch" type="xml">
+		<form string="Tipdol Form">
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="num"/>
+                            <field name="code"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+<!-- tipdol tree view -->
+     <record model="ir.ui.view" id="tipdol_tree_view">
+            <field name="name">tipdol.tree</field>
+            <field name="model">tabel.tipdol</field>
+            <field name="arch" type="xml">
+                <tree string="Tipdol Tree" >
+			<field name="num"/>
+             		<field name="name"/>
+             		<field name="code"/>
+			<field name="id" />
+                </tree>
+            </field>
+        </record>
 
 <!-- post form view -->
          <record model="ir.ui.view" id="post_form_view">
@@ -420,12 +465,28 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="num"/>
+			    <field name="enddate"/>
+			    <field name="startdate"/>
                         </group>
                     </sheet>
                 </form>
             </field>
         </record>
-
+<!-- post tree view -->
+     <record model="ir.ui.view" id="post_tree_view">
+            <field name="name">post.tree</field>
+            <field name="model">tabel.post</field>
+            <field name="arch" type="xml">
+                <tree string="Post Tree" >
+			<field name="num"/>
+             		<field name="name"/> 
+			<field name="id" />
+			<field name="enddate"/>
+			<field name="startdate"/>
+                </tree>
+            </field>
+        </record>
 <!-- ank search view -->
 	<record id="view_ank_search" model="ir.ui.view">
 		<field name="name">tabel.ank.search</field>
@@ -509,11 +570,13 @@
                 <tree string="Fcac Tree" >
 			<field name="id"/>
 			<field name="ank_rn"/>
+			<field name="tipdol_rn"/>
 			<field name="post_rn"/>
 			<field name="subdiv_rn"/>
 			<field name="vidisp_rn"/>
 			<field name="startdate"/>
 			<field name="enddate"/>
+			<field name="katper_rn"/>
                 </tree>
             </field>
         </record>
@@ -657,17 +720,6 @@
                 </tree>
             </field>
         </record> 
-<!-- post tree view -->
-     <record model="ir.ui.view" id="post_tree_view">
-            <field name="name">post.tree</field>
-            <field name="model">tabel.post</field>
-            <field name="arch" type="xml">
-                <tree string="Post Tree" >
-             		<field name="name"/>
-			<field name="id"/>
-                </tree>
-            </field>
-        </record>
 <!-- grday tree view -->
      <record model="ir.ui.view" id="grday_tree_view">
             <field name="name">grday.tree</field>
@@ -692,7 +744,7 @@
 			<field name="grmonth_rn"/>
                 </graph>
             </field>
-        </record>
+        </record>		
 <!-- grmonth tree view -->
      <record model="ir.ui.view" id="grmonth_tree_view">
             <field name="name">grmonth.tree</field>
@@ -725,6 +777,22 @@
                 </tree>
             </field>
         </record>
+<!-- katper tree view -->
+     <record model="ir.ui.view" id="katper_tree_view">
+            <field name="name">katper.tree</field>
+            <field name="model">tabel.katper</field>
+            <field name="arch" type="xml">
+                <tree string="Katper Tree" >
+			<field name="id"/>
+			<field name="code"/>
+			<field name="name"/>
+			<field name="nick"/>
+			<field name="num"/>
+                </tree>
+            </field>
+        </record>
+
+
 <!-- ACTIONS -->
         <record model="ir.actions.act_window" id="string_list_action">
             <field name="name">String</field>
@@ -790,7 +858,13 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-
+	<!-- window action tipdol-->
+	<record model="ir.actions.act_window" id="tipdol_list_action">
+            <field name="name">Tipdol</field>
+            <field name="res_model">tabel.tipdol</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
 	<!-- window action post-->
 	<record model="ir.actions.act_window" id="post_list_action">
             <field name="name">Post</field>
@@ -819,6 +893,14 @@
 	<record model="ir.actions.act_window" id="grrbdc_list_action">
             <field name="name">Grrbdc</field>
             <field name="res_model">tabel.grrbdc</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+	<!-- window action katper-->
+	<record model="ir.actions.act_window" id="katper_list_action">
+            <field name="name">Katper</field>
+            <field name="res_model">tabel.katper</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
@@ -902,20 +984,6 @@
 	    <field name="context">{'state':'create'}</field>
 
         </record>
-        <record id="model_action_id" model="ir.actions.act_window">
-                <field name="name">Валидация пароля</field>
-                <field name="type">ir.actions.act_window</field> 
-                <field name="res_model">tabel.temp</field>
-                <field name="view_type">form</field>
-                <field name="view_mode">form</field>
-<!--                <field name="search_view_id" ref="view_password_search"/> -->
-                <field name="view_id" ref="my_specific_view"/> 
-           <!--     <field name="domain">[]</field> -->
-<!--                <field name="context">{'user_id':uid}</field> -->
-<!--                <field name="target">new</field> -->
-        </record>
-
-
 
         <!-- top level menu: no parent -->
         <menuitem id="main_tabel_menu" name="Tabel"/>
@@ -924,7 +992,7 @@
                   parent="main_tabel_menu" />
 
         <menuitem id="tabel_menu_settings" name="Настройки"
-                  parent="main_tabel_menu"  groups="group_manager"/>
+                  parent="main_tabel_menu"  groups="Tabel.group_manager"/>
 <!-- 
         <menuitem id="new_tabel_menu" name="Сотрудники"
 		  parent="tabel_menu_settings"
@@ -969,9 +1037,16 @@
         <menuitem id="grrbdc_menu" name="Графики работы"
                   parent="tabel_menu_settings"
                   action="grrbdc_list_action"/>
+        <menuitem id="katper_menu" name="категории сотрудников"
+                  parent="tabel_menu_settings"
+                  action="katper_list_action"/>
         <menuitem id="post_menu" name="Должности"
                   parent="tabel_menu_settings"
                   action="post_list_action"/>
+
+        <menuitem id="tipdol_menu" name="Должности типовые"
+                  parent="tabel_menu_settings"
+                  action="tipdol_list_action"/>
 
         <menuitem id="temp_menu" name="временная таблица"
                   parent="tabel_menu_settings"

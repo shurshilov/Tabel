@@ -1,5 +1,6 @@
 #!/usr/bin/env python 
 # -*- coding: utf-8 -*-
+import re
 import math
 import compute_hash
 import time_format
@@ -119,6 +120,8 @@ class Temp(models.TransientModel):
                         raise exceptions.ValidationError("Не правильный пароль(Повторите ввод)!")
 
 
+
+#Значение нормы часов для конкретного дня месяца по конкретному виду часов
 class Grday (models.Model):
 	_name = 'tabel.grday'
 
@@ -126,6 +129,21 @@ class Grday (models.Model):
 	monthday = fields.Integer(string="MONTHDAY",index=True)
 	hourinday = fields.Float(string="HOUR IN DAY")
 
+
+
+#Таблица с категориями работников, не используется
+class Katper (models.Model):
+	_name = 'tabel.katper'
+	_rec_name = 'num'
+	_order = 'num'
+	code = fields.Char(string="code of katper")
+	name = fields.Char(string="name of katper")
+	nick = fields.Char(string="nick of katper")
+	num = fields.Integer(string="NUM")
+
+
+
+#Количество нормо-дней и часов за конкретный месяц конкретного года, по виду из таблицы Grrgdc
 class Grmonth (models.Model):
 	_name = 'tabel.grmonth'
 	_rec_name = 'grrbdc_rn'
@@ -136,6 +154,9 @@ class Grmonth (models.Model):
 	dayall = fields.Integer(string="DAYALL")
 	hourall = fields.Float(string="HOURALL")
 
+
+
+#Вид трудового дня, он же график работы, т.е. по 8 часов по 7,7 по 6 часов 5 дневка 6 дневка и т.д.
 class Grrbdc (models.Model):
 	_name = 'tabel.grrbdc'
 
@@ -147,12 +168,19 @@ class Grrbdc (models.Model):
 	daysmin = fields.Float(string="DAYSMIN")
 	hourmin = fields.Float(string="HOURMIN")
 
+
+
+#Расшифровка дня неявки О-отпуск К-командировка и т.д.
 class Daytype(models.Model):
 	_name = 'tabel.daytype'
 	
 	nick = fields.Char(string="nick of Vidisp")
 	name = fields.Char(string="name of Vidisp")
-	
+
+
+
+#Сформированные бухгалтером дни явок для каждого сотрудника за каждый день месяца, большая таблица
+#Не используется, если бух. формирует дни после приема табелей
 class Fcacwtd(models.Model):
 	_name = 'tabel.fcacwtd'
 	
@@ -160,6 +188,10 @@ class Fcacwtd(models.Model):
 	daytype_rn = fields.Many2one('tabel.daytype',  ondelete='cascade', string="daytype_id")
 	date=  fields.Date(string="time of day tabel", index = True)
 
+
+
+#Сформированные бухгалтером отработанные часы за каждый день месяца для каждого сотрудника, очень большая таблица
+#Не используется, если бух. формирует часы после приема табелей
 class Fcacwth(models.Model):
 	_name = 'tabel.fcacwth'
 	_rec_name = 'hourqnt'
@@ -169,32 +201,66 @@ class Fcacwth(models.Model):
 	hourqnt = fields.Float(string="chasi hourqnt")
 	date =  fields.Date(string="time of hour tabel", index = True)
 
+
+
+#Таблица ставок для каждого лицевого счета
 class Fcacch(models.Model):
 	_name = 'tabel.fcacch'
 	_rec_name = 'stqnt'
+
 	stqnt = fields.Float(string="stavka stqnt", required=True)
 	fcacbs_rn = fields.Integer(string="FCACBS_RN",index=True)
 	grrbdc_rn = fields.Integer(string="grrbdc_rn")
-    
+
+
+
+#Таблица вида исполнения (основной, совместительство и т.д.)
 class Vidisp(models.Model):
 	_name = 'tabel.vidisp'
+	_rec_name = 'code'
 
 	code = fields.Char(string="code of Vidisp", required=True)
 	name = fields.Char(string="name of Vidisp", required=True)
+
+
+
+#Таблица должностей
 class Post(models.Model):
 	_name = 'tabel.post'
+	_rec_name = 'name'
+	_order = 'num'
 
+	num = fields.Integer(string="num")
 	name = fields.Char(string="name of Post", required=True)
+	enddate = fields.Date(string="enddate post")
+	startdate = fields.Date(string="startdate post")
+
+
+
+#Таблица типовых должностей
+class Tipdol(models.Model):
+	_name = 'tabel.tipdol'
+	_rec_name = 'code'
+	_order = 'num'
+
+	num = fields.Integer(string="num")
+	name = fields.Char(string="name of Tipdol")
+	code = fields.Char(string="code of Tipdol")
+
+
+#Таблица персон, содержит только фамилию имя и отчества, значения могут повторяться
 class Person(models.Model):
 	_name = 'tabel.person'
 	_rec_name= 'full_name'
 	_order = 'full_name'
+
 	surname = fields.Char(string="Фамилия", required=True)
 	firstname = fields.Char(string="Имя", required=True)
 	secondname = fields.Char(string="Отчество", required=True)
 	initials_first = fields.Char(compute='_compute_first',string="Инициал Имени")
 	initials_second = fields.Char(compute='_compute_second',string="Инициал Отчества")
 	full_name = fields.Char (string="Полное имя")
+#	init_name  = fields.Char(compute='_compute_init',string="Фамилии инициалы")
 
 	@api.depends('firstname')
 	def _compute_first (self):
@@ -215,20 +281,44 @@ class Person(models.Model):
 			if len (record.secondname) >1:
 				record.initials_second = record.secondname [1]+". "
 
+#	@api.depends('surname','firstname','secondname')
+#        def _compute_init (self):
+#		for record in self:
+#		    record.init_name=surname+initials_first+initials_second
+
+	def name_get(self, cr, uid, ids, context):
+        	if not len(ids):
+        	    return []
+        	res=[]
+        	for emp in self.browse(cr, uid, ids):
+			ank=emp.surname+emp.initials_first+emp.initials_second
+			
+			res.append((emp.id,ank))
+		return res
+
+
+
+#Таблица сотрудников
 class Ank(models.Model):
 	_name = 'tabel.ank'
 	_rec_name = 'orgbase_rn'
 	_order = 'orgbase_rn'
+
 	orgbase_rn = fields.Many2one('tabel.person',  ondelete='cascade', string="orgbase_rn")
 	tab_num = fields.Integer(string="TAB_NUM")
 	jobbegin = fields.Date(string="time begin of work")
 	jobend = fields.Date(string="time end of work")
+
+
+
+#Таблица лицевых счетов, основная таблица
 class Fcac(models.Model):
 	_name = 'tabel.fcac'
-
-	#name = fields.Char(compute='_compute_name')
 	_rec_name = 'ank_rn'
-	_order = 'ank_rn'
+	_order = 'katper_rn'
+
+	tipdol_rn = fields.Many2one('tabel.tipdol',ondelete='cascade', string="tipdol_rn")
+	katper_rn = fields.Many2one('tabel.katper',ondelete='cascade', string="katper_rn")
 	fcacch_rn =fields.One2many('tabel.fcacch', 'fcacbs_rn', string="fcacch_rn")
 	ank_rn = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_rn")
 	post_rn = fields.Many2one('tabel.post',  ondelete='cascade', string="post_rn",index=True)
@@ -236,44 +326,47 @@ class Fcac(models.Model):
 	vidisp_rn = fields.Many2one('tabel.vidisp', ondelete='cascade', string="vidisp_rn",index =True)
 	startdate = fields.Date(string="time begin of fcac")
 	enddate = fields.Date(string="time end of fcac")
-#	stqnt = fields.One2many ('tabel.fcacch',)
-	def name_get(self, cr, uid, ids, context):         
-        	if not len(ids):
-        	    return []
-        	res=[]
-        	for emp in self.browse(cr, uid, ids,context=context):
 
-			post = ""
-			for line in emp.post_rn:
-				post=line.name
-			ank = ""
-			for line in emp.ank_rn:
-				for r in line.orgbase_rn:
-					ank=r.surname+r.initials_first+r.initials_second	
-			vidisp = ""
-			for line in emp.vidisp_rn:
-				vidisp=line.name	
-			
-			res.append((emp.id,ank))
-	        #res.sort()
-		return res
+	def name_get(self, cr, uid, ids, context):
+    	    if not len(ids):
+    		return []
+    	    res=[]
+    	    for emp in self.browse(cr, uid, ids,context=context):
+		ank = " "
+		for line in emp.ank_rn:
+		    for r in line.orgbase_rn:
+			ank=r.surname+r.initials_first+r.initials_second
+		res.append((emp.id,ank))
+	    return res
 
+
+
+#Таблица подразделений
 class Division(models.Model):
     _name = 'tabel.division'
 
     name = fields.Char(string="name of Division", required=True)
+    enddate = fields.Date(string="enddate div")
+    startdate = fields.Date(string="startdate div")
 
+
+
+#Таблица строк табелей, основная таблица
 class String(models.Model):
     _name = 'tabel.string'
     _rec_name = 'id_fcac'
-    _order = 'id_fcac'
+    _order = 'id_tipdol, id_person'
 
-#    _defaults = {'order_line': lambda obj, cr, uid, context: '/',}
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
+#    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="сотрудник")
+    id_tipdol = fields.Many2one('tabel.tipdol',string="тип. должности")
+    #используется для сортировки по алфавиту,во вью невидимое
+    id_person = fields.Many2one('tabel.person',  ondelete='cascade', string="фамилии")
     id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id")
-    id_post = fields.Char(string="должность")
-    id_vidisp = fields.Char(string="вид л.с.")
-    stqnt = fields.Float(string="ставка")
+    #не используется
+    id_post = fields.Many2one('tabel.post',string="должность")
+    id_vidisp = fields.Many2one('tabel.vidisp',string="вид л.с.")
+    stqnt = fields.Float(string="ставка",digits=(12,3))
 
     hours1 = fields.Char(string="1")
     hours2 = fields.Char(string="2")
@@ -314,35 +407,47 @@ class String(models.Model):
     hours_internal = fields.Char(string="Вну",compute='_compute_days_appear')
     days_absences = fields.Char (string="Неяв",compute='_compute_days_appear')
     days_absences_sum = fields.Char (string="Сум",compute='_compute_days_appear')
-    counter = fields.Integer (string = "Счет", default = 0)
+    counter = fields.Integer (string = "Счет",default=0)
     percent = fields.Char (string = "Прц")
-
     complet = fields.Char (string = "Разнести")
+    
+    def create(self, cr, uid, values, context):
+			context = {}
+			values ['counter']=1
+			id = super(String, self).create(cr, uid, values)
+			return id
 
     def fields_view_get(self, cr, uid,context, view_id=None, view_type='form', toolbar=False, submenu=False):
-#	 for i in self:
-#	    i.counter=1
-#        raise osv.except_osv('info ',str(context['ids_string'][0][1]))
 	 
 	 result = super(String, self).fields_view_get(cr, uid, view_id, view_type,context, toolbar, submenu)
          # use lxml to compose the arch XML
          arch=result['arch']
          fields = result['fields']
          tb = {'print': [], 'action': [], 'relate': []}
-         if view_type=='search':
-             return result
+
+#         if view_type=='search':
+#             return result
+#
+#         if view_type=='tree':
+#             return result
+
          if view_type=='form':
-             #return result
-            #raise osv.except_osv('info ',str(result['fields']))
-	    arch = ''' <form string="Analytic" >
+#	    now_date = datetime.date.today()
+#	    now_date = now_date.replace(day=1).strftime('%Y-%m-%d')
+#        <field name="id_post" string="должность" readonly= "True" domain="[('enddate','&gt;=',' '''+str(time)+''' '),('startdate','&lt;=',' '''+str(time2)+''' '),('startdate','&gt;=',' '''+time3+''' ')   ]"/>
+	    time3=datetime.date(2014, 03, 1).strftime('%Y-%m-%d')
+	    time=context['time_start_t']
+	    time2=context['time_end_t']
+	    arch = ''' <form string="Analytic" create="false" edit="false" write="false">
             <group>
-        <field name="id_fcac" string="ФИО" readonly= "True"/>
-        <field name="id_vidisp" string="вид л.с." readonly= "True"/>
-        <field name="id_post" string="должность" readonly= "True"/>
+        <field name="id_fcac" string="ФИО" readonly= "True" domain="[('enddate','&gt;=',' '''+str(time)+''' '),('startdate','&lt;=',' '''+str(time2)+''' ')   ]"/>
+        <field name="id_vidisp" string="вид л.с." readonly= "True" domain="[('code','not like','----')]"/>
+        <field name="id_tipdol" string="должность" readonly= "True"/>
+
         <field name="stqnt" string="кол-во ст." readonly= "True"/>
         </group>
         <table>
-            <tr>
+            <tr>									
             <th>сумма дней</th>
             <th>основные </th>
             <th>внутренние</th>
@@ -376,7 +481,6 @@ class String(models.Model):
         <th><p align="center">Воскресенье</p></th>
         </tr>
              '''
-	    time=context['time_start_t']
 	    dayweek =  int(datetime.datetime.strptime(time, '%Y-%m-%d').date().weekday())
 	    cnt=dayweek
 	    for i in range (1,32):
@@ -416,12 +520,12 @@ class String(models.Model):
          }
          return result
 
-#   поле используемое для вычисления изменений в строке, если они есть то counter > 0
-    @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31','stqnt','id_fcac','hours_night','hours_holiday')
-    @api.one
-    def _compute_counter (self):
-	self.counter = self.counter + 1
-#функция разнести
+    #поле используемое для вычисления изменений в строке, если они есть то counter > 0
+#    @api.one
+#    @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31','stqnt','id_fcac','hours_night','hours_holiday')
+#    def compute_counter (self):
+#	self.counter = 2
+    #функция разнести
     @api.one
     def compute_complet (self):
 		    self.hours1= self.complet
@@ -454,48 +558,25 @@ class String(models.Model):
             	    self.hours28= self.complet
             	    self.hours29= self.complet
             	    self.hours30= self.complet
-		    self.hours31= self.complet
 
-    @api.one
-    @api.depends('id_fcac','post_rn','vidisp_rn')
-    def _compute_post_vidisp (self):
-	self.id_post=self.id_fcac.post_rn.name
-	self.id_vidisp=self.id_fcac.vidisp_rn.code
     #функция вычисляющая количетсво дней неявок,явок,отработанных часов и т.д.
-    @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15')
-    @api.depends('hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
+    @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
     def _compute_days_appear(self):
-
-	def floatToTime (a):#перевод из десятичного в часы:минуты
-	    a = float(a)*60
-	    minutes = a%60
-	    hours =  a/60
-	    if int(round(minutes)) < 10:
-		return str(int(hours))+":0"+str(int(round (minutes)))
-	    else:
-		return str(int(hours))+":"+str(int(round(minutes)))
-
-	def timeToFloat (a):#перевод из часы:минуты в десятичное
-	    time= a.split(':')
-	    hours = float (time[0])
-	    minutes = float (time[1])
-	    t = hours*60.0 + minutes
-	    t = t/60
-	    return round(t,3)
-
-	def timeToFloat2 (a):#перевод из часы:минуты в десятичное
-	    time= a.split(',')
-	    hours = float (time[0])
-	    minutes = float (time[1])
-	    t = hours*60.0 + minutes*6.0
-	    t = t/60
-	    return round(t,3)
-
+	
         id_emp_sec=self.pool.get('tabel.daytype').search(self._cr,self._uid,[('nick','!=','')])#получаем ид всех строк из таблице daytype где есть ник
 	model_daytype= self.pool.get('tabel.daytype').browse(self._cr, self._uid, id_emp_sec)
 
-
+#	self=self.sorted(key=lambda r: r.id_fcac.katper_rn)
 	for record in self:
+#		проверка на то чтобы должности и типовые должности совпадали
+#		if record.id_tipdol.code != record.id_post.name:
+#		    record.counter=1
+
+#		if record.counter:
+#		    record.counter = str(float (record.counter) +1)
+#		else:
+#		    record.counter="0"
+		#record.stqnt=round(record.stqnt,3)
 		record.days_absences_sum = "0"#количество дней неявок в сумме
 		record.days_absences = " "#строка неявок в формате (код/кол-во;)
 		record.days_appear = "0"#дни явок в сумме
@@ -505,8 +586,10 @@ class String(models.Model):
 		d_abse ={}#заполняем словарь из кодов неявок для дальнейшего подсчета
 		for r in model_daytype:
 		    a = r.nick.replace (' ','')
+#		    a = a.upper()
 		    d_abse[a] = 0
-		vidisp = record.id_fcac.vidisp_rn.name
+		#vidisp = record.id_fcac.vidisp_rn.name
+		vidisp= record.id_vidisp.name
 		if vidisp:
             	    vidisp1 = u' Внутренний совместитель'#если внутренний совместитель то считаются часы не основные а внутренние
 		    current_model = self.pool.get('tabel.tabel').browse(self._cr, self._uid, record.id_tabel.id,self._context)
@@ -520,16 +603,14 @@ class String(models.Model):
 			global flag
 			flagEx = False
 			if a:
-			    if a.find(':')>=0 or a.find(',')>=0:
-				if a.find(':')>=0:
-				    a =timeToFloat(a)
-				else:
-				    a = timeToFloat2(a)
+			    if re.search(':|,|-',a)>=0:
+				a =time_format.timeToFloat  (a)
 			    
 			    try:#проверяем если в поле число значит считаем часы
 				float(a)
 			    except ValueError:#если встретили код
 				a=a.replace(' ', '')
+#				a=a.upper()
 				flagEx = True#показываем что уже был посчитан код
 				if a in d_abse:
 				    d_abse[a]=d_abse[a]+1#добавляем в словарь кода 1
@@ -542,9 +623,9 @@ class String(models.Model):
 			    if flagEx==False:#если у нас число то пересчитываем основные или внутренние часы. переводим в числа.
 
 				if record.hours_internal.find(':')>=0:
-				    record.hours_internal = timeToFloat (record.hours_internal)
+				    record.hours_internal = time_format.timeToFloat (record.hours_internal)
 				if record.hours_main.find(':')>=0:
-				    record.hours_main = timeToFloat (record.hours_main)
+				    record.hours_main = time_format.timeToFloat (record.hours_main)
 
 				if flag == 1:#считаем внутренние
 				#    if current_model.format:#сморим какой нужен формат вывода
@@ -556,6 +637,7 @@ class String(models.Model):
 				#	record.hours_main = floatToTime (float(record.hours_main)+ float(a))
 				#    else:
 			    		record.hours_main = str (float(record.hours_main)+ float(a))
+
 				record.days_appear = str (int(record.days_appear) + 1)#в любом случае это явка
 
 
@@ -592,17 +674,34 @@ class String(models.Model):
             	    summ (record.hours29)
             	    summ (record.hours30)
 		    summ (record.hours31)
-
+		
 		    if record.days_absences_sum == "0":
 			    record.days_absences_sum = " "
 		    if record.days_appear == "0":
 			     record.days_appear = " "
-		    if record.hours_main == "0.0":
+		    #Не печатаем ноль только в основном виде исполнения и внутреннем совместительстве
+		    if record.hours_main == "0.0" and (vidisp==u' Основной' or  vidisp==u' Внутренний совместитель'):
 			    record.hours_main = " "
 		    if record.hours_internal == "0.0":
 			    record.hours_internal = " "
 		    if record.percent:
 			record.days_appear= " "
+		    # 4 строки надо удалить + переделать округление
+		    #if record.hours_internal.find(':')>=0:
+		#	    record.hours_internal = time_format.timeToFloat (record.hours_internal)
+		#    if record.hours_main.find(':')>=0:
+		#	    record.hours_main = timeToFloat (record.hours_main)
+		    try:
+			aaa=float(record.hours_internal)
+			record.hours_internal = str (round (aaa,2)  )
+		    except:
+			print 1
+		    try:
+			bbb=float(record.hours_main)
+			record.hours_main = str (round(bbb,2) )
+		    except:
+			print 1
+		
 
 class Password(models.Model):
 
@@ -637,7 +736,7 @@ class Tabel(models.Model):
     _name = 'tabel.tabel'
     
     #_rec_name = 'id_ank'
-    #_order = 'id_ank'
+    _order = 'id_division'
 
     #первый день текущего месяца
     def time_first (self):
@@ -697,7 +796,7 @@ class Tabel(models.Model):
     num_tabel = fields.Integer(string="number of Tabel")
     time_start_t = fields.Date(string="time start of tabel", default = time_first)
     time_end_t = fields.Date(string="time end of tabel", default = time_last)
-    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default, order ='surname')
+    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default, order ='orgbase_rn')
     ids_string = fields.One2many('tabel.string', 'id_tabel', string="string",  limit = 500)
     state = fields.Selection([
          ('draft', "Не подписанный"),
@@ -714,19 +813,56 @@ class Tabel(models.Model):
 		self.format = False
 	else:
 		self.format = True
-	time_format.time_format (self)
+#	time_format.time_format (self)
+#	self.hours1
 
     #Обновить данные по пропускам(приказам),если появился новый сотрудник или больничный или отпуск и т.д. то данные обновятся не стирая введеные часы
     @api.one
     def action_tabel(self):
 	#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
 	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
-	#Обновляем данные по ставкам
-	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
 
-	#обновляем данные вдолжности и виды л.с.
-	self._cr.execute("UPDATE tabel_string SET  id_post = tabel_post.name  FROM tabel_post WHERE  tabel_post.id = (SELECT tabel_fcac.post_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
-	self._cr.execute("UPDATE tabel_string SET  id_vidisp = tabel_vidisp.code  FROM tabel_vidisp WHERE  tabel_vidisp.id = (SELECT tabel_fcac.vidisp_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
+	#id_emp_sec=self.pool.get('tabel.string').search(self._cr,self._uid,[(1,'=',1)])#получаем ид всех строк из таблице daytype где есть ник
+	#Если строка была создана вручную или уже есть, то ее не обновляем. Обновляем только новые пустые строки.... 
+	#(возможна неправильная ситуация (не сработает обновление на уже созданном) надо подумать)
+	#Обновляем должности и вид л.с.
+        id_emp_sec=self.pool.get('tabel.string').search(self._cr,self._uid,[('id_tabel','=',self.id)])#получаем ид всех строк из таблице daytype где есть ник
+	for i in id_emp_sec:
+		
+		model_string= self.pool.get('tabel.string').browse(self._cr, self._uid, i)
+
+		#обновляем ставки, если поле пустое
+		if model_string.stqnt:
+		    continue
+		else:
+		    id_emp_sec2=self.pool.get('tabel.fcacch').search(self._cr,self._uid,[('fcacbs_rn','=',model_string.id_fcac.id)])
+		    for j in id_emp_sec2:
+			model_fcacch= self.pool.get('tabel.fcacch').browse(self._cr, self._uid, j)
+			model_string.stqnt=model_fcacch.stqnt
+
+		#обновляем должности если поле пустое
+		if model_string.id_post:
+		    continue
+		else:
+		    model_string.id_post=model_string.id_fcac.post_rn.id
+
+		#обновляем типовые должности, которые используются, если поле пустое
+		if model_string.id_tipdol:
+		    continue
+		else:
+		    model_string.id_tipdol=model_string.id_fcac.tipdol_rn.id
+
+		#обновляем ФИО, если поле пустое
+		if model_string.id_person:
+		    continue
+		else:
+		    model_string.id_person=model_string.id_fcac.orgbase_rn.id
+
+		#обновляем виды исполнения, если поле пустое
+		if model_string.id_vidisp:
+		    continue
+		else:
+		    model_string.id_vidisp=model_string.id_fcac.vidisp_rn.id
 
 	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем дням и обновляем
 	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, DAYTYPE_RN int, DATE date);") 
@@ -748,10 +884,13 @@ class Tabel(models.Model):
 	#Обновляем данные по ставкам
 	self._cr.execute("UPDATE tabel_string SET  stqnt = tabel_fcacch.stqnt  FROM tabel_fcacch WHERE  tabel_fcacch.fcacbs_rn = tabel_string.id_fcac "+" and tabel_string.id_tabel = "+str(self.id)+"  ;")
 
-	#обновляем данные вдолжности и виды л.с.
-	self._cr.execute("UPDATE tabel_string SET  id_post = tabel_post.name  FROM tabel_post WHERE  tabel_post.id = (SELECT tabel_fcac.post_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
-	self._cr.execute("UPDATE tabel_string SET  id_vidisp = tabel_vidisp.code  FROM tabel_vidisp WHERE  tabel_vidisp.id = (SELECT tabel_fcac.vidisp_rn FROM tabel_fcac WHERE tabel_fcac.id = tabel_string.id_fcac  "+" and tabel_string.id_tabel = "+str(self.id)+")  ;")
-
+        id_emp_sec=self.pool.get('tabel.string').search(self._cr,self._uid,[('id_tabel','=',self.id)])#получаем ид всех строк из таблице daytype где есть ник
+	for i in id_emp_sec:
+		model_string= self.pool.get('tabel.string').browse(self._cr, self._uid, i)
+		model_string.id_post=model_string.id_fcac.post_rn.id
+		model_string.id_tipdol=model_string.id_fcac.tipdol_rn.id
+		model_string.id_vidisp=model_string.id_fcac.vidisp_rn.id
+		model_string.id_person=model_string.id_fcac.ank_rn.orgbase_rn.id
 #"""
 #Вариант 1
 #Если бухгалтерия не формирует часы зараннее, то нужно их импортировать из графиков
@@ -760,6 +899,7 @@ class Tabel(models.Model):
 #Обновляем данные по часам"""
 	year =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().year
 	month =  datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date().month
+
 	for i in self.ids_string:
 		    if i.id_fcac.vidisp_rn.id in [17,14,23,24]:
 			i.percent=str(i.stqnt*100)
@@ -775,7 +915,7 @@ class Tabel(models.Model):
 			    for k in id_day:
 				day= self.pool.get('tabel.grday').browse(self._cr, self._uid, k)
 				norma = day.hourinday*i.stqnt
-				self._cr.execute("UPDATE tabel_string SET  hours"+str(c)+" = "+str(norma)+" where  tabel_string.id="+str(i.id)+" ;")
+				self._cr.execute("UPDATE tabel_string SET  hours"+str(c)+" = '"+time_format.floatToTime(norma)+"' where  tabel_string.id="+str(i.id)+" ;")
 				break
 			    c+=1
 			break
@@ -814,7 +954,7 @@ class Tabel(models.Model):
 
 	#ставим счетчик =0 положение когда в табеле ничего не изменено.
 	for r in self.ids_string:
-		r.counter = 0
+#		r.counter = 0
 		r.hours_night = ""
 		r.hours_holiday = ""
 

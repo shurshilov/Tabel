@@ -5,15 +5,19 @@ import psycopg2
 import datetime
 import sys
 import parus_id_to_odoo
+import datetime
 def person_func(directory,dbname,userr,pas,hostt,portt):
 	ank = dbf.Dbf(directory+"zpost.dbf")
 	f_ank = open(directory+'post.csv', 'w')
-	f_ank.write ("ID; NAME\n")
+	f_ank.write ("ID; STARTDATE;  ENDDATE; POST_NUM; NAME\n")
 	#print len(ank)
 	for i in ank:
-		if i.deleted or i["POST_CODE"] == None :
+		if i.deleted or i["POST_CODE"] == None or i["ENDDATE"] == None or i["STARTDATE"] == None:
 			continue
 		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["POST_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
+		f_ank.write (str (i ["STARTDATE"])  +"; ")
+		f_ank.write (str (i ["ENDDATE"])  +"; ")
+		f_ank.write (i ["POST_NUM"]  +"; ")
 		f_ank.write (i ["POST_CODE"].decode('cp1251').encode('utf-8')  +"\n")
 	f_ank.close()
 	print "zpost.dbf to post.csv [ ok ]"
@@ -26,15 +30,15 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 	my_file = open(directory+'post.csv')
 
 	#CREATE TEMP TABLE
-	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, NAME  text);") 
+	cur.execute("CREATE TEMP TABLE tmp_z (ID int unique, STARTDATE date, ENDDATE date, NUM int, NAME  text);") 
 	cur.copy_expert("COPY tmp_z FROM STDIN WITH DELIMITER ';' CSV HEADER;", my_file)
 	#cur.execute ("DELETE from tabel_fcac;")
 	#UPDATE DATA
-	cur.execute("UPDATE tabel_post SET  NAME=tmp_z.NAME FROM tmp_z WHERE  tabel_post.id = tmp_z.id;")
+	cur.execute("UPDATE tabel_post SET STARTDATE=tmp_z.STARTDATE, ENDDATE=tmp_z.ENDDATE, NUM=tmp_z.NUM, NAME=tmp_z.NAME FROM tmp_z WHERE  tabel_post.id = tmp_z.id;")
 
 	#cur.execute("SELECT G.id, G.ANK_RN, G.POST_RN, G.SUBDIV_RN, G.VIDISP_RN, G.STARTDATE, G.ENDDATE FROM (SELECT T.id, T.ANK_RN, T.POST_RN, T.SUBDIV_RN, T.VIDISP_RN, T.STARTDATE, T.ENDDATE FROM tmp_z AS T LEFT JOIN tabel_fcac AS P  ON T.id = P.id WHERE P.id IS NULL) AS G, tabel_ank AS H where G.ank_rn = H.id  ;")
 	#INSERT DATA add something which lacks
-	cur.execute("INSERT INTO tabel_post (id, name) SELECT T.id, T.NAME FROM tmp_z AS T LEFT JOIN tabel_post AS P  ON T.id = P.id WHERE P.id IS NULL ;")
+	cur.execute("INSERT INTO tabel_post (id, startdate, enddate, num, name) SELECT T.id, T.STARTDATE, T.ENDDATE, T.NUM, T.NAME FROM tmp_z AS T LEFT JOIN tabel_post AS P  ON T.id = P.id WHERE P.id IS NULL ;")
 	
 	#rows = cur.fetchall()
 	#for i in rows:
