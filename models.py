@@ -290,9 +290,10 @@ class Person(models.Model):
         	if not len(ids):
         	    return []
         	res=[]
+		ank=" "
         	for emp in self.browse(cr, uid, ids):
-			ank=emp.surname+emp.initials_first+emp.initials_second
-			
+			if emp.surname and emp.initials_first and emp.initials_second:
+			    ank=emp.surname+emp.initials_first+emp.initials_second
 			res.append((emp.id,ank))
 		return res
 
@@ -416,14 +417,18 @@ class String(models.Model):
 			values ['counter']=1
 			id = super(String, self).create(cr, uid, values)
 			return id
+    def fields_view_get(self, cr, uid, view_id=None, view_type='form',context=None, toolbar=False, submenu=False):
 
-    def fields_view_get(self, cr, uid,context, view_id=None, view_type='form', toolbar=False, submenu=False):
-	 
 	 result = super(String, self).fields_view_get(cr, uid, view_id, view_type,context, toolbar, submenu)
          # use lxml to compose the arch XML
          arch=result['arch']
          fields = result['fields']
          tb = {'print': [], 'action': [], 'relate': []}
+         if view_type=='search':
+             return result
+         if view_type=='tree':
+             return result
+
 
 #         if view_type=='search':
 #             return result
@@ -680,7 +685,7 @@ class String(models.Model):
 		    if record.days_appear == "0":
 			     record.days_appear = " "
 		    #Не печатаем ноль только в основном виде исполнения и внутреннем совместительстве
-		    if record.hours_main == "0.0" and (vidisp==u' Основной' or  vidisp==u' Внутренний совместитель'):
+		    if record.hours_main == "0.0" and (vidisp==u' Основной работник' or  vidisp==u' Внутренний совместитель'):
 			    record.hours_main = " "
 		    if record.hours_internal == "0.0":
 			    record.hours_internal = " "
@@ -856,7 +861,7 @@ class Tabel(models.Model):
 		if model_string.id_person:
 		    continue
 		else:
-		    model_string.id_person=model_string.id_fcac.orgbase_rn.id
+		    model_string.id_person=model_string.id_fcac.ank_rn.orgbase_rn.id
 
 		#обновляем виды исполнения, если поле пустое
 		if model_string.id_vidisp:
@@ -1029,5 +1034,102 @@ class Tabel(models.Model):
 	    'create':False,
 	}
 
+
+
+class Ustring(models.Model):
+    _name = 'tabel.ustring'
+    id_upload = fields.Many2one('tabel.upload', ondelete='cascade', string="upload_id")
+    id_tabel = fields.Many2one('tabel.tabel', ondelete='cascade', string="tabel_id")
+    id_tipdol = fields.Many2one('tabel.tipdol',string="Должность")
+    id_fcac = fields.Many2one('tabel.fcac',string="fcac")
+    #используется для сортировки по алфавиту,во вью невидимое
+    id_person = fields.Many2one('tabel.person',  ondelete='cascade', string="фамилии")
+    id_vidisp = fields.Many2one('tabel.vidisp',string="Вид л.с.")
+    stqnt = fields.Float(string="Занятые ставки",digits=(12,3))
+    id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="Подразделение")
+    id_string= fields.Integer( string="id")
+    ids_string = fields.Many2one('tabel.string', string="ФИО")
+
+    hours_main= fields.Char( string="Основной")
+    hours_internal= fields.Char( string="Совместительство")
+
+    hours_sov= fields.Char( string="Совмещение")
+    hours_isp= fields.Char( string="Исполнение")
+    hours_zon= fields.Char( string="Расш.зона")
+    hours_uve= fields.Char( string="Увел.объема")
+
+    hours_all= fields.Char( string="Итого",compute='_compute_all')
+    norm_hours = fields.Char (string = "Норма")
+    @api.one
+    def _compute_all (self):
+	self.hours_all="0"
+	if self.hours_main:
+	    self.hours_all=str(float(time_format.timeToFloat(self.hours_all))+float(time_format.timeToFloat(self.hours_main)))
+	if self.hours_internal:
+	    self.hours_all=str(float(time_format.timeToFloat(self.hours_all))+float(time_format.timeToFloat(self.hours_internal)))
+	if self.hours_sov:
+	    self.hours_all=str(float(time_format.timeToFloat(self.hours_all))+float(time_format.timeToFloat(self.hours_sov)))
+	if self.hours_isp:
+	    self.hours_all=str(float(time_format.timeToFloat(self.hours_all))+float(time_format.timeToFloat(self.hours_isp)))
+	if self.hours_zon:
+	    self.hours_all=str(float(time_format.timeToFloat(self.hours_all))+float(time_format.timeToFloat(self.hours_zon)))
+	if self.hours_uve:
+	    self.hours_all=str(float(time_format.timeToFloat(self.hours_all))+float(time_format.timeToFloat(self.hours_uve)))
+
+class Upload(models.Model):
+    _name = 'tabel.upload'
+    time_start = fields.Date(string="time start of tabel")
+    time_end = fields.Date(string="time end of tabel")
+    ids_ustring = fields.One2many('tabel.ustring', 'id_upload', string="ustring",  limit = 500)
+
+
+    @api.one 
+    def action_upload(self):
+	#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
+	self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T LEFT JOIN (SELECT * from tabel_ustring WHERE id_upload="+str(self.id)+") AS P  ON T.id_fcac = P.id_fcac  WHERE P.id_fcac IS NULL and ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"'   )  ;")
+
+	for i in self.ids_ustring:
+		i.ids_string=i.id_string
+#		raise exceptions.ValidationError(str(i.id_vidisp))
+		if i.id_vidisp.name==u" Совмещение":
+		    i.hours_sov=i.ids_string.hours_main
+		if i.id_vidisp.name==u" Исполнение обязанностей":
+		    i.hours_isp=i.ids_string.hours_main
+		if i.id_vidisp.name==u" Расширение зоны обслуживания":
+		    i.hours_zon=i.ids_string.hours_main
+		if i.id_vidisp.name==u" Увеличение объема работ":
+		    i.hours_uve=i.ids_string.hours_main
+		if i.id_vidisp.name==u" Основной работник":
+		    i.hours_main=i.ids_string.hours_main
+		#if i.id_vidisp.name==u" Внутренний совместитель":
+		i.hours_internal=i.ids_string.hours_internal
+		if i.id_tabel:
+		    id_emp_sec=self.pool.get('tabel.tabel').search(self._cr,self._uid,[('id','=',i.id_tabel.id)])
+		    for j in id_emp_sec:
+			model_tabel= self.pool.get('tabel.tabel').browse(self._cr, self._uid, j)
+			i.id_division=model_tabel.id_division
+
+		year =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().year
+		month =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().month
+
+		id_month=self.pool.get('tabel.grmonth').search(self._cr,self._uid,[('month','=',month),('year','=',year),('grrbdc_rn.id','=',i.ids_string.id_fcac.fcacch_rn.grrbdc_rn)])
+	        for j in id_month:
+		    month_model= self.pool.get('tabel.grmonth').browse(self._cr, self._uid, j)
+		    i.norm_hours=str(0)
+		    c = 1
+		    while c < 32:
+		        id_day= self.pool.get('tabel.grday').search(self._cr,self._uid,[('monthday','=',c),('grmonth_rn','=',month_model.id)])
+			for k in id_day:
+			    day= self.pool.get('tabel.grday').browse(self._cr, self._uid, k)
+			    #считаем норму с учетом сокращенных дней
+			    if day.hourinday:
+				i.norm_hours=str(float(i.norm_hours)+day.hourinday)
+				break
+			c+=1				
+
+				
+		    #умножаем норму на ставку
+		    i.norm_hours=str( float(i.norm_hours)*i.stqnt)
+		    break
 
 

@@ -580,6 +580,97 @@
                 </tree>
             </field>
         </record>
+<!-- upload search view -->
+    <record id="view_upload_search" model="ir.ui.view">
+        <field name="name">tabel.upload.search</field>
+        <field name="model">tabel.upload</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Checker">
+		    <field name="time_end" select="True"/>
+		    <field name="time_start" select="True"/>
+            </search>
+        </field>
+    </record>
+
+<!-- upload tree view -->
+     <record model="ir.ui.view" id="upload_tree_view">
+            <field name="name">upload.tree</field>
+            <field name="model">tabel.upload</field>
+            <field name="arch" type="xml">
+                <tree string="Upload Tree" >
+			<field name="time_start"/>
+             		<field name="time_end"/>
+<!--			<field name="id_fcac"/>
+             		<field name="id_tipdol"/>-->
+                </tree>
+            </field>
+        </record>
+<!-- upload form view -->
+         <record model="ir.ui.view" id="upload_form_view">
+            <field name="name">upload.form</field>
+            <field name="model">tabel.upload</field>
+            <field name="arch" type="xml">
+		<form string="Upload Form">
+                        <group>
+			<field name="time_start"/>
+             		<field name="time_end"/>
+<!--			<field name="id_fcac"/>
+         		<field name="id_tipdol"/> -->
+			<button
+				name="action_upload"
+				type="object"
+				string="Создать выгрузку"
+				class="oe_inline oe_stat_button"
+				icon="fa-file-o"
+				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
+			/>
+                        </group>
+             		<field name="ids_ustring" widget="one2Many"/>
+                </form>
+            </field>
+        </record>
+
+<!-- ustring tree view -->
+     <record model="ir.ui.view" id="ustring_tree_view">
+            <field name="name">ustring.tree</field>
+            <field name="model">tabel.ustring</field>
+            <field name="arch" type="xml">
+                <tree string="Ustring Tree" >
+              		<field name="id_division"/>
+              		<field name="ids_string"/>
+			<field name="id_tipdol"/> 
+              		<field name="id_vidisp"/>
+              		<field name="hours_main"/>
+              		<field name="hours_internal"/>
+			<field name="hours_sov"/>
+			<field name="hours_isp"/>
+			<field name="hours_zon"/>
+			<field name="hours_uve"/>
+<!--           		<field name="id_upload"/>
+              		<field name="id_string"/>-->
+			<field name="hours_all"/>
+			<field name="norm_hours"/>
+			<field name="stqnt"/>
+                </tree>
+            </field>
+	
+        </record>
+<!--
+         <record model="ir.ui.view" id="ustring_form_view">
+            <field name="name">ustring.form</field>
+            <field name="model">tabel.ustring</field>
+            <field name="arch" type="xml">
+		<form string="Ustring Form">
+                    <sheet>
+                        <group>
+			<field name="id_fcac"/>
+             		<field name="id_upload"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>-->
 
 <!-- person search view -->
 	<record id="view_person_search" model="ir.ui.view">
@@ -799,7 +890,7 @@
             <field name="res_model">tabel.string</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
-	    <field name="limit">500</field>
+	    <field name="limit">2000</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the new string
                 </p>
@@ -925,7 +1016,7 @@
             <field name="res_model">tabel.person</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-<field name="limit">500</field>
+<field name="limit">2000</field>
         </record>
 	<!-- window action vidisp-->
 	<record model="ir.actions.act_window" id="vidisp_list_action">
@@ -973,6 +1064,24 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
+	<!-- window action upload-->
+	<record model="ir.actions.act_window" id="upload_list_action">
+            <field name="name">Upload</field>
+            <field name="res_model">tabel.upload</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+	    <field name="limit">2000</field>
+        </record>
+	<!-- window action ustring-->
+	<record model="ir.actions.act_window" id="ustring_list_action">
+            <field name="name">Ustring</field>
+            <field name="res_model">tabel.ustring</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+	    <field name="limit">2000</field>
+        </record>
+
+
 
         <!-- window action passwd2-->
         <record model="ir.actions.act_window" id="password2_list_action">
@@ -993,6 +1102,13 @@
 
         <menuitem id="tabel_menu_settings" name="Настройки"
                   parent="main_tabel_menu"  groups="Tabel.group_manager"/>
+
+        <menuitem id="tabel_menu_economists" name="Экономисты"
+                  parent="main_tabel_menu"/>
+        <menuitem id="upload_tabel_menu" name="Выгрузка"
+		  parent="tabel_menu_economists"
+                  action="upload_list_action"/>
+
 <!-- 
         <menuitem id="new_tabel_menu" name="Сотрудники"
 		  parent="tabel_menu_settings"
