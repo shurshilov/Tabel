@@ -4,6 +4,9 @@ import re
 def timeToFloat (a):#перевод из часы:минуты в десятичное
 	    time1= re.sub(',' , '.' , a)
 	    time= re.split(':|-',a)
+#	    for i in time:
+#		if re.search('\D',i)>=0:
+#	    	    return -1
 	    try:
 		if len(time)==4:
 		    hours = float (time[0])
@@ -23,6 +26,7 @@ def timeToFloat (a):#перевод из часы:минуты в десятич
 		    return float(time1)
 	    except ValueError:
 		return 0
+#	    return -1
 	    
 def floatToTime (a):#перевод из десятичного в часы:минуты
 	    a = float(a)*60

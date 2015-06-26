@@ -10,6 +10,7 @@ group_manager_vidisp,admin,model_tabel_vidisp,group_manager,1,1,1,1
 group_manger_daytype,admin,model_tabel_daytype,group_manager,1,1,0,0
 group_manger_password,admin,model_tabel_password,group_manager,1,1,1,1
 group_manger_temp,admin,model_tabel_temp,group_manager,1,1,1,1
+tabel_katper,admin,model_tabel_katper,tabel_division_inf,1,1,1,1
 tabel_tabel,admin,model_tabel_tabel,tabel_division_inf,1,1,1,1
 tabel_string,admin,model_tabel_string,tabel_division_inf,1,1,1,1
 tabel_division,admin,model_tabel_division,tabel_division_inf,1,1,1,1
@@ -22,7 +23,6 @@ tabel_password,admin,model_tabel_password,tabel_division_inf,1,1,1,1
 tabel_grday,admin,model_tabel_grday,tabel_division_inf,1,1,1,1
 tabel_grmonth,admin,model_tabel_grmonth,tabel_division_inf,1,1,1,1
 tabel_grrbdc,admin,model_tabel_grrbdc,tabel_division_inf,1,1,1,1
-tabel_katper,admin,model_tabel_katper,tabel_division_inf,1,1,1,1
 tabel_fcacch,admin,model_tabel_fcacch,tabel_division_inf,1,1,1,1
 tabel_tipdol,admin,model_tabel_tipdol,tabel_division_inf,1,1,1,1
 tabel_daytype,admin,model_tabel_daytype,tabel_division_inf,1,1,0,0
@@ -54,4 +54,22 @@ acount_grmonth,admin,model_tabel_grmonth,group_accountant,1,1,1,1
 acount_grrbdc,admin,model_tabel_grrbdc,group_accountant,1,1,1,1
 acount_fcacch,admin,model_tabel_fcacch,group_accountant,1,1,1,1
 acount_daytype,admin,model_tabel_daytype,group_accountant,1,1,1,1
+eco_tabel,admin,model_tabel_tabel,group_eco,1,1,1,1
+eco_string,admin,model_tabel_string,group_eco,1,1,1,1
+eco_division,admin,model_tabel_division,group_eco,1,1,1,1
+eco_ank,admin,model_tabel_ank,group_eco,1,1,1,1
+eco_fcac,admin,model_tabel_fcac,group_eco,1,1,1,1
+eco_post,admin,model_tabel_post,group_eco,1,1,1,1
+eco_person,admin,model_tabel_person,group_eco,1,1,1,1
+eco_vidisp,admin,model_tabel_vidisp,group_eco,1,1,1,1
+eco_password,admin,model_tabel_password,group_eco,1,1,1,1
+eco_grday,admin,model_tabel_grday,group_eco,1,1,1,1
+eco_grmonth,admin,model_tabel_grmonth,group_eco,1,1,1,1
+eco_grrbdc,admin,model_tabel_grrbdc,group_eco,1,1,1,1
+eco_katper,admin,model_tabel_katper,group_eco,1,1,1,1
+eco_fcacch,admin,model_tabel_fcacch,group_eco,1,1,1,1
+eco_tipdol,admin,model_tabel_tipdol,group_eco,1,1,1,1
+eco_daytype,admin,model_tabel_daytype,group_eco,1,1,0,0
+eco_upload,admin,model_tabel_upload,group_eco,1,1,1,1
+eco_ustring,admin,model_tabel_ustring,group_eco,1,1,1,1
 

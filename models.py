@@ -134,7 +134,7 @@ class Grday (models.Model):
 #Таблица с категориями работников, не используется
 class Katper (models.Model):
 	_name = 'tabel.katper'
-	_rec_name = 'num'
+#	_rec_name = 'num'
 	_order = 'num'
 	code = fields.Char(string="code of katper")
 	name = fields.Char(string="name of katper")
@@ -359,11 +359,12 @@ class String(models.Model):
     _order = 'id_tipdol, id_person'
 
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
+    id_katper = fields.Many2one('tabel.katper',  ondelete='cascade', string="категории")
 #    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="сотрудник")
     id_tipdol = fields.Many2one('tabel.tipdol',string="тип. должности")
     #используется для сортировки по алфавиту,во вью невидимое
     id_person = fields.Many2one('tabel.person',  ondelete='cascade', string="фамилии")
-    id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id")
+    id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id",index=True)
     #не используется
     id_post = fields.Many2one('tabel.post',string="должность")
     id_vidisp = fields.Many2one('tabel.vidisp',string="вид л.с.")
@@ -563,7 +564,7 @@ class String(models.Model):
             	    self.hours28= self.complet
             	    self.hours29= self.complet
             	    self.hours30= self.complet
-
+            	    self.hours31= self.complet
     #функция вычисляющая количетсво дней неявок,явок,отработанных часов и т.д.
     @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
     def _compute_days_appear(self):
@@ -605,12 +606,24 @@ class String(models.Model):
 				    flag =0
 				    break
 		    def summ (a):
+			
 			global flag
 			flagEx = False
 			if a:
-			    if re.search(':|,|-',a)>=0:
+			    #проверяем если поле является временем в формате hh:mm (or h:m) или числом,тогда все ок
+			    a=a.replace(' ', '')
+			    if re.search('(([0,1][0-9])|(2[0-3])|([0-9])):(([0-5][0-9])|([0-9]))',a)>=0 or re.search('\-?\d+((,|\.)\d+)?',a)>=0:
 				a =time_format.timeToFloat  (a)
-			    
+			    #иначе предполагаем что это код. смотрим в словарь кодов и если не код возвращаем ошибку (-1)
+			    else:
+				if len(a)>0:
+				    if a not in d_abse:
+					return -1
+
+
+#			    if re.search(':|,|-',a)>=0:
+#				a =time_format.timeToFloat  (a)
+			
 			    try:#проверяем если в поле число значит считаем часы
 				float(a)
 			    except ValueError:#если встретили код
@@ -624,7 +637,8 @@ class String(models.Model):
 				    for i in d_abse:#генерируем строку неявок код/число неявок
 					if d_abse[i]>0:
 					    record.days_absences=record.days_absences+ i+u'/'+str(d_abse[i]).decode('utf-8')+u'; '
-
+				#если нет такого кода возвращаем ошибку
+				
 			    if flagEx==False:#если у нас число то пересчитываем основные или внутренние часы. переводим в числа.
 
 				if record.hours_internal.find(':')>=0:
@@ -644,42 +658,72 @@ class String(models.Model):
 			    		record.hours_main = str (float(record.hours_main)+ float(a))
 
 				record.days_appear = str (int(record.days_appear) + 1)#в любом случае это явка
+			return 1
 
 
 
-
-		    summ (record.hours1)
-            	    summ (record.hours2)
-            	    summ (record.hours3)
-            	    summ (record.hours4)
-            	    summ (record.hours5)
-		    summ (record.hours6)
-            	    summ (record.hours7)
-            	    summ (record.hours8)
-            	    summ (record.hours9)
-            	    summ (record.hours10)
-            	    summ (record.hours11)
-            	    summ (record.hours12)
-            	    summ (record.hours13)
-            	    summ (record.hours14)
-            	    summ (record.hours15)
-            	    summ (record.hours16)
-            	    summ (record.hours17)
-            	    summ (record.hours18)
-            	    summ (record.hours19)
-            	    summ (record.hours20)
-            	    summ (record.hours21)
-            	    summ (record.hours22)
-            	    summ (record.hours23)
-            	    summ (record.hours24)
-            	    summ (record.hours25)
-            	    summ (record.hours26)
-            	    summ (record.hours27)
-            	    summ (record.hours28)
-            	    summ (record.hours29)
-            	    summ (record.hours30)
-		    summ (record.hours31)
-		
+		    if summ (record.hours1) == -1:
+			record.counter=2
+            	    if summ (record.hours2) == -1:
+			record.counter=2
+            	    if summ (record.hours3) == -1:
+			record.counter=2
+            	    if summ (record.hours4) == -1:
+			record.counter=2
+            	    if summ (record.hours5) == -1:
+			record.counter=2
+		    if summ (record.hours6) == -1:
+			record.counter=2
+            	    if summ (record.hours7) == -1:
+			record.counter=2
+            	    if summ (record.hours8) == -1:
+			record.counter=2
+            	    if summ (record.hours9) == -1:
+			record.counter=2
+            	    if summ (record.hours10) == -1:
+			record.counter=2
+            	    if summ (record.hours11) == -1:
+			record.counter=2
+            	    if summ (record.hours12) == -1:
+			record.counter=2
+            	    if summ (record.hours13) == -1:
+			record.counter=2
+            	    if summ (record.hours14) == -1:
+			record.counter=2
+            	    if summ (record.hours15) == -1:
+			record.counter=2
+            	    if summ (record.hours16) == -1:
+			record.counter=2
+            	    if summ (record.hours17) == -1:
+			record.counter=2
+            	    if summ (record.hours18) == -1:
+			record.counter=2
+            	    if summ (record.hours19) == -1:
+			record.counter=2
+            	    if summ (record.hours20) == -1:
+			record.counter=2
+            	    if summ (record.hours21) == -1:
+			record.counter=2
+            	    if summ (record.hours22) == -1:
+			record.counter=2
+            	    if summ (record.hours23) == -1:
+			record.counter=2
+            	    if summ (record.hours24) == -1:
+			record.counter=2
+            	    if summ (record.hours25) == -1:
+			record.counter=2
+            	    if summ (record.hours26) == -1:
+			record.counter=2
+            	    if summ (record.hours27) == -1:
+			record.counter=2
+            	    if summ (record.hours28) == -1:
+			record.counter=2
+            	    if summ (record.hours29) == -1:
+			record.counter=2
+            	    if summ (record.hours30) == -1:
+			record.counter=2
+		    if summ (record.hours31) == -1:
+			record.counter=2		
 		    if record.days_absences_sum == "0":
 			    record.days_absences_sum = " "
 		    if record.days_appear == "0":
@@ -799,8 +843,8 @@ class Tabel(models.Model):
 
     format = fields.Boolean (string = "десятичные/минуты", default = False)
     num_tabel = fields.Integer(string="number of Tabel")
-    time_start_t = fields.Date(string="time start of tabel", default = time_first)
-    time_end_t = fields.Date(string="time end of tabel", default = time_last)
+    time_start_t = fields.Date(string="time start of tabel", default = time_first,index=True)
+    time_end_t = fields.Date(string="time end of tabel", default = time_last,index=True)
     id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default, order ='orgbase_rn')
     ids_string = fields.One2many('tabel.string', 'id_tabel', string="string",  limit = 500)
     state = fields.Selection([
@@ -827,7 +871,7 @@ class Tabel(models.Model):
 	#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
 	self._cr.execute("INSERT INTO tabel_string (id_fcac,id_tabel) (SELECT T.id,"+str(self.id)+"  FROM tabel_fcac AS T LEFT JOIN (SELECT * from tabel_string WHERE id_tabel="+str(self.id)+") AS P  ON T.id = P.id_fcac  WHERE P.id_fcac IS NULL and T.startdate::date <='"+str(self.time_end_t)+"' and T.enddate::date >= '"+str(self.time_start_t)+"' and T.subdiv_rn = "+str(self.id_division.id)+"   )  ;")
 
-	#id_emp_sec=self.pool.get('tabel.string').search(self._cr,self._uid,[(1,'=',1)])#получаем ид всех строк из таблице daytype где есть ник
+#	id_emp_sec=self.pool.get('tabel.string').search(self._cr,self._uid,[(1,'=',1)])#получаем ид всех строк из таблице daytype где есть ник
 	#Если строка была создана вручную или уже есть, то ее не обновляем. Обновляем только новые пустые строки.... 
 	#(возможна неправильная ситуация (не сработает обновление на уже созданном) надо подумать)
 	#Обновляем должности и вид л.с.
@@ -869,6 +913,12 @@ class Tabel(models.Model):
 		else:
 		    model_string.id_vidisp=model_string.id_fcac.vidisp_rn.id
 
+		#обновляем категории, если поле пустое
+		if model_string.id_katper:
+		    continue
+		else:
+		    model_string.id_katper=model_string.id_fcac.katper_rn.id
+
 	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем дням и обновляем
 	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, DAYTYPE_RN int, DATE date);") 
 	a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
@@ -895,6 +945,7 @@ class Tabel(models.Model):
 		model_string.id_post=model_string.id_fcac.post_rn.id
 		model_string.id_tipdol=model_string.id_fcac.tipdol_rn.id
 		model_string.id_vidisp=model_string.id_fcac.vidisp_rn.id
+		model_string.id_katper=model_string.id_fcac.katper_rn.id
 		model_string.id_person=model_string.id_fcac.ank_rn.orgbase_rn.id
 #"""
 #Вариант 1
@@ -1033,15 +1084,12 @@ class Tabel(models.Model):
 	    'res_id': False,
 	    'create':False,
 	}
-
-
-
 class Ustring(models.Model):
     _name = 'tabel.ustring'
     id_upload = fields.Many2one('tabel.upload', ondelete='cascade', string="upload_id")
-    id_tabel = fields.Many2one('tabel.tabel', ondelete='cascade', string="tabel_id")
+    id_fcac = fields.Many2one('tabel.fcac', ondelete='cascade', string="fcac_id",index=True)
+    id_tabel = fields.Many2one('tabel.tabel', ondelete='cascade', string="tabel_id",index=True)
     id_tipdol = fields.Many2one('tabel.tipdol',string="Должность")
-    id_fcac = fields.Many2one('tabel.fcac',string="fcac")
     #используется для сортировки по алфавиту,во вью невидимое
     id_person = fields.Many2one('tabel.person',  ondelete='cascade', string="фамилии")
     id_vidisp = fields.Many2one('tabel.vidisp',string="Вид л.с.")
@@ -1049,6 +1097,40 @@ class Ustring(models.Model):
     id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="Подразделение")
     id_string= fields.Integer( string="id")
     ids_string = fields.Many2one('tabel.string', string="ФИО")
+
+    hours1 = fields.Char(string="1")
+    hours2 = fields.Char(string="2")
+    hours3 = fields.Char(string="3")
+    hours4 = fields.Char(string="4")
+    hours5 = fields.Char(string="5")
+    hours6 = fields.Char(string="6")
+    hours7 = fields.Char(string="7")
+    hours8 = fields.Char(string="8")
+    hours9 = fields.Char(string="9")
+    hours10 = fields.Char(string="10")
+    hours11 = fields.Char(string="11")
+    hours12 = fields.Char(string="12")
+    hours13 = fields.Char(string="13")
+    hours14 = fields.Char(string="14")
+    hours15 = fields.Char(string="15")
+    hours16 = fields.Char(string="16")
+    hours17 = fields.Char(string="17")
+    hours18 = fields.Char(string="18")
+    hours19 = fields.Char(string="19")
+    hours20 = fields.Char(string="20")
+    hours21 = fields.Char(string="21")
+    hours22 = fields.Char(string="22")
+    hours23 = fields.Char(string="23")
+    hours24 = fields.Char(string="24")
+    hours25 = fields.Char(string="25")
+    hours26 = fields.Char(string="26")
+    hours27 = fields.Char(string="27")
+    hours28 = fields.Char(string="28")
+    hours29 = fields.Char(string="29")
+    hours30 = fields.Char(string="30")
+    hours31 = fields.Char(string="31")
+
+
 
     hours_main= fields.Char( string="Основной")
     hours_internal= fields.Char( string="Совместительство")
@@ -1080,37 +1162,72 @@ class Upload(models.Model):
     _name = 'tabel.upload'
     time_start = fields.Date(string="time start of tabel")
     time_end = fields.Date(string="time end of tabel")
-    ids_ustring = fields.One2many('tabel.ustring', 'id_upload', string="ustring",  limit = 500)
+    id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="Подразделение")
+    ids_ustring = fields.One2many('tabel.ustring', 'id_upload', string="ustring")
+    checker = fields.Boolean(string="Выгрузка или численность? (галочка-выгрузка)")
 
 
     @api.one 
     def action_upload(self):
-	#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
-	self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T LEFT JOIN (SELECT * from tabel_ustring WHERE id_upload="+str(self.id)+") AS P  ON T.id_fcac = P.id_fcac  WHERE P.id_fcac IS NULL and ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"'   )  ;")
+
+	if self.checker == True:
+	    if not self.id_division:
+		#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
+		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"'   )  ;")
+	    else:
+		#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
+		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"' and (SELECT id_division FROM tabel_tabel where tabel_tabel.id= T.id_tabel)="+str(self.id_division.id)+" )  ;")
+	else:
+	    if not self.id_division:
+		#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
+		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"' and T.id_vidisp in (5,4,1)  )  ;")
+	    else:
+		#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
+		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"' and T.id_vidisp in (5,4,1) and (SELECT id_division FROM tabel_tabel where tabel_tabel.id= T.id_tabel)="+str(self.id_division.id)+" )  ;")
 
 	for i in self.ids_ustring:
-		i.ids_string=i.id_string
-#		raise exceptions.ValidationError(str(i.id_vidisp))
+	    #Выбираем из даты отдельно год и месяц для поиска
+	    year =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().year
+	    month =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().month
+
+	    i.ids_string=i.id_string
+
+	    #Load division
+	    if i.id_tabel:
+	        id_emp_sec=self.pool.get('tabel.tabel').search(self._cr,self._uid,[('id','=',i.id_tabel.id)])
+	        for j in id_emp_sec:
+	    	    model_tabel= self.pool.get('tabel.tabel').browse(self._cr, self._uid, j)
+	    	    i.id_division=model_tabel.id_division
+
+#################################################################################
+#		ВЫГРУЗКА							#
+#										#
+#										#
+#										#
+	    if self.checker == True:
+		#Считаем часы для выгрузки
+		#Каждый вид записываем в соответствующее поле
 		if i.id_vidisp.name==u" Совмещение":
-		    i.hours_sov=i.ids_string.hours_main
+		    i.hours_sov=str(float(i.ids_string.hours_main)*i.ids_string.stqnt)
 		if i.id_vidisp.name==u" Исполнение обязанностей":
-		    i.hours_isp=i.ids_string.hours_main
+		    i.hours_isp=str(float(i.ids_string.hours_main)*i.ids_string.stqnt)
 		if i.id_vidisp.name==u" Расширение зоны обслуживания":
-		    i.hours_zon=i.ids_string.hours_main
+		    i.hours_zon=str(float(i.ids_string.hours_main)*i.ids_string.stqnt)
 		if i.id_vidisp.name==u" Увеличение объема работ":
-		    i.hours_uve=i.ids_string.hours_main
+		    i.hours_uve=str(float(i.ids_string.hours_main)*i.ids_string.stqnt)
+
+		#Три вида пишутся в основной
 		if i.id_vidisp.name==u" Основной работник":
 		    i.hours_main=i.ids_string.hours_main
-		#if i.id_vidisp.name==u" Внутренний совместитель":
-		i.hours_internal=i.ids_string.hours_internal
-		if i.id_tabel:
-		    id_emp_sec=self.pool.get('tabel.tabel').search(self._cr,self._uid,[('id','=',i.id_tabel.id)])
-		    for j in id_emp_sec:
-			model_tabel= self.pool.get('tabel.tabel').browse(self._cr, self._uid, j)
-			i.id_division=model_tabel.id_division
+		if i.id_vidisp.name==u" Внешний совместитель":
+		    i.hours_main=i.ids_string.hours_main
+		if i.id_vidisp.name==u" Временный работник":
+		    i.hours_main=i.ids_string.hours_main
 
-		year =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().year
-		month =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().month
+		#" Внутренний совместитель всегда пишется во внутренний
+		i.hours_internal=i.ids_string.hours_internal
+
+		#Считаем норму часов для Выгрузки
 
 		id_month=self.pool.get('tabel.grmonth').search(self._cr,self._uid,[('month','=',month),('year','=',year),('grrbdc_rn.id','=',i.ids_string.id_fcac.fcacch_rn.grrbdc_rn)])
 	        for j in id_month:
@@ -1126,10 +1243,95 @@ class Upload(models.Model):
 				i.norm_hours=str(float(i.norm_hours)+day.hourinday)
 				break
 			c+=1				
-
-				
+		
 		    #умножаем норму на ставку
 		    i.norm_hours=str( float(i.norm_hours)*i.stqnt)
 		    break
+#################################################################################
+#		СРЕДНЕСПИСОЧНАЯ							#
+#										#
+#										#
+#										#
+#№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№#################################################
+	    if self.checker == False:
+		dayweek =  int(datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().weekday())
+		cnt=dayweek
+
+		id_month=self.pool.get('tabel.grmonth').search(self._cr,self._uid,[('month','=',month),('year','=',year),('grrbdc_rn.id','=',i.ids_string.id_fcac.fcacch_rn.grrbdc_rn)])
+		for j in id_month:
+			month_model= self.pool.get('tabel.grmonth').browse(self._cr, self._uid, j)
+			break
+
+		vidisp= i.id_vidisp.name
+		if vidisp:
+			j=1
+			#изменить на то сколько в месяце!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			while j<32:
+			    #Если в текущий день лицевой счет еще действует, то ставим, иначе поднимаем флаг
+			    flagEx = True
+			    nowDate =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date()
+			    fcacDateStart = datetime.datetime.strptime(i.id_fcac.startdate, '%Y-%m-%d').date()
+			    fcacDateEnd = datetime.datetime.strptime(i.id_fcac.enddate, '%Y-%m-%d').date()
+			    newdate = nowDate.replace(day=j)
+			    if newdate <= fcacDateEnd and newdate >= fcacDateStart:
+				    flagEx=True
+			    else:
+				    flagEx=False
+			    #Данные за определенный день, если человек в отпуске без содердания(А),родах(Р) и т.д. то ставку не ставим
+			    self._cr.execute("SELECT hours"+str(j)+" FROM tabel_string WHERE tabel_string.id = "+str(i.ids_string.id)+";")
+			    a=self._cr.dictfetchone()['hours'+str(j)]
+#			    raise exceptions.ValidationError(a)
+			    if a:
+					if a in [u'А',u'Р', u'ОУ', u'р']:
+					    flagEx = False
+					else:
+					    flagEx = True
+			    if flagEx:
+	    			id_day= self.pool.get('tabel.grday').search(self._cr,self._uid,[('monthday','=',j),('grmonth_rn','=',month_model.id)])
+				#Если не рабочий день (Праздничный или выходной, то берем данные из предыдущего дня)
+				if not id_day:
+				    if j>1:
+					self._cr.execute("UPDATE tabel_ustring SET  hours"+str(j)+" = hours"+str(j-1)+" where tabel_ustring.id = "+str(i.id)+";")
+				    else:
+					#из первого числа месяца вычитаем 1 и получаем предудущую дату
+					date_start =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date()
+					date_last = date_start - datetime.timedelta(days=1)
+					day=int(date_last.day)
+
+					id_string=self.pool.get('tabel.string').search(self._cr,self._uid,[('id_tabel.time_end_t','=',date_last),('id_fcac','=',i.id_fcac.id),('id_vidisp','=',i.id_vidisp.id),('id_tabel.id_division','=',i.id_division.id)])
+					if not id_string:
+					    self._cr.execute("UPDATE tabel_ustring SET  hours"+str(j)+" = tabel_ustring.stqnt where tabel_ustring.id = "+str(i.id)+";")
+					else:
+					    for k in id_string:
+						#БАЯН БАБАЯН
+						model_string= self.pool.get('tabel.string').browse(self._cr, self._uid, k)
+						flagLast = True
+						if day == 31:
+						    if  model_string.hours31  in [u'А',u'Р', u'ОУ', u'р']:
+							flagLast = False
+						if day == 30:
+						    if  model_string.hours30  in [u'А',u'Р', u'ОУ', u'р']:
+							flagLast = False
+						if day == 29:
+						    if  model_string.hours29  in [u'А',u'Р', u'ОУ', u'р']:
+							flagLast = False
+						if day == 28:
+						    if  model_string.hours28  in [u'А',u'Р', u'ОУ', u'р']:
+							flagLast = False
+						if flagLast:
+							self._cr.execute("UPDATE tabel_ustring SET  hours1 = tabel_ustring.stqnt where tabel_ustring.id = "+str(i.id)+";")
+
+						break
+#<-----><------><------><------><------>raise exceptions.ValidationError(date_last)
+
+#					raise exceptions.ValidationError(date_last)
+				else:
+				    self._cr.execute("UPDATE tabel_ustring SET  hours"+str(j)+" = tabel_ustring.stqnt where tabel_ustring.id = "+str(i.id)+";")
+				
+			
+			    j=j+1
+
+
+
 
 

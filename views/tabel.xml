@@ -128,9 +128,12 @@
 	<field name="arch" type="xml">
 	<form string="Tabel Form">
 	    <group>
+		<field name="create_uid" string="Дата создания" readonly="True" invisible="True"/>
+<!--		<field name="time_start_t" string="Дата начала табеля" attrs="{'readonly': [('create_uid','!=',1)] }" />
+		<field name="time_end_t" string="Дата конца табеля" attrs="{'readonly': [('create_uid','!=',1)] }" /> -->
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик"  />
+		<field name="id_ank" string="Табельщик" />
 		<field name="id_division" string="Подразделение" domain="[('enddate','&gt;=',time_start_t),('startdate','&lt;=',time_end_t)  ]"/>
 		<field name="dayall" readonly= "True" />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
@@ -373,10 +376,11 @@
 	<field name="name">string.tree</field>
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
-	<tree string="String Tree" colors="blue:counter != 0"   toolbar="1">
+	<tree string="String Tree" colors="blue:counter == 1; red:counter == 2"   toolbar="1">
 					<field name="id_fcac" string="ФИО" />
 					<field name="id_person" string="ФИО" invisible="True"/>
 					<field name="id_post" invisible="True"/>
+					<field name="id_katper" invisible="True"/>
 					<field name="id_tipdol"/>
 					<field name="id_vidisp"/>
 					<field name="stqnt" string="кол-во ст."/>
@@ -580,82 +584,7 @@
                 </tree>
             </field>
         </record>
-<!-- upload search view -->
-    <record id="view_upload_search" model="ir.ui.view">
-        <field name="name">tabel.upload.search</field>
-        <field name="model">tabel.upload</field>
-        <field name="type">search</field>
-        <field name="arch" type="xml">
-            <search string="Checker">
-		    <field name="time_end" select="True"/>
-		    <field name="time_start" select="True"/>
-            </search>
-        </field>
-    </record>
 
-<!-- upload tree view -->
-     <record model="ir.ui.view" id="upload_tree_view">
-            <field name="name">upload.tree</field>
-            <field name="model">tabel.upload</field>
-            <field name="arch" type="xml">
-                <tree string="Upload Tree" >
-			<field name="time_start"/>
-             		<field name="time_end"/>
-<!--			<field name="id_fcac"/>
-             		<field name="id_tipdol"/>-->
-                </tree>
-            </field>
-        </record>
-<!-- upload form view -->
-         <record model="ir.ui.view" id="upload_form_view">
-            <field name="name">upload.form</field>
-            <field name="model">tabel.upload</field>
-            <field name="arch" type="xml">
-		<form string="Upload Form">
-                        <group>
-			<field name="time_start"/>
-             		<field name="time_end"/>
-<!--			<field name="id_fcac"/>
-         		<field name="id_tipdol"/> -->
-			<button
-				name="action_upload"
-				type="object"
-				string="Создать выгрузку"
-				class="oe_inline oe_stat_button"
-				icon="fa-file-o"
-				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
-			/>
-                        </group>
-             		<field name="ids_ustring" widget="one2Many"/>
-                </form>
-            </field>
-        </record>
-
-<!-- ustring tree view -->
-     <record model="ir.ui.view" id="ustring_tree_view">
-            <field name="name">ustring.tree</field>
-            <field name="model">tabel.ustring</field>
-            <field name="arch" type="xml">
-                <tree string="Ustring Tree" >
-              		<field name="id_division"/>
-              		<field name="ids_string"/>
-			<field name="id_tipdol"/> 
-              		<field name="id_vidisp"/>
-              		<field name="hours_main"/>
-              		<field name="hours_internal"/>
-			<field name="hours_sov"/>
-			<field name="hours_isp"/>
-			<field name="hours_zon"/>
-			<field name="hours_uve"/>
-<!--           		<field name="id_upload"/>
-              		<field name="id_string"/>-->
-			<field name="hours_all"/>
-			<field name="norm_hours"/>
-			<field name="stqnt"/>
-                </tree>
-            </field>
-	
-        </record>
 <!--
          <record model="ir.ui.view" id="ustring_form_view">
             <field name="name">ustring.form</field>
@@ -882,7 +811,161 @@
                 </tree>
             </field>
         </record>
+<!-- upload search view -->
+    <record id="view_upload_search" model="ir.ui.view">
+        <field name="name">tabel.upload.search</field>
+        <field name="model">tabel.upload</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Checker">
+		    <field name="time_end" select="True"/>
+		    <field name="time_start" select="True"/>
+            </search>
+        </field>
+    </record>
 
+<!-- upload tree view -->
+     <record model="ir.ui.view" id="upload_tree_view">
+            <field name="name">upload.tree</field>
+            <field name="model">tabel.upload</field>
+            <field name="arch" type="xml">
+                <tree string="Upload Tree" >
+			<field name="time_start"/>
+             		<field name="time_end"/>
+             		<field name="checker"/>
+<!--			<field name="id_fcac"/>
+             		<field name="id_tipdol"/>-->
+                </tree>
+            </field>
+        </record>
+<!-- upload form view -->
+         <record model="ir.ui.view" id="upload_form_view">
+            <field name="name">upload.form</field>
+            <field name="model">tabel.upload</field>
+            <field name="arch" type="xml">
+		<form string="Upload Form">
+                        <group>
+			<field name="time_start"/>
+             		<field name="time_end"/>
+             		<field name="id_division" domain="[('enddate','&gt;=',time_start),('startdate','&lt;=',time_end)   ]" placeholder="Сначала введите дату,(не выбрано=выгрузить все)"/>
+             		<field name="checker"/>
+<!--			<field name="id_fcac"/>
+         		<field name="id_tipdol"/> -->
+			<button
+				name="action_upload"
+				type="object"
+				string="Создать выгрузку"
+				class="oe_inline oe_stat_button"
+				icon="fa-file-o"
+				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
+			/>
+			<separator string="Выгрузка"/>
+                        </group>
+             		<field name="ids_ustring" widget="handle"/>
+                </form>
+            </field>
+        </record>
+
+<!-- upload form view 2 -->
+         <record model="ir.ui.view" id="upload2_form_view">
+            <field name="name">upload2.form</field>
+            <field name="model">tabel.upload</field>
+            <field name="arch" type="xml">
+		<form string="Upload2 Form">
+                        <group>
+
+			<field name="time_start"/>
+             		<field name="time_end"/>
+             		<field name="id_division" domain="[('enddate','&gt;=',time_start),('startdate','&lt;=',time_end)   ]" placeholder="Сначала введите дату,(не выбрано=выгрузить все)"/>
+             		<field name="checker"/>
+			<button
+				name="action_upload"
+				type="object"
+				string="Создать численность"
+				class="oe_inline oe_stat_button"
+				icon="fa-file-o"
+				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
+			/>
+			<separator string="Среднесписочность численность"/>
+                        </group>
+             		<field name="ids_ustring"/>
+                </form>
+            </field>
+        </record>
+
+<!-- ustring tree view -->
+     <record model="ir.ui.view" id="ustring_tree_view">
+            <field name="name">ustring.tree</field>
+            <field name="model">tabel.ustring</field>
+            <field name="arch" type="xml">
+                <tree string="Ustring Tree" >
+              		<field name="id_division"/>
+              		<field name="ids_string"/>
+			<field name="id_tipdol"/> 
+              		<field name="id_vidisp"/>
+					<field name="hours1"/>
+					<field name="hours2"/>
+       					<field name="hours3"/>
+       					<field name="hours4"/>
+       					<field name="hours5"/>
+                       			<field name="hours6"/>
+                           		<field name="hours7"/>
+                           		<field name="hours8"/>
+                           		<field name="hours9"/>
+                           		<field name="hours10"/>
+                           		<field name="hours11"/>
+                           		<field name="hours12"/>
+                           		<field name="hours13"/>
+                           		<field name="hours14"/>
+                           		<field name="hours15"/>
+                           		<field name="hours16"/>
+                           		<field name="hours17"/>
+                           		<field name="hours18"/>
+                           		<field name="hours19"/>
+                           		<field name="hours20"/>
+                           		<field name="hours21"/>
+                           		<field name="hours22"/>
+                           		<field name="hours23"/>
+                           		<field name="hours24"/>
+                           		<field name="hours25"/>
+                           		<field name="hours26"/>
+                           		<field name="hours27"/>
+                           		<field name="hours28"/>
+                           		<field name="hours29"/>
+                           		<field name="hours30"/>
+                           		<field name="hours31"/>
+              		<field name="hours_main"/>
+              		<field name="hours_internal"/>
+			<field name="hours_sov"/>
+			<field name="hours_isp"/>
+			<field name="hours_zon"/>
+			<field name="hours_uve"/>
+<!--           		<field name="id_upload"/>
+              		<field name="id_string"/>-->
+			<field name="hours_all"/>
+			<field name="norm_hours"/>
+			<field name="stqnt"/>
+                </tree>
+            </field>
+        </record>
+
+<!-- tabel search view -->
+	<record id="view_tabel_search2" model="ir.ui.view">
+		<field name="name">tabel.tabel.search2</field>
+		<field name="model">tabel.tabel</field>
+		<field name="type">search</field>
+		<field name="arch" type="xml">
+		<search string="Checker">
+		    <filter 
+		    string="Текущий и последующие месяцы" 
+		    name="male" 
+		    domain="[('time_end_t', '>=' ,(context_today()-datetime.timedelta(weeks=1)).strftime('%Y-%m-%d'))]" 
+		    help = "Чтобы посмотреть табели за прошлые месяцы нажмите ВСЕ"/>
+		    <field name="time_start_t" select="True"/>
+		    <field name="id_ank" select="True"/>
+		</search>
+		</field>
+	</record>
 
 <!-- ACTIONS -->
         <record model="ir.actions.act_window" id="string_list_action">
@@ -913,6 +996,9 @@
             <field name="view_type">form</field>
 	    <field name="domain">[('state','=', 'draft')]</field>
             <field name="view_mode">tree,form,graph</field>
+	    <field name="search_view_id" ref="view_tabel_search2"/>
+	    <field name="context">{'search_default_male':1}</field>
+
         </record>
 
 	<record model="ir.actions.act_window" id="tabel_list_confirmed2_action">
@@ -1064,24 +1150,6 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-	<!-- window action upload-->
-	<record model="ir.actions.act_window" id="upload_list_action">
-            <field name="name">Upload</field>
-            <field name="res_model">tabel.upload</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-	    <field name="limit">2000</field>
-        </record>
-	<!-- window action ustring-->
-	<record model="ir.actions.act_window" id="ustring_list_action">
-            <field name="name">Ustring</field>
-            <field name="res_model">tabel.ustring</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
-	    <field name="limit">2000</field>
-        </record>
-
-
 
         <!-- window action passwd2-->
         <record model="ir.actions.act_window" id="password2_list_action">
@@ -1091,8 +1159,25 @@
             <field name="view_mode">tree,form,graph</field>
 	    <field name="view_id" ref="password_graph_view"/>
 	    <field name="context">{'state':'create'}</field>
-
+	</record>
+	<!-- window action upload-->
+	<record model="ir.actions.act_window" id="upload_list_action">
+            <field name="name">Upload</field>
+            <field name="res_model">tabel.upload</field>
+            <field name="view_type">form</field>
+    	    <field name="view_mode">tree,form</field>
+	    <field name="view_id" ref="Tabel.upload_form_view"/>
         </record>
+
+	<!-- window action upload2-->
+	<record model="ir.actions.act_window" id="upload2_list_action">
+            <field name="name">Upload2</field>
+            <field name="res_model">tabel.upload</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+	    <field name="view_id" ref="Tabel.upload2_form_view"/>
+        </record>
+
 
         <!-- top level menu: no parent -->
         <menuitem id="main_tabel_menu" name="Tabel"/>
@@ -1103,11 +1188,17 @@
         <menuitem id="tabel_menu_settings" name="Настройки"
                   parent="main_tabel_menu"  groups="Tabel.group_manager"/>
 
-        <menuitem id="tabel_menu_economists" name="Экономисты"
-                  parent="main_tabel_menu"/>
+    <menuitem id="tabel_menu_economists" name="Экономисты"
+                  parent="main_tabel_menu" groups="Tabel.group_eco"/>
+
         <menuitem id="upload_tabel_menu" name="Выгрузка"
 		  parent="tabel_menu_economists"
                   action="upload_list_action"/>
+
+        <menuitem id="upload2_tabel_menu" name="Среднечисленная списочность"
+		  parent="tabel_menu_economists"
+                  action="upload2_list_action"/>
+
 
 <!-- 
         <menuitem id="new_tabel_menu" name="Сотрудники"
@@ -1172,7 +1263,7 @@
                   parent="tabel_menu_settings"
                   action="string_list_action"/>
 
-        <menuitem id="tabel_menu_draft" name="Создать табель"
+        <menuitem id="tabel_menu_draft" name="Рабочие табели"
                   parent="tabel_menu"
                   action="tabel_list_draft_action" sequence="1"/>
 
