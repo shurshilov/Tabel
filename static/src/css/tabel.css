@@ -2,9 +2,59 @@
   width: 240px !important;
   
 }
-.openerp .oe_leftbar {
-  background: #ffffff;
+
+
+/*LEFTBAR CHANGE*/
+.openerp .oe_leftbar_folded {
+  display: block !important;
+  min-width: 20px !important;
+  width: 20px !important;
+  background: #4d394b;
+  border-right: 1px solid #afafb6;
+  text-shadow: 0 1px 1px white;
+  position: relative;
+  height: 69% !important;
+  cursor: pointer;
 }
+.openerp .oe_leftbar {
+  background: #4d394b;
+  border-right: 0px solid #afafb6;.
+}
+.openerp .nav-pills li > a {
+  padding: 6px 4px 2px 18px;
+  color: #ab9ba9;
+}
+.openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
+  background-color: #4c9689;
+  color: white;
+  border-radius: 0;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  text-decoration: none;
+  background-color: #3e313c;
+}
+
+/*NAVBAR CHANGE*/
+.navbar-inverse {
+    background: #4c9689;
+     border: 1px solid  #4c9689;
+}
+.navbar-inverse .navbar-nav > li > a {
+  color: #ffffff;
+}
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  color: #fff;
+  background-color: #4d394b;
+    
+}
+.navbar-inverse .navbar-nav > li > a:hover, .nav > li > a:focus {
+  text-decoration: none;
+  background-color: #7c7bad;
+}
+
+
+
 .openerp .oe_view_manager table.oe_view_manager_header h2 {
   font-size: 18px;
   margin: 0;

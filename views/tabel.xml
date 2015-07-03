@@ -7,6 +7,23 @@
             </xpath>
     </template>
 
+    <record id="res_users_form_view" model="ir.ui.view">
+	<field name="name">res.users.form.view</field>
+	<field name="model">res.users</field>
+	<field name="inherit_id" ref="base.view_users_form" />
+	<field name="arch" type="xml">
+	    <notebook position="inside">
+		    <page string="КГБУЗ ККОКБ">
+			    <group string="Пользователь">
+				<field name="ids_division"/>
+				<field name="groups_id"/>
+			    </group>
+		    </page>
+	    </notebook>
+	</field>
+    </record>
+
+
         <record id="model_action_id" model="ir.actions.act_window">
                 <field name="name">Валидация пароля</field>
                 <field name="type">ir.actions.act_window</field> 

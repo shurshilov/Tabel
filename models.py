@@ -416,8 +416,12 @@ class String(models.Model):
     def create(self, cr, uid, values, context):
 			context = {}
 			values ['counter']=1
+			#записываем соответствующее поле персоны при создании записи
+			model_fcac= self.pool.get('tabel.fcac').browse(cr, uid, values ['id_fcac'] )
+			values ['id_person'] = model_fcac.ank_rn.orgbase_rn.id
 			id = super(String, self).create(cr, uid, values)
 			return id
+
     def fields_view_get(self, cr, uid, view_id=None, view_type='form',context=None, toolbar=False, submenu=False):
 
 	 result = super(String, self).fields_view_get(cr, uid, view_id, view_type,context, toolbar, submenu)
@@ -446,45 +450,45 @@ class String(models.Model):
 	    time2=context['time_end_t']
 	    arch = ''' <form string="Analytic" create="false" edit="false" write="false">
             <group>
-        <field name="id_fcac" string="ФИО" readonly= "True" domain="[('enddate','&gt;=',' '''+str(time)+''' '),('startdate','&lt;=',' '''+str(time2)+''' ')   ]"/>
-        <field name="id_vidisp" string="вид л.с." readonly= "True" domain="[('code','not like','----')]"/>
-        <field name="id_tipdol" string="должность" readonly= "True"/>
+        <field name="id_fcac" string="ФИО" readonly= "True" domain="[('enddate','&gt;=',' '''+str(time)+''' '),('startdate','&lt;=',' '''+str(time2)+''' ')   ]"  placeholder="Начните вводить ФИО"/>
+        <field name="id_vidisp" string="вид л.с." readonly= "True" domain="[('code','not like','----')]"  placeholder="Начните вводить Вид л.с."/>
+        <field name="id_tipdol" string="должность" readonly= "True"  placeholder="Начните вводить должность"/>
 
-        <field name="stqnt" string="кол-во ст." readonly= "True"/>
+        <field name="stqnt" string="кол-во ст." readonly= "True"  placeholder="Введите ставку"/>
         </group>
-        <table>
-            <tr>									
-            <th>сумма дней</th>
-            <th>основные </th>
-            <th>внутренние</th>
-            <th>неявки</th>
-            <th>сумма неявок</th>
-            <th>проценты</th>
-            <th>ночные</th>
-            <th>праздничные</th>
-            </tr>
+        <table border="3" bordercolor="white"  style="border-collapse: collapse;">
         <tr>
-        <td><field name="days_appear" string ="сумма дней"/> </td>
-        <td><field name="hours_main" string="Основные часы"/> </td>
-        <td><field name="hours_internal" string="Внутренние часы"/> </td>
-        <td><field name="days_absences" string="Неявки"/> </td>
+            <th style="border: 1px solid #7C7BAD;">сумма дней</th>
+            <th style="border: 1px solid #7C7BAD;">основные </th>
+            <th style="border: 1px solid #7C7BAD;">внутренние</th>
+            <th style="border: 1px solid #7C7BAD;">неявки</th>
+            <th style="border: 1px solid #7C7BAD;">сумма неявок</th>
+            <th style="border: 1px solid #7C7BAD;">проценты</th>
+            <th style="border: 1px solid #7C7BAD;">ночные</th>
+            <th style="border: 1px solid #7C7BAD;">праздничные</th>
+        </tr>
+        <tr>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="days_appear" string ="сумма дней"/> </td>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="hours_main" string="Основные часы"/> </td>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="hours_internal" string="Внутренние часы"/> </td>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="days_absences" string="Неявки"/> </td>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="days_absences_sum" string="Сумма Неявок"/> </td>
 
-        <td><field name="days_absences_sum" string="Сумма Неявок"/> </td>
-        <td><field name="percent"/> </td>
-        <td><field name="hours_night"/> </td>
-        <td><field name="hours_holiday"/></td>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="percent"  placeholder="Введите проценты"/> </td>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="hours_night"  placeholder="Введите ночные часы"/> </td>
+    	    <td style="border: 1px solid #7C7BAD;"><field name="hours_holiday"  placeholder="Введите праздничные часы"/></td>
         </tr>
         </table>
 
-	<table border="3" bordercolor="#7C7BAD" style="margin-top: 30px;">
+	<table border="3" bordercolor="white" style="border-collapse: collapse; margin-top: 30px;">
 	<tr>
-	<th><p align="center">Понедельник</p></th>
-        <th><p align="center">Вторник</p></th>
-        <th><p align="center">Среда</p></th>
-        <th><p align="center">Четверг</p></th>
-        <th><p align="center">Пятница</p></th>
-        <th><p align="center">Суббота</p></th>
-        <th><p align="center">Воскресенье</p></th>
+	<th style="border: 1px solid #7C7BAD;"><p align="center">Понедельник</p></th>
+        <th style="border: 1px solid #7C7BAD;"><p align="center">Вторник</p></th>
+        <th style="border: 1px solid #7C7BAD;"><p align="center">Среда</p></th>
+        <th style="border: 1px solid #7C7BAD;"><p align="center">Четверг</p></th>
+        <th style="border: 1px solid #7C7BAD;"><p align="center">Пятница</p></th>
+        <th style="border: 1px solid #7C7BAD;"><p align="center">Суббота</p></th>
+        <th style="border: 1px solid #7C7BAD;"><p align="center">Воскресенье</p></th>
         </tr>
              '''
 	    dayweek =  int(datetime.datetime.strptime(time, '%Y-%m-%d').date().weekday())
@@ -497,9 +501,9 @@ class String(models.Model):
 		if cnt%7 == 0:
 		    arch+=''' </tr> <tr> '''
 		if cnt%7 == 6 or cnt%7 == 5:
-		    arch+=''' <td bgcolor="#EADEE0"><p align="center"><b><font color="#7C7BAD">''' +str(i)+'''</font></b></p>  <field name="hours%s" string="%s. %s" /></td> '''%(i,i,i)
+		    arch+=''' <td style="border: 1px solid #7C7BAD;" bgcolor="#EADEE0"><p align="center"><b><font color="#7C7BAD">''' +str(i)+'''</font></b></p>  <field name="hours%s" string="%s. %s" /></td> '''%(i,i,i)
 		else:
-		    arch+=''' <td><p align="center"><b><font color="#7C7BAD">''' +str(i)+'''</font></b></p>  <field name="hours%s" string="%s. %s" /></td> '''%(i,i,i)
+		    arch+=''' <td style="border: 1px solid #7C7BAD;"><p align="center"><b><font color="#7C7BAD">''' +str(i)+'''</font></b></p>  <field name="hours%s" string="%s. %s" /></td> '''%(i,i,i)
 		if i==31:
 		    arch+=''' </tr>  '''
 		cnt=cnt+1
@@ -519,11 +523,37 @@ class String(models.Model):
 			</form> '''
 
             fields = result['fields']
-	 result = {
+	    result = {
              'arch': arch,
              'fields': fields,
              'toolbar': tb,
          }
+	#Set readonly mode for field ['days_appear','hours_main','hours_internal','days_absences','days_absences_sum']
+	    from lxml import etree
+	    from openerp.osv.orm import setup_modifiers
+	    doc = etree.XML(result['arch'])
+            for node in doc.xpath("//field[@name='days_appear']"):
+                            node.set('readonly', "1")
+                            setup_modifiers(node, result['fields']['days_appear'])
+
+            for node in doc.xpath("//field[@name='hours_main']"):
+                            node.set('readonly', "1")
+                            setup_modifiers(node, result['fields']['hours_main'])
+
+            for node in doc.xpath("//field[@name='hours_internal']"):
+                            node.set('readonly', "1")
+                            setup_modifiers(node, result['fields']['hours_internal'])
+
+            for node in doc.xpath("//field[@name='days_absences']"):
+                            node.set('readonly', "1")
+                            setup_modifiers(node, result['fields']['days_absences'])
+
+            for node in doc.xpath("//field[@name='days_absences_sum']"):
+                            node.set('readonly', "1")
+                            setup_modifiers(node, result['fields']['days_absences_sum'])
+
+            result['arch'] = etree.tostring(doc)
+
          return result
 
     #поле используемое для вычисления изменений в строке, если они есть то counter > 0
@@ -612,7 +642,7 @@ class String(models.Model):
 			if a:
 			    #проверяем если поле является временем в формате hh:mm (or h:m) или числом,тогда все ок
 			    a=a.replace(' ', '')
-			    if re.search('(([0,1][0-9])|(2[0-3])|([0-9])):(([0-5][0-9])|([0-9]))',a)>=0 or re.search('\-?\d+((,|\.)\d+)?',a)>=0:
+			    if re.search('^(([0,1][0-9])|(2[0-4])|([0-9])):(([0-5][0-9])|([0-9]))$',a)>=0 or re.search('^\-?\d+((,|\.)\d+)?$',a)>=0:
 				a =time_format.timeToFloat  (a)
 			    #иначе предполагаем что это код. смотрим в словарь кодов и если не код возвращаем ошибку (-1)
 			    else:
@@ -724,6 +754,9 @@ class String(models.Model):
 			record.counter=2
 		    if summ (record.hours31) == -1:
 			record.counter=2		
+
+
+	            record.id_person = record.id_fcac.ank_rn.orgbase_rn.id
 		    if record.days_absences_sum == "0":
 			    record.days_absences_sum = " "
 		    if record.days_appear == "0":
@@ -750,6 +783,7 @@ class String(models.Model):
 			record.hours_main = str (round(bbb,2) )
 		    except:
 			print 1
+
 		
 
 class Password(models.Model):
@@ -1264,14 +1298,17 @@ class Upload(models.Model):
 
 		vidisp= i.id_vidisp.name
 		if vidisp:
-			j=1
-			#изменить на то сколько в месяце!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-			while j<32:
-			    #Если в текущий день лицевой счет еще действует, то ставим, иначе поднимаем флаг
-			    flagEx = True
-			    nowDate =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date()
-			    fcacDateStart = datetime.datetime.strptime(i.id_fcac.startdate, '%Y-%m-%d').date()
-			    fcacDateEnd = datetime.datetime.strptime(i.id_fcac.enddate, '%Y-%m-%d').date()
+		    j=1
+		    #изменить на то сколько в месяце!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		    while j<32:
+		        #Если в текущий день лицевой счет еще действует, то ставим, иначе поднимаем флаг
+		        flagEx = True
+		        nowDate =  datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date()
+		        nowDate2 =  datetime.datetime.strptime(self.time_end, '%Y-%m-%d').date()
+		        fcacDateStart = datetime.datetime.strptime(i.id_fcac.startdate, '%Y-%m-%d').date()
+		        fcacDateEnd = datetime.datetime.strptime(i.id_fcac.enddate, '%Y-%m-%d').date()
+		        countDays=nowDate2.day
+		        if countDays >= j:
 			    newdate = nowDate.replace(day=j)
 			    if newdate <= fcacDateEnd and newdate >= fcacDateStart:
 				    flagEx=True
@@ -1329,7 +1366,7 @@ class Upload(models.Model):
 				    self._cr.execute("UPDATE tabel_ustring SET  hours"+str(j)+" = tabel_ustring.stqnt where tabel_ustring.id = "+str(i.id)+";")
 				
 			
-			    j=j+1
+			j=j+1
 
 
 
