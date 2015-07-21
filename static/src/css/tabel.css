@@ -1,59 +1,73 @@
+/*подсветка строк в one2many полях*/
+.openerp .oe_form_field_one2many .oe_list_content > tbody tr:hover {
+    background: #eadee0;
+}
+/*Сетка в one2many*/
+.openerp .oe_form_field_one2many .oe_list_content > tbody td {
+    border-left: 1px solid #dfdfdf;
+}
+.openerp .oe_list_content > tbody > tr:nth-child(odd) {
+  background-color:  #eadee0;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#eadee0), to(#eadee0));
+  background-image: -webkit-linear-gradient(top, #eadee0, #eadee0);
+  background-image: -moz-linear-gradient(top, #eadee0, #eadee0);
+  background-image: -ms-linear-gradient(top, #eadee0, #eadee0);
+  background-image: -o-linear-gradient(top, #eadee0, #eadee0);
+  background-image: linear-gradient(to bottom, #eadee0, #eadee0);
+}
+
+
+
+/*Увеличиваем кнопки*/
 .openerp .oe_stat_button  {
   width: 240px !important;
-  
 }
-
-
 /*LEFTBAR CHANGE*/
-.openerp .oe_leftbar_folded {
-  display: block !important;
-  min-width: 20px !important;
-  width: 20px !important;
-  background: #4d394b;
-  border-right: 1px solid #afafb6;
-  text-shadow: 0 1px 1px white;
-  position: relative;
-  height: 69% !important;
-  cursor: pointer;
+.openerp .nav-pills > li.active a:hover {
+background-color: #5a0821;
 }
-.openerp .oe_leftbar {
-  background: #4d394b;
-  border-right: 0px solid #afafb6;.
-}
-.openerp .nav-pills li > a {
-  padding: 6px 4px 2px 18px;
-  color: #ab9ba9;
-}
-.openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
-  background-color: #4c9689;
-  color: white;
-  border-radius: 0;
-}
-
+/*цвет пунктов меню при наведении*/
 .nav > li > a:hover, .nav > li > a:focus {
   text-decoration: none;
-  background-color: #3e313c;
+  background-color: #5a0821;
+}
+/*цвет свернутого лефт бара*/
+.openerp .oe_leftbar_folded {
+  background: #740c2b;
+}
+/*цвет заголовков лефт бара*/
+.openerp .oe_secondary_menu_section {
+  color: #df4179;
+}
+/*цвет фона лефт бара*/
+.openerp .oe_leftbar {
+  background: #740c2b;
+  border-right: 0px solid #afafb6;.
+}
+/*цвет букв лефт бара*/
+.openerp .nav-pills li > a {
+  color: #f691b5;
+}
+.openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
+  background-color: #dfa941;
 }
 
 /*NAVBAR CHANGE*/
 .navbar-inverse {
-    background: #4c9689;
-     border: 1px solid  #4c9689;
+    background:#dfa941;
+    border: 1px solid  #dfa941;
 }
 .navbar-inverse .navbar-nav > li > a {
   color: #ffffff;
 }
 .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
   color: #fff;
-  background-color: #4d394b;
-    
+  background-color: #740c2b;
 }
 .navbar-inverse .navbar-nav > li > a:hover, .nav > li > a:focus {
   text-decoration: none;
-  background-color: #7c7bad;
+  background-color: #740c2b;
 }
-
-
 
 .openerp .oe_view_manager table.oe_view_manager_header h2 {
   font-size: 18px;
@@ -65,9 +79,10 @@
   background-image: linear-gradient(to bottom, #ffffff, #ffffff); 
 
 }
+/*
 .openerp .oe_list_content td, .openerp .oe_list_content th {
   border-left: 1px solid #dfdfdf;
-}
+}*/
 /*Увеличиваем чат*/
 .oe_im_chatview .oe_im_chatview_header_name {
   max-width: 100%;
@@ -136,3 +151,44 @@ padding-bottom: 8px;
 .mytable {
 margin-left:200px;
 }
+
+
+/*SLACK.COM STYLE
+.openerp .nav-pills > li.active a:hover {
+background-color: #7c7bad;
+}
+.nav > li > a:hover, .nav > li > a:focus {
+  background-color: #3e313c;
+}
+.openerp .oe_leftbar_folded {
+  background: #4d394b; slack theme
+}
+.openerp .oe_secondary_menu_section {
+    color:#7c7bad;
+}
+.openerp .oe_leftbar {
+  background: #740c2b;
+  background: #4d394b; slack theme
+}
+.openerp .nav-pills li > a {
+  color: #ab9ba9; slack theme
+}
+.openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
+  background-color: #4c9689; slack theme 
+}
+.navbar-inverse {
+    background: #4c9689;  slack theme
+    border: 1px solid  #4c9689; slack theme
+}
+.navbar-inverse .navbar-nav > li > a {
+  color: #ffffff;
+}
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  color: #fff;
+  background-color: #4d394b;slack style
+}
+.navbar-inverse .navbar-nav > li > a:hover, .nav > li > a:focus {
+  text-decoration: none;
+  background-color: #7c7bad;
+}
+*/

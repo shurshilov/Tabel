@@ -86,7 +86,14 @@ class Temp(models.TransientModel):
 	
 	#функция проверки существует ли такой пароль у такого юзера в базе (проверка идет похешу)	
 	def validation(self, cr, uid, values, context):
+		if not context['password']:
+		    raise exceptions.ValidationError("Забыли ввести пароль!")
+
+		if len(context['password'])!=8:
+		    raise exceptions.ValidationError("Неправильная длина пароля!")
+
 		code_private=context['password']
+		code_public=code_private.upper()[4:8]
 		user_id=context['user_id']
                 code_private=code_private.upper()[:8]
                 vals = {}
@@ -107,10 +114,13 @@ class Temp(models.TransientModel):
                         if(context['state']=='draft'):
                                 recs.signal_workflow('draft')
                         if(context['state']=='confirm'):
+				recs.signature_public_tabel=code_public
                                 recs.signal_workflow('confirm')
                         if(context['state']=='confirm2'):
+				recs.signature_public_boss=code_public
                                 recs.signal_workflow('confirm2')
                         if(context['state']=='done'):
+				recs.signature_public_accountant=code_public
                                 recs.signal_workflow('done')
 
 			return {
@@ -412,6 +422,8 @@ class String(models.Model):
     counter = fields.Integer (string = "Счет",default=0)
     percent = fields.Char (string = "Прц")
     complet = fields.Char (string = "Разнести")
+    time_start_s = fields.Date (related='id_tabel.time_start_t', string="время начала")
+
     
     def create(self, cr, uid, values, context):
 			context = {}
@@ -497,7 +509,7 @@ class String(models.Model):
 		if i == 1:
 		    arch+=''' <tr>  '''
 		    for j in range (0,dayweek):
-			arch+=''' <td></td>  '''
+			arch+=''' <td style="border: 1px solid #7C7BAD;"></td>  '''
 		if cnt%7 == 0:
 		    arch+=''' </tr> <tr> '''
 		if cnt%7 == 6 or cnt%7 == 5:
@@ -794,19 +806,27 @@ class Password(models.Model):
         	return self._uid
 
 	user_id = fields.Many2one('res.users','Пользователь',default = user)
-	password = fields.Char(string="password")
+	password = fields.Char(string="Простая электронная подпись")
+	public_key = fields.Char(string="Открытый ключ")
 	#перед тем как сохранить пароль берем от него хеш и сохраняем не сам пароль а хеш
 	def create(self, cr, uid, values, context):
 		if  context['state']=='create':
+			if not values['password']:
+			    raise exceptions.ValidationError("Забыли ввести пароль!")
+			if len(values['password'])!=8:
+			    raise exceptions.ValidationError("Неправильная длина пароля!")
+
 			context = {}
 			vals = {}
 			h = hashlib.sha256()
 			code_private=values['password']
+			code_public=code_private.upper()[4:8]
 			user_id=values['user_id']
-			#8 - change len to dynamic!!!
+			#8 - password fixed length!!!
 			code_private=code_private.upper()[:8]
 			h.update(code_private)
 			vals ['user_id']=user_id
+			vals ['public_key']=code_public
 			vals ['password']=h.hexdigest()
 			id = super(Password, self).create(cr, uid, vals, context=None)
 			return id
@@ -819,7 +839,10 @@ class Tabel(models.Model):
     _name = 'tabel.tabel'
     
     #_rec_name = 'id_ank'
-    _order = 'id_division'
+    _order = 'orgbase_rn'
+    _inherits = {
+	'tabel.ank':'id_ank',
+}
 
     #первый день текущего месяца
     def time_first (self):
@@ -870,6 +893,9 @@ class Tabel(models.Model):
     signature_tabel      =  fields.Char(string="signature tabel")
     signature_boss       =  fields.Char(string="signature boss")
     signature_accountant =  fields.Char(string="signature accountant")
+    signature_public_tabel      =  fields.Char(string="Открытая часть табельщика")
+    signature_public_boss       =  fields.Char(string="Открытая часть начальника")
+    signature_public_accountant =  fields.Char(string="Открытая часть бухгалтера")
     check_signature = fields.Boolean(string="проверка подписи",default=True)#для пользователей сырой документ считается валидным.
 #    ank_signature_tabel      = fields.Many2one('tabel.ank', string="имя сотрудника подписи (табельщик)")
     ank_signature_boss       = fields.Many2one('res.users', string="имя сотрудника подписи (нач.отдела)")
@@ -879,8 +905,8 @@ class Tabel(models.Model):
     num_tabel = fields.Integer(string="number of Tabel")
     time_start_t = fields.Date(string="time start of tabel", default = time_first,index=True)
     time_end_t = fields.Date(string="time end of tabel", default = time_last,index=True)
-    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default, order ='orgbase_rn')
-    ids_string = fields.One2many('tabel.string', 'id_tabel', string="string",  limit = 500)
+    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default)
+    ids_string = fields.One2many('tabel.string', 'id_tabel', string="string")
     state = fields.Selection([
          ('draft', "Не подписанный"),
          ('confirmed', "Подписанный табельщиком"),

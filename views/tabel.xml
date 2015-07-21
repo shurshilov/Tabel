@@ -4,9 +4,29 @@
     <template id="assets_backend" name="tabel assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <link rel="stylesheet" href="/Tabel/static/src/css/tabel.css"/>
+    		<script type="text/javascript" src="/Tabel/static/src/js/mywidget.js"></script>
             </xpath>
     </template>
 
+
+    <!-- Created menu in setting for usability -->
+    <record id="open_module_tree_kkokb" model="ir.actions.act_window">
+	<field name="name">KGBUZ KKOKB Modules</field>
+	<field name="res_model">ir.module.module</field>
+	<field name="view_type">form</field>
+	<field name="view_mode">kanban,tree,form</field>
+	<field name="domain">['|',('name', 'ilike', 'Tabel'),('name', 'like', 'Graph')]</field>
+	<field name="search_view_id" ref="base.view_module_filter"/>
+	<field name="help" type="html">
+	    <p>
+		<b>No module found!</b>
+	    </p>
+	</field>
+    </record>
+
+    <menuitem name="КГБУЗ ККОКБ" parent="base.menu_management" id="modules_kkokb" sequence="7" action="open_module_tree_kkokb"/>
+
+    <!-- Created page for user-->
     <record id="res_users_form_view" model="ir.ui.view">
 	<field name="name">res.users.form.view</field>
 	<field name="model">res.users</field>
@@ -40,7 +60,22 @@
 	<tree string="Password Tree" >
 	    <field name="user_id"/>
 	    <field name="password" />
+	    <field name="public_key" />
 	</tree>
+	</field>
+    </record>
+    <!-- password form view-->
+    <record model="ir.ui.view" id="password_form_view">
+	<field name="name">password.form</field>
+	<field name="model">tabel.password</field>
+	<field name="arch" type="xml">
+	<form string="Password Form" >
+	    <group>
+	    <field name="user_id"/>
+	    <field name="password" placeholder="8-символьный пароль (4-private 4-public)" />
+	    <field name="public_key" readonly="True" placeholder="Последние 4 знака ключа"/>
+	    </group>
+	</form>
 	</field>
     </record>
 
@@ -78,7 +113,7 @@
 	    <sheet>
 	    <group>
 	    <field name="user_id" />
-	    <field name="password" password="True" default_focus="1"/>
+	    <field name="password" password="True" default_focus="1" placeholder="Введите пароль"/>
 			<button
                                 name="validation"
                                 type="object"
@@ -237,7 +272,69 @@
 	</form>
 	</field>
     </record>
+<!--
+    <record id="tabel_form_view_widget" model="ir.ui.view">
+	<field name="name">tabel_form_view_widget</field>
+	<field name="model">tabel.tabel</field>
+	<field name="inherit_id" ref="Tabel.tabel_form_view" />
+	<field name="arch" type="xml">
+	    <field name="ids_string" context="{'time_start_t':time_start_t,'time_end_t':time_end_t}">
+		<tree editable="bottom">
+		    			<field name="time_start_s" invisible="True" />
+					<field name="id_fcac" string="ФИО" />
+					<field name="id_person" string="ФИО" invisible="True"/>
+					<field name="id_post" invisible="True"/>
+					<field name="id_katper" invisible="True"/>
+					<field name="id_tipdol"/>
+					<field name="id_vidisp"/>
+					<field name="stqnt" string="кол-во ст."/>
+					<field name="hours1" widget="mywidget"/>
+					<field name="hours2" widget="mywidget"/>
+       					<field name="hours3" widget="mywidget"/>
+       					<field name="hours4" widget="mywidget"/>
+       					<field name="hours5" widget="mywidget"/>
+                       			<field name="hours6" widget="mywidget"/>
+                           		<field name="hours7" widget="mywidget"/>
+                           		<field name="hours8" widget="mywidget"/>
+                           		<field name="hours9" widget="mywidget"/>
+                           		<field name="hours10" widget="mywidget"/>
+                           		<field name="hours11" widget="mywidget"/>
+                           		<field name="hours12" widget="mywidget"/>
+                           		<field name="hours13" widget="mywidget"/>
+                           		<field name="hours14" widget="mywidget"/>
+                           		<field name="hours15" widget="mywidget"/>
+                           		<field name="hours16" widget="mywidget"/>
+                           		<field name="hours17" widget="mywidget"/>
+                           		<field name="hours18" widget="mywidget"/>
+                           		<field name="hours19" widget="mywidget"/>
+                           		<field name="hours20" widget="mywidget"/>
+                           		<field name="hours21" widget="mywidget"/>
+                           		<field name="hours22" widget="mywidget"/>
+                           		<field name="hours23" widget="mywidget"/>
+                           		<field name="hours24" widget="mywidget"/>
+                           		<field name="hours25" widget="mywidget"/>
+                           		<field name="hours26" widget="mywidget"/>
+                           		<field name="hours27" widget="mywidget"/>
+                           		<field name="hours28" widget="mywidget"/>
+                           		<field name="hours29" widget="mywidget"/>
+                           		<field name="hours30" widget="mywidget"/>
+                           		<field name="hours31" widget="mywidget"/>
+					<field name="percent"/>
+					<field name="hours_night"/>
+					<field name="hours_holiday"/>
+					<field name="days_appear"/>
+					<field name="hours_main"/>
+					<field name="hours_internal"/>
+					<field name="days_absences"/>
+					<field name="days_absences_sum"/>
+					<field name="counter" invisible="True"/>
+					<field name="complet" invisible="True"/>
+		</tree>
+	    </field>
+	</field>
+    </record>
 
+-->
     <!-- tabel tree view -->
     <record model="ir.ui.view" id="tabel_tree_view">
 	<field name="name">tabel.tree</field>
@@ -247,16 +344,20 @@
 <!--	    <field name="id"/>  -->
 	    <field name="id_ank" string="Табельщик"/>
 	    <field name="id_division" string="Подразделение" />
-	    <field name="create_date" string="дата создания" />
+	    <field name="create_date" string="дата создания" groups="Tabel.group_manager"/>
+	    <field name="write_date" string="дата изменения" groups="Tabel.group_manager" />
+	    <field name="write_uid" string="кто изменил" groups="Tabel.group_manager" />
 	    <field name="ank_signature_boss" string="Начальник"/>
 	    <field name="ank_signature_accountant" string="Бухгалтер"/>
 
 	    <field name="time_start_t" string="Дата начала табеля"/>
 	    <field name="time_end_t" string="Дата конца табеля"/>
-<!--	    <field name="signature_tabel" string="Подпись1"/>
+	    <field name="signature_tabel" string="Подпись1"/>
 	    <field name="signature_boss" string="Подпись2"/>
 	    <field name="signature_accountant" string="Подпись3"/>
-	    <field name="num_tabel" string="Номер табеля"/>  -->
+	    <field name="signature_public_tabel" string="Public1"/>
+	    <field name="signature_public_boss" string="Public2"/>
+	    <field name="signature_public_accountant" string="Public3"/>
 	    <field name="ids_string" string="Количество записей"/>
 
 	</tree>
@@ -394,6 +495,7 @@
 	<field name="model">tabel.string</field>
 	<field name="arch" type="xml">
 	<tree string="String Tree" colors="blue:counter == 1; red:counter == 2"   toolbar="1">
+					<field name="time_start_s" invisible="True" />
 					<field name="id_fcac" string="ФИО" />
 					<field name="id_person" string="ФИО" invisible="True"/>
 					<field name="id_post" invisible="True"/>
@@ -401,7 +503,7 @@
 					<field name="id_tipdol"/>
 					<field name="id_vidisp"/>
 					<field name="stqnt" string="кол-во ст."/>
-					<field name="hours1"/>
+					<field name="hours1" />
 					<field name="hours2"/>
        					<field name="hours3"/>
        					<field name="hours4"/>
@@ -876,7 +978,7 @@
 				icon="fa-file-o"
 				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
 			/>
-			<separator string="Выгрузка"/>
+			<separator string="Выгрузки и численности"/>
                         </group>
              		<field name="ids_ustring" widget="handle"/>
                 </form>
@@ -884,6 +986,7 @@
         </record>
 
 <!-- upload form view 2 -->
+<!--
          <record model="ir.ui.view" id="upload2_form_view">
             <field name="name">upload2.form</field>
             <field name="model">tabel.upload</field>
@@ -909,7 +1012,7 @@
                 </form>
             </field>
         </record>
-
+-->
 <!-- ustring tree view -->
      <record model="ir.ui.view" id="ustring_tree_view">
             <field name="name">ustring.tree</field>
@@ -976,7 +1079,7 @@
 		    <filter 
 		    string="Текущий и последующие месяцы" 
 		    name="male" 
-		    domain="[('time_end_t', '>=' ,(context_today()-datetime.timedelta(weeks=1)).strftime('%Y-%m-%d'))]" 
+		    domain="[('time_end_t', '>=' ,(context_today()).strftime('%d-%m-%Y'))]" 
 		    help = "Чтобы посмотреть табели за прошлые месяцы нажмите ВСЕ"/>
 		    <field name="time_start_t" select="True"/>
 		    <field name="id_ank" select="True"/>
@@ -990,7 +1093,7 @@
             <field name="res_model">tabel.string</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree</field>
-	    <field name="limit">2000</field>
+	    <field name="limit">150</field>
             <field name="help" type="html">
                 <p class="oe_view_nocontent_create">Create the new string
                 </p>
@@ -1002,7 +1105,7 @@
             <field name="name">Tabel All</field>
             <field name="res_model">tabel.tabel</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form,calendar</field>
+            <field name="view_mode">tree,form,calendar,graph</field>
 		<field name="limit">500</field>
         </record>
 
@@ -1119,7 +1222,7 @@
             <field name="res_model">tabel.person</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-<field name="limit">2000</field>
+	    <field name="limit">2000</field>
         </record>
 	<!-- window action vidisp-->
 	<record model="ir.actions.act_window" id="vidisp_list_action">
@@ -1174,7 +1277,7 @@
             <field name="res_model">tabel.password</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,graph</field>
-	    <field name="view_id" ref="password_graph_view"/>
+	    <field name="view_id" ref="password_tree_view"/>
 	    <field name="context">{'state':'create'}</field>
 	</record>
 	<!-- window action upload-->
@@ -1183,18 +1286,26 @@
             <field name="res_model">tabel.upload</field>
             <field name="view_type">form</field>
     	    <field name="view_mode">tree,form</field>
-	    <field name="view_id" ref="Tabel.upload_form_view"/>
+<!--	    <field name="view_id" ref="Tabel.upload_form_view"/> -->
+	    <field name="view_id" ref="Tabel.upload_tree_view"/>
         </record>
 
-	<!-- window action upload2-->
-	<record model="ir.actions.act_window" id="upload2_list_action">
-            <field name="name">Upload2</field>
-            <field name="res_model">tabel.upload</field>
+        <record model="ir.actions.act_window" id="ustring_list_action">
+            <field name="name">Ustring</field>
+            <field name="res_model">tabel.ustring</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-	    <field name="view_id" ref="Tabel.upload2_form_view"/>
+	    <field name="limit">80</field>
         </record>
-
+	<!--
+	<record model="ir.actions.act_window" id="tabel_list_widget_action">
+            <field name="name">Tabel.calendar.edit</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+	    <field name="view_id" ref="Tabel.tabel_form_view_widget"/>
+        </record>
+-->
 
         <!-- top level menu: no parent -->
         <menuitem id="main_tabel_menu" name="Tabel"/>
@@ -1205,17 +1316,12 @@
         <menuitem id="tabel_menu_settings" name="Настройки"
                   parent="main_tabel_menu"  groups="Tabel.group_manager"/>
 
-    <menuitem id="tabel_menu_economists" name="Экономисты"
+	<menuitem id="tabel_menu_economists" name="Экономисты"
                   parent="main_tabel_menu" groups="Tabel.group_eco"/>
 
-        <menuitem id="upload_tabel_menu" name="Выгрузка"
+        <menuitem id="upload_tabel_menu" name="Выгрузки и численности"
 		  parent="tabel_menu_economists"
                   action="upload_list_action"/>
-
-        <menuitem id="upload2_tabel_menu" name="Среднечисленная списочность"
-		  parent="tabel_menu_economists"
-                  action="upload2_list_action"/>
-
 
 <!-- 
         <menuitem id="new_tabel_menu" name="Сотрудники"
@@ -1299,8 +1405,10 @@
         <menuitem id="tabel_menu_all" name="Все"
                   parent="tabel_menu"
                   action="tabel_list_all_action"  sequence="5"/> 
-
-
+    <!--    <menuitem id="tabel_menu_calendar_edit" name="Табель календарь"
+                  parent="tabel_menu"
+                  action="tabel_list_widget_action"  sequence="6"/> 
+-->
 
 
 	
