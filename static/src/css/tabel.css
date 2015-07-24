@@ -1,19 +1,11 @@
-/*подсветка строк в one2many полях*/
-.openerp .oe_form_field_one2many .oe_list_content > tbody tr:hover {
-    background: #eadee0;
+/* каждая клетка по своему размеру*/
+.openerp .oe_list_content td, .openerp .oe_list_content th {
+  padding: 0px 5px;
+  line-height: 18px;
 }
-/*Сетка в one2many*/
-.openerp .oe_form_field_one2many .oe_list_content > tbody td {
-    border-left: 1px solid #dfdfdf;
-}
-.openerp .oe_list_content > tbody > tr:nth-child(odd) {
-  background-color:  #eadee0;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#eadee0), to(#eadee0));
-  background-image: -webkit-linear-gradient(top, #eadee0, #eadee0);
-  background-image: -moz-linear-gradient(top, #eadee0, #eadee0);
-  background-image: -ms-linear-gradient(top, #eadee0, #eadee0);
-  background-image: -o-linear-gradient(top, #eadee0, #eadee0);
-  background-image: linear-gradient(to bottom, #eadee0, #eadee0);
+/* текст в клетки по середине*/
+.openerp td {
+   vertical-align: middle; 
 }
 
 
@@ -21,52 +13,6 @@
 /*Увеличиваем кнопки*/
 .openerp .oe_stat_button  {
   width: 240px !important;
-}
-/*LEFTBAR CHANGE*/
-.openerp .nav-pills > li.active a:hover {
-background-color: #5a0821;
-}
-/*цвет пунктов меню при наведении*/
-.nav > li > a:hover, .nav > li > a:focus {
-  text-decoration: none;
-  background-color: #5a0821;
-}
-/*цвет свернутого лефт бара*/
-.openerp .oe_leftbar_folded {
-  background: #740c2b;
-}
-/*цвет заголовков лефт бара*/
-.openerp .oe_secondary_menu_section {
-  color: #df4179;
-}
-/*цвет фона лефт бара*/
-.openerp .oe_leftbar {
-  background: #740c2b;
-  border-right: 0px solid #afafb6;.
-}
-/*цвет букв лефт бара*/
-.openerp .nav-pills li > a {
-  color: #f691b5;
-}
-.openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
-  background-color: #dfa941;
-}
-
-/*NAVBAR CHANGE*/
-.navbar-inverse {
-    background:#dfa941;
-    border: 1px solid  #dfa941;
-}
-.navbar-inverse .navbar-nav > li > a {
-  color: #ffffff;
-}
-.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
-  color: #fff;
-  background-color: #740c2b;
-}
-.navbar-inverse .navbar-nav > li > a:hover, .nav > li > a:focus {
-  text-decoration: none;
-  background-color: #740c2b;
 }
 
 .openerp .oe_view_manager table.oe_view_manager_header h2 {
@@ -153,7 +99,54 @@ margin-left:200px;
 }
 
 
-/*SLACK.COM STYLE
+/*LEFTBAR CHANGE*/
+/*.openerp .nav-pills > li.active a:hover {
+background-color: #5a0821;
+}*/
+/*цвет пунктов меню при наведении*/
+/*.nav > li > a:hover, .nav > li > a:focus {
+  text-decoration: none;
+  background-color: #5a0821;
+}*/
+/*цвет свернутого лефт бара*/
+/*.openerp .oe_leftbar_folded {
+  background: #740c2b;
+}*/
+/*цвет заголовков лефт бара*/
+/*.openerp .oe_secondary_menu_section {
+  color: #df4179;
+}*/
+/*цвет фона лефт бара*/
+/*.openerp .oe_leftbar {
+  background: #740c2b;
+  border-right: 0px solid #afafb6;.
+}*/
+/*цвет букв лефт бара*/
+/*.openerp .nav-pills li > a {
+  color: #f691b5;
+}
+.openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
+  background-color: #dfa941;
+}*/
+
+/*NAVBAR CHANGE*/
+/*.navbar-inverse {
+    background:#dfa941;
+    border: 1px solid  #dfa941;
+}
+.navbar-inverse .navbar-nav > li > a {
+  color: #ffffff;
+}
+.navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+  color: #fff;
+  background-color: #740c2b;
+}
+.navbar-inverse .navbar-nav > li > a:hover, .nav > li > a:focus {
+  text-decoration: none;
+  background-color: #740c2b;
+}
+*/
+/*SLACK.COM STYLE*/
 .openerp .nav-pills > li.active a:hover {
 background-color: #7c7bad;
 }
@@ -161,34 +154,50 @@ background-color: #7c7bad;
   background-color: #3e313c;
 }
 .openerp .oe_leftbar_folded {
-  background: #4d394b; slack theme
+  background: #4d394b;
 }
 .openerp .oe_secondary_menu_section {
     color:#7c7bad;
 }
 .openerp .oe_leftbar {
   background: #740c2b;
-  background: #4d394b; slack theme
+  background: #4d394b;
 }
 .openerp .nav-pills li > a {
-  color: #ab9ba9; slack theme
+  color: #ab9ba9;
 }
 .openerp .nav-pills > li.active > a, .openerp a.list-group-item.active > a {
-  background-color: #4c9689; slack theme 
+  background-color: #4c9689;
 }
 .navbar-inverse {
-    background: #4c9689;  slack theme
-    border: 1px solid  #4c9689; slack theme
+    background: #4c9689;
+    border: 1px solid  #4c9689;
 }
 .navbar-inverse .navbar-nav > li > a {
   color: #ffffff;
 }
 .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
   color: #fff;
-  background-color: #4d394b;slack style
+  background-color: #4d394b;
 }
 .navbar-inverse .navbar-nav > li > a:hover, .nav > li > a:focus {
   text-decoration: none;
   background-color: #7c7bad;
 }
-*/
+/*подсветка строк в one2many полях*/
+.openerp .oe_form_field_one2many .oe_list_content > tbody tr:hover {
+    background: #d2d2ff;
+}
+/*Сетка в one2many*/
+.openerp .oe_form_field_one2many .oe_list_content > tbody td {
+    border-left: 1px solid #ddd;
+}
+.openerp .oe_list_content > tbody > tr:nth-child(odd) {
+  background-color:  #d2d2ff;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#d2d2ff), to(#d2d2ff));
+  background-image: -webkit-linear-gradient(top, #d2d2ff, #d2d2ff);
+  background-image: -moz-linear-gradient(top, #d2d2ff, #d2d2ff);
+  background-image: -ms-linear-gradient(top, #d2d2ff, #d2d2ff);
+  background-image: -o-linear-gradient(top, #d2d2ff, #d2d2ff);
+  background-image: linear-gradient(to bottom, #d2d2ff, #d2d2ff);
+}

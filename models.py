@@ -492,15 +492,15 @@ class String(models.Model):
         </tr>
         </table>
 
-	<table border="3" bordercolor="white" style="border-collapse: collapse; margin-top: 30px;">
+	<table border="3" bordercolor="white" style="width: 865px; white-space: nowrap; table-layout: fixed;m border-collapse: collapse; margin-top: 30px;">
 	<tr>
-	<th style="border: 1px solid #7C7BAD;"><p align="center">Понедельник</p></th>
-        <th style="border: 1px solid #7C7BAD;"><p align="center">Вторник</p></th>
-        <th style="border: 1px solid #7C7BAD;"><p align="center">Среда</p></th>
-        <th style="border: 1px solid #7C7BAD;"><p align="center">Четверг</p></th>
-        <th style="border: 1px solid #7C7BAD;"><p align="center">Пятница</p></th>
-        <th style="border: 1px solid #7C7BAD;"><p align="center">Суббота</p></th>
-        <th style="border: 1px solid #7C7BAD;"><p align="center">Воскресенье</p></th>
+	<th style=" border: 1px solid #7C7BAD;"><p align="center">Понедельник</p></th>
+        <th style=" border: 1px solid #7C7BAD;"><p align="center">Вторник</p></th>
+        <th style=" border: 1px solid #7C7BAD;"><p align="center">Среда</p></th>
+        <th style=" border: 1px solid #7C7BAD;"><p align="center">Четверг</p></th>
+        <th style=" border: 1px solid #7C7BAD;"><p align="center">Пятница</p></th>
+        <th style=" border: 1px solid #7C7BAD;"><p align="center">Суббота</p></th>
+        <th style=" border: 1px solid #7C7BAD;"><p align="center">Воскресенье</p></th>
         </tr>
              '''
 	    dayweek =  int(datetime.datetime.strptime(time, '%Y-%m-%d').date().weekday())
@@ -800,7 +800,8 @@ class String(models.Model):
 
 class Password(models.Model):
 
-	_name = 'tabel.password' 
+	_name = 'tabel.password'
+
 	#функция для дефаулта юзера (идет во вьюху с валидацией простой подписи)
 	def user(self):
         	return self._uid
@@ -809,6 +810,10 @@ class Password(models.Model):
 	password = fields.Char(string="Простая электронная подпись")
 	public_key = fields.Char(string="Открытый ключ")
 	#перед тем как сохранить пароль берем от него хеш и сохраняем не сам пароль а хеш
+	_sql_constraints = [
+	        ('public_key_uniq', 'unique (public_key)', 'Public key must be unique.'),
+	        ('password_uniq', 'unique (password)', 'Password must be unique.'),
+	    ]
 	def create(self, cr, uid, values, context):
 		if  context['state']=='create':
 			if not values['password']:
@@ -837,7 +842,7 @@ class Password(models.Model):
 
 class Tabel(models.Model):
     _name = 'tabel.tabel'
-    
+
     #_rec_name = 'id_ank'
     _order = 'orgbase_rn'
     _inherits = {
@@ -889,7 +894,7 @@ class Tabel(models.Model):
 
 
     name = fields.Char ('КГБУЗ ККОКБ им. П.Г. Макарова',default="КГБУЗ ККОКБ им. П.Г. Макарова" )
-
+    comment = fields.Text (string="Комментарии к табелю")
     signature_tabel      =  fields.Char(string="signature tabel")
     signature_boss       =  fields.Char(string="signature boss")
     signature_accountant =  fields.Char(string="signature accountant")

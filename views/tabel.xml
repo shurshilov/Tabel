@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
 <data>
+<!--
+	<record id="report_person_card_id" model="ir.actions.report.xml">
+	    <field name="name">Печать в формате doc</field>
+	    <field name="type">ir.actions.report.xml</field>
+	    <field name="model">tabel.tabel</field>
+	    <field name="report_name">person_card</field>
+	    <field name="report_type">aeroo</field>
+	    <field name="in_format">oo-odt</field>
+	    <field name="tml_source">file</field>
+	    <field name="report_rml">/tabel2.odt</field>
+	    <field name="parser_state">default</field>
+	</record>
+-->
+
     <template id="assets_backend" name="tabel assets" inherit_id="web.assets_backend">
             <xpath expr="." position="inside">
                 <link rel="stylesheet" href="/Tabel/static/src/css/tabel.css"/>
@@ -190,6 +204,7 @@
 		<field name="dayall" readonly= "True" />
 		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
 		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True" invisible="True"/>
+		<field name="comment" placeholder="Введите комментарий"/>
 		<field name="state" widget="statusbar" string="статус документа"/>
 	    </group>
 	<table>
@@ -352,9 +367,9 @@
 
 	    <field name="time_start_t" string="Дата начала табеля"/>
 	    <field name="time_end_t" string="Дата конца табеля"/>
-	    <field name="signature_tabel" string="Подпись1"/>
-	    <field name="signature_boss" string="Подпись2"/>
-	    <field name="signature_accountant" string="Подпись3"/>
+	    <field name="signature_tabel" string="Подпись1"  invisible="True" groups="Tabel.group_manager"/>
+	    <field name="signature_boss" string="Подпись2"  invisible="True" groups="Tabel.group_manager"/>
+	    <field name="signature_accountant" string="Подпись3" invisible="True"  groups="Tabel.group_manager"/>
 	    <field name="signature_public_tabel" string="Public1"/>
 	    <field name="signature_public_boss" string="Public2"/>
 	    <field name="signature_public_accountant" string="Public3"/>
@@ -371,7 +386,7 @@
 	<field name="arch" type="xml">
 	<graph string="Leads Analysis" type="bar" stacked="True">
 <!--	    <field name="id"/>  -->
-
+	    <field name="id_division" string="Подразделение" />
 	    <field name="time_start_t" string="Дата начала табеля"/>
 	    <field name="time_end_t" string="Дата конца табеля"/>
 <!--	    <field name="signature_tabel" string="Подпись1"/>
@@ -503,37 +518,37 @@
 					<field name="id_tipdol"/>
 					<field name="id_vidisp"/>
 					<field name="stqnt" string="кол-во ст."/>
-					<field name="hours1" />
-					<field name="hours2"/>
-       					<field name="hours3"/>
-       					<field name="hours4"/>
-       					<field name="hours5"/>
-                       			<field name="hours6"/>
-                           		<field name="hours7"/>
-                           		<field name="hours8"/>
-                           		<field name="hours9"/>
-                           		<field name="hours10"/>
-                           		<field name="hours11"/>
-                           		<field name="hours12"/>
-                           		<field name="hours13"/>
-                           		<field name="hours14"/>
-                           		<field name="hours15"/>
-                           		<field name="hours16"/>
-                           		<field name="hours17"/>
-                           		<field name="hours18"/>
-                           		<field name="hours19"/>
-                           		<field name="hours20"/>
-                           		<field name="hours21"/>
-                           		<field name="hours22"/>
-                           		<field name="hours23"/>
-                           		<field name="hours24"/>
-                           		<field name="hours25"/>
-                           		<field name="hours26"/>
-                           		<field name="hours27"/>
-                           		<field name="hours28"/>
-                           		<field name="hours29"/>
-                           		<field name="hours30"/>
-                           		<field name="hours31"/>
+					<field name="hours1" widget="mywidget"/>
+					<field name="hours2" widget="mywidget"/>
+       					<field name="hours3" widget="mywidget"/>
+       					<field name="hours4" widget="mywidget"/>
+       					<field name="hours5" widget="mywidget"/>
+                       			<field name="hours6" widget="mywidget"/>
+                           		<field name="hours7" widget="mywidget"/>
+                           		<field name="hours8" widget="mywidget"/>
+                           		<field name="hours9" widget="mywidget"/>
+                           		<field name="hours10" widget="mywidget"/>
+                           		<field name="hours11" widget="mywidget"/>
+                           		<field name="hours12" widget="mywidget"/>
+                           		<field name="hours13" widget="mywidget"/>
+                           		<field name="hours14" widget="mywidget"/>
+                           		<field name="hours15" widget="mywidget"/>
+                           		<field name="hours16" widget="mywidget"/>
+                           		<field name="hours17" widget="mywidget"/>
+                           		<field name="hours18" widget="mywidget"/>
+                           		<field name="hours19" widget="mywidget"/>
+                           		<field name="hours20" widget="mywidget"/>
+                           		<field name="hours21" widget="mywidget"/>
+                           		<field name="hours22" widget="mywidget"/>
+                           		<field name="hours23" widget="mywidget"/>
+                           		<field name="hours24" widget="mywidget"/>
+                           		<field name="hours25" widget="mywidget"/>
+                           		<field name="hours26" widget="mywidget"/>
+                           		<field name="hours27" widget="mywidget"/>
+                           		<field name="hours28" widget="mywidget"/>
+                           		<field name="hours29" widget="mywidget"/>
+                           		<field name="hours30" widget="mywidget"/>
+                           		<field name="hours31" widget="mywidget"/>
 					<field name="percent"/>
 					<field name="hours_night"/>
 					<field name="hours_holiday"/>
