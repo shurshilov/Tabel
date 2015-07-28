@@ -13,10 +13,10 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 	for i in ank:
 		if i.deleted or i["FCACBS_RN"] == None or i["STQNT"] == None or i["FCACBS_RN"] == None or i["GRRBDC_RN"] == None:
 			continue
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACCH_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACBS_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["GRRBDC_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( i ["STQNT"]).decode('cp1251').encode('utf-8')+"\n")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACCH_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+"; ")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACBS_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+"; ")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["GRRBDC_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+"; ")
+		f_ank.write ("\""+ str ( i ["STQNT"]).decode('cp1251').encode('utf-8') +"\""+"\n")
 	f_ank.close()
 	print "zfcacch.dbf to zfcacch.csv [ ok ]"
 	#CONNECT TO DATABASE

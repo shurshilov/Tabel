@@ -14,11 +14,11 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 	for i in ank:
 		if i.deleted or i["POST_CODE"] == None or i["ENDDATE"] == None or i["STARTDATE"] == None:
 			continue
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["POST_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write (str (i ["STARTDATE"])  +"; ")
-		f_ank.write (str (i ["ENDDATE"])  +"; ")
-		f_ank.write (i ["POST_NUM"]  +"; ")
-		f_ank.write (i ["POST_CODE"].decode('cp1251').encode('utf-8')  +"\n")
+		f_ank.write ("\""+str ( parus_id_to_odoo.parusIndexToOdoo ( i ["POST_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+"; ")
+		f_ank.write ("\""+str (i ["STARTDATE"])  +"\""+"; ")
+		f_ank.write ("\""+str (i ["ENDDATE"])  +"\""+"; ")
+		f_ank.write ("\""+i ["POST_NUM"]  +"\""+"; ")
+		f_ank.write ("\""+i ["POST_CODE"].decode('cp1251').encode('utf-8')  +"\""+"\n")
 	f_ank.close()
 	print "zpost.dbf to post.csv [ ok ]"
 	#CONNECT TO DATABASE

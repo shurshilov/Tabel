@@ -422,7 +422,7 @@ class String(models.Model):
     counter = fields.Integer (string = "Счет",default=0)
     percent = fields.Char (string = "Прц")
     complet = fields.Char (string = "Разнести")
-    time_start_s = fields.Date (related='id_tabel.time_start_t', string="время начала")
+    time_start_s = fields.Date (related='id_tabel.time_start_t', string="дата начала(строка в каком месяце)")
 
     
     def create(self, cr, uid, values, context):
@@ -921,6 +921,15 @@ class Tabel(models.Model):
     id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="division_id", required=True,default= div_default)
     dayall = fields.Integer(string="Количество рабочих дней в месяце")
 
+    def fields_view_get(self, cr, uid, view_id=None, view_type='form', context=True, toolbar=False, submenu=False):
+
+        result = super(Tabel, self).fields_view_get(cr, uid, view_id, view_type, context, toolbar, submenu)
+        if view_type=='form':
+	    state=context.get('state', False)
+            if state!='draft':
+		result['arch']=result['arch'].replace('<form','<form edit=\"false\"')
+        return result
+
     @api.one
     def time_button (self):
 	if self.format:
@@ -1085,6 +1094,9 @@ class Tabel(models.Model):
 	self.signature_boss = ""
 	self.signature_tabel = ""
 	self.signature_accountant = ""
+	self.signature_public_tabel =  ""
+	self.signature_public_boss =  ""
+	self.signature_public_accountant = ""
 	self.ank_signature_boss = 0
 	self.ank_signature_accountant = 0
         self.state = 'draft'

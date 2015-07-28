@@ -13,10 +13,10 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 	for i in ank:
 		if i.deleted or i["SURNAME"] == None or i["FIRSTNAME"] == None or i ["SECONDNAME"] == None:
 			continue
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ORBASE_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write (i ["SURNAME"].decode('cp1251').encode('utf-8').replace(' ', '')  +"; ")
-		f_ank.write (i ["FIRSTNAME"].decode('cp1251').encode('utf-8')  +"; ")
-		f_ank.write (i ["SECONDNAME"].decode('cp1251').encode('utf-8')  +"\n")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ORBASE_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+"; ")
+		f_ank.write ("\""+i ["SURNAME"].decode('cp1251').encode('utf-8').replace(' ', '')  +"\""+"; ")
+		f_ank.write ("\""+i ["FIRSTNAME"].decode('cp1251').encode('utf-8')  +"\""+"; ")
+		f_ank.write ("\""+i ["SECONDNAME"].decode('cp1251').encode('utf-8')  +"\""+"\n")
 	f_ank.close()
 	print "person.dbf to person.csv [ ok ]"
 	#CONNECT TO DATABASE

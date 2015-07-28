@@ -14,9 +14,9 @@ def person_func(directory,dbname,userr,pas,hostt,portt):
 		if i.deleted or i["NAME"] == None or i["ENDDATE"] == None or i["STARTDATE"] == None:
 			continue
 #		if  i ["NAME"].find(';')>0:
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["SUBDIV_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write (str(i["ENDDATE"]) + "; ")
-		f_ank.write (str(i["STARTDATE"]) + "; ")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["SUBDIV_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+"; ")
+		f_ank.write ("\""+str(i["ENDDATE"]) +"\""+ "; ")
+		f_ank.write ("\""+str(i["STARTDATE"]) +"\""+ "; ")
 		f_ank.write ("\""+i ["NAME"].decode('cp1251').encode('utf-8')  +"\"\n")
 	f_ank.close()
 	print "zsubdiv.dbf to subdiv.csv [ ok ]"

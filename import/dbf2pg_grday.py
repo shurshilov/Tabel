@@ -13,10 +13,10 @@ def post_func(directory,dbname,userr,pas,hostt,portt):
 	for i in ank:
 		if i.deleted or i["GRDAY_RN"] == None or i["GRMONTH_RN"] == None or i ["MONTHDAY"] == None or i ["HOURINDAY"] == None:
 			continue
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["GRDAY_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["GRMONTH_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ))+"; ")
-		f_ank.write ( str ( i["MONTHDAY"] ).decode('cp1251').encode('utf-8')+"; ")
-		f_ank.write ( str ( i["HOURINDAY"] ).decode('cp1251').encode('utf-8')+"\n")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["GRDAY_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+"; ")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["GRMONTH_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ))+"\""+"; ")
+		f_ank.write ("\""+ str ( i["MONTHDAY"] ).decode('cp1251').encode('utf-8')+"\""+"; ")
+		f_ank.write ("\""+ str ( i["HOURINDAY"] ).decode('cp1251').encode('utf-8')+"\""+"\n")
 
 	print "zgrday.dbf to grday.csv [ ok ]"
 	f_ank.close()

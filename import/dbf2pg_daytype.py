@@ -13,9 +13,9 @@ def pfcac_func(directory,dbname,userr,pas,hostt,portt):
 	for i in ank:
 		if i.deleted or i["NICK"] == None or i ["NAME"] == None or  i ["DAYTYPE_RN"] == None  :
 			continue
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["DAYTYPE_RN"].decode('cp1251').encode('utf-8').decode('utf-8'))) +"; ")
-		f_ank.write ( str( i["NICK"].decode('cp1251').encode('utf-8') ) + ";")
-		f_ank.write ( str( i["NAME"].decode('cp1251').encode('utf-8') ) + "\n")		         
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["DAYTYPE_RN"].decode('cp1251').encode('utf-8').decode('utf-8'))) +"\""+"; ")
+		f_ank.write ("\""+ str( i["NICK"].decode('cp1251').encode('utf-8') ) +"\""+ ";")
+		f_ank.write ("\""+ str( i["NAME"].decode('cp1251').encode('utf-8') ) +"\""+ "\n")
 	print "daytype.dbf to daytype.csv [ ok ]"	
 	f_ank.close()
 	#CONNECT TO DATABASE

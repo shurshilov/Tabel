@@ -15,10 +15,10 @@ def post_func(directory,dbname,userr,pas,hostt,portt):
 			continue
 		try:
         		int(i["TAB_NUM"])
-			f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ANK_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-			f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ORGBASE_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ))+"; ")
-			f_ank.write ( str ( i["TAB_NUM"] ).decode('cp1251').encode('utf-8')+"; ")
-			f_ank.write ( str( i["JOBBEGIN"] ) +"; "+ str (i["JOBEND"] )+"\n")		         
+			f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ANK_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ))+"\"" +"; ")
+			f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ORGBASE_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ))+"\""+"; ")
+			f_ank.write ("\""+ str ( i["TAB_NUM"] ).decode('cp1251').encode('utf-8')+"\""+"; ")
+			f_ank.write ("\""+ str( i["JOBBEGIN"] ) +"\""+"; "+"\""+ str (i["JOBEND"] )+"\""+"\n")
 		except ValueError:
 			print "fixed error in database [ ok ]"
 

@@ -195,8 +195,6 @@
 	<form string="Tabel Form">
 	    <group>
 		<field name="create_uid" string="Дата создания" readonly="True" invisible="True"/>
-<!--		<field name="time_start_t" string="Дата начала табеля" attrs="{'readonly': [('create_uid','!=',1)] }" />
-		<field name="time_end_t" string="Дата конца табеля" attrs="{'readonly': [('create_uid','!=',1)] }" /> -->
 		<field name="time_start_t" string="Дата начала табеля" />
 		<field name="time_end_t" string="Дата конца табеля" />
 		<field name="id_ank" string="Табельщик" />
@@ -284,9 +282,12 @@
 	    </tr>
 	</table>
 	<field name="ids_string" widget="one2Many" context="{'time_start_t':time_start_t,'time_end_t':time_end_t}"/>
+
 	</form>
 	</field>
     </record>
+
+
 <!--
     <record id="tabel_form_view_widget" model="ir.ui.view">
 	<field name="name">tabel_form_view_widget</field>
@@ -1132,7 +1133,7 @@
 	    <field name="domain">[('state','=', 'draft')]</field>
             <field name="view_mode">tree,form,graph</field>
 	    <field name="search_view_id" ref="view_tabel_search2"/>
-	    <field name="context">{'search_default_male':1}</field>
+	    <field name="context">{'search_default_male':1,'state':'draft'}</field>
 
         </record>
 

@@ -13,12 +13,12 @@ def pfcac_func(directory,dbname,userr,pas,hostt,portt):
 	for i in ank:
 		if i.deleted or i["DATE"] == None or i ["FCAC_RN"] == None or  i ["HOURQNT"] == None or  i ["HRTYPE_RN"] == None or  i ["FCACWTH_RN"] == None  :
 			continue
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACWTH_RN"].decode('cp1251').encode('utf-8').decode('utf-8'))) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCAC_RN"].decode('cp1251').encode('utf-8').decode('utf-8')))  +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["HRTYPE_RN"].decode('cp1251').encode('utf-8').decode('utf-8'))) +"; ")
-		f_ank.write ( str ( i["HOURQNT"] )  + "; ")
-		f_ank.write ( str( i["DATE"] ) + "\n")		         
-	print "zfcacwth.dbf to fcacwth.csv [ ok ]"	
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCACWTH_RN"].decode('cp1251').encode('utf-8').decode('utf-8'))) +"\""+"; ")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCAC_RN"].decode('cp1251').encode('utf-8').decode('utf-8')))  +"\""+"; ")
+		f_ank.write ("\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["HRTYPE_RN"].decode('cp1251').encode('utf-8').decode('utf-8'))) +"\""+"; ")
+		f_ank.write ("\""+ str ( i["HOURQNT"] )  +"\""+ "; ")
+		f_ank.write ("\""+ str( i["DATE"] ) +"\""+ "\n")
+	print "zfcacwth.dbf to fcacwth.csv [ ok ]"
 	f_ank.close()
 	#CONNECT TO DATABASE
 	con = psycopg2.connect(database=dbname, user=userr,password=pas,host=hostt,port=portt)

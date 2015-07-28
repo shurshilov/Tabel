@@ -5,10 +5,17 @@ openerp.Tabel = function (instance) {
         this._super.apply(this, arguments);
 	//Get html element by ClassName of openerp date. On my page is 2 date
 	//Return [date_start_t,date_end_t]
-        var data=document.getElementsByClassName('oe_form_field oe_datepicker_root oe_form_field_date');
-	var startDate = data[0].textContent;
-	if (data.length>0){
-	    var startDate = data[0].textContent;
+        var dataView=document.getElementsByClassName('oe_form_field oe_datepicker_root oe_form_field_date');
+	//When click button change date element change to picker master
+        var dataChange=document.getElementsByClassName('oe_datepicker_master');
+
+	var startDate="0";
+	if (dataChange.length >0)
+	    startDate=dataChange[0].value
+	else
+	    if (dataView.length>0)
+		startDate = dataView[0].textContent;
+	if (startDate!="0"){
 	    //Get massive dd.mm.yyyy
 	    var arr = startDate.split('.');
 	    var d = new Date(arr[2],arr[1]-1,arr[0]);

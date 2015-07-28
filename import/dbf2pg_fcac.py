@@ -19,14 +19,14 @@ def pfcac_func(directory,dbname,userr,pas,hostt,portt):
 			continue
 		if parus_id_to_odoo.parusIndexToOdoo ( i ["TIPDOL_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ) == 0:
 			continue
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCAC_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["TIPDOL_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["KATPER_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ANK_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["POST_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["SUBDIV_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"; ")
-		f_ank.write ( str ( parus_id_to_odoo.parusIndexToOdoo ( i ["VIDISP_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ))+"; ")
-		f_ank.write ( str( i["STARTDATE"] ) +"; "+ str (i["ENDDATE"] )+"\n")		         
+		f_ank.write ( "\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["FCAC_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+ "; ")
+		f_ank.write ( "\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["TIPDOL_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+ "; ")
+		f_ank.write ( "\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["KATPER_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+ "; ")
+		f_ank.write ( "\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["ANK_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+ "; ")
+		f_ank.write ( "\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["POST_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+ "; ")
+		f_ank.write ( "\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["SUBDIV_RN"].decode('cp1251').encode('utf-8').decode('utf-8') )) +"\""+ "; ")
+		f_ank.write ( "\""+ str ( parus_id_to_odoo.parusIndexToOdoo ( i ["VIDISP_RN"].decode('cp1251').encode('utf-8').decode('utf-8') ))+"\""+ "; ")
+		f_ank.write ( "\""+ str( i["STARTDATE"] ) +"\""+"; "+"\""+ str (i["ENDDATE"] )+"\""+ "\n")		         
 	print "zfcac.dbf to fcac.csv [ ok ]"	
 	f_ank.close()
 	#CONNECT TO DATABASE
