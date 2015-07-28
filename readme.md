@@ -1,7 +1,7 @@
 ########################################
 #INSTALL Debian Wheezy & Odoo на OpenVZ#
 ########################################
-![Alt text](https://github.com/shurshilov/Tabel/blob/master/edit.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/edit.png "Optional title")
 1. Download template from https://openvz.org/Download/template/precreated
 2. Install with proxmox (option ip-addr, id, name etc. Connection Bridge)
 (my setting of MY debian server, you will have other)
