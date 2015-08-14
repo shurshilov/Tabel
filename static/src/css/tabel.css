@@ -1,6 +1,11 @@
+.openerp th, .openerp td {
+    /* padding: 0; */
+    /* text-align: left; */
+/*    width: 1px;*/
+}
 /* каждая клетка по своему размеру*/
 .openerp .oe_list_content td, .openerp .oe_list_content th {
-  padding: 0px 5px;
+  padding: 0px 0px;
   line-height: 18px;
 }
 /* текст в клетки по середине*/
@@ -14,6 +19,22 @@
 .openerp .oe_stat_button  {
   width: 240px !important;
 }
+/*кнопки в хедере меняем фон и цвет наведения*/
+.openerp header .oe_stat_button  {
+  background: #dddddd;
+}
+.openerp header .oe_stat_button:hover {
+    background: #4c9689;
+    color: white;
+}
+.openerp header .oe_stat_button .stat_button_icon {
+    color: #4c9689;
+    font-size: 24px;
+    padding: 0px 3px;
+    width: 37px;
+    text-align: center;
+}
+
 
 .openerp .oe_view_manager table.oe_view_manager_header h2 {
   font-size: 18px;
@@ -92,6 +113,7 @@ padding-bottom: 8px;
 .openerp .oe_list_content > tbody > tr > td.oe_list_field_cell {
   padding: 3px 0px;
   white-space: pre-line;
+  height: 37px;
 }
 
 .mytable {
@@ -162,6 +184,12 @@ background-color: #7c7bad;
 .openerp .oe_leftbar {
   background: #740c2b;
   background: #4d394b;
+  width: 120px;
+}
+.openerp .oe_leftbar > div {
+  background: #740c2b;
+  background: #4d394b;
+  width: 120px;
 }
 .openerp .nav-pills li > a {
   color: #ab9ba9;
@@ -186,18 +214,29 @@ background-color: #7c7bad;
 }
 /*подсветка строк в one2many полях*/
 .openerp .oe_form_field_one2many .oe_list_content > tbody tr:hover {
-    background: #d2d2ff;
+    background: #e0e0e0;
+}
+
+
+.openerp .oe_form_field_one2many .oe_list_content > tbody tr {
+    font-size: 11px;
+/*    font-family: serif;*/
+    background: #f5f5f5;
+    height: 27px;
+}
+.oe_list_header_columns {
+    font-size:11px;
 }
 /*Сетка в one2many*/
 .openerp .oe_form_field_one2many .oe_list_content > tbody td {
     border-left: 1px solid #ddd;
 }
 .openerp .oe_list_content > tbody > tr:nth-child(odd) {
-  background-color:  #d2d2ff;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#d2d2ff), to(#d2d2ff));
-  background-image: -webkit-linear-gradient(top, #d2d2ff, #d2d2ff);
-  background-image: -moz-linear-gradient(top, #d2d2ff, #d2d2ff);
-  background-image: -ms-linear-gradient(top, #d2d2ff, #d2d2ff);
-  background-image: -o-linear-gradient(top, #d2d2ff, #d2d2ff);
-  background-image: linear-gradient(to bottom, #d2d2ff, #d2d2ff);
+  background-color:  #f5f5f5;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f5f5), to(#f5f5f5));
+  background-image: -webkit-linear-gradient(top, #f5f5f5, #f5f5f5);
+  background-image: -moz-linear-gradient(top, #f5f5f5, #f5f5f5);
+  background-image: -ms-linear-gradient(top, #f5f5f5, #f5f5f5);
+  background-image: -o-linear-gradient(top, #f5f5f5, #f5f5f5);
+  background-image: linear-gradient(to bottom, #f5f5f5, #f5f5f5);
 }

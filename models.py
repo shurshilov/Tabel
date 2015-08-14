@@ -14,6 +14,7 @@ import datetime
 #old api work
 class res_users(osv.osv):
     _inherit='res.users'
+    _rec_name='name'
     _description = ''
     def _get_emp_ids(self, cr, uid, ids, field_name, args, context=None):
 	result = {}
@@ -32,6 +33,9 @@ class res_users(osv.osv):
 		#ищем все ид записей в которых совпадает фамилия имя и отчество текущего юзера
 	        id_person=self.pool.get('tabel.person').search(cr,uid,['|',('full_name','=',username),('full_name','=',reverse_username)])
 		#по всем ид пробегаем и получаем все ид сотрудников которые ссылаются на фамилии в person( такой ид обычно один)
+		mas=[]
+		for i in user.category_ids:
+			mas.append(i.id)
 		for i in id_person:
 			id_ank=self.pool.get('tabel.ank').search(cr,uid,[('orgbase_rn.id','=',i)])
 			#ищем текущий лицевой счет сотрудника
@@ -40,11 +44,15 @@ class res_users(osv.osv):
 			    #далее из модели берем ид отдела
 			    for j in id_fcac:
 				id_div = self.pool.get('tabel.fcac').browse(cr, uid, j)
-				mas = id_div.subdiv_rn
-				result[user.id]= id_div.subdiv_rn.id
-				return result
+				mas.append(id_div.subdiv_rn.id)
+		result[user.id]= mas
+		return result
     _columns = {
-	'ids_division': openerp.osv.fields.function(_get_emp_ids,method=True,string='Сотрудник',type='many2one',store=False,relation='tabel.division',help='Employee'),
+	#Подразделения по дефаулту + дополнительные
+	'ids_division': openerp.osv.fields.function(_get_emp_ids,method=True,string='Сотрудник',type='many2many',store=False,relation='tabel.division',help='Employee'),
+	#Подразделения введенные вручную(дополнительные)
+	'category_ids':   openerp.osv.fields.many2many('tabel.division','tabel_division_user_rel','user_id','division_id', 'Divisions'),
+
 	}
 #odoo v8 dont work
 #class res_users(models.Model):
@@ -101,7 +109,7 @@ class Temp(models.TransientModel):
                 vals ['password']=code_private
 
                 check_flag=False
-                id_emp_sec=self.pool.get('tabel.password').search(cr,uid,[('user_id.id','=',uid)])
+                id_emp_sec=self.pool.get('tabel.password').search(cr,uid,[('user_id.id','=',user_id)])
                 for r in self.pool.get('tabel.password').browse(cr, uid, id_emp_sec, context=context):
                         h = hashlib.sha256()
                         h.update(code_private)
@@ -115,12 +123,15 @@ class Temp(models.TransientModel):
                                 recs.signal_workflow('draft')
                         if(context['state']=='confirm'):
 				recs.signature_public_tabel=code_public
+				recs.ank_signature_tabel=user_id
                                 recs.signal_workflow('confirm')
                         if(context['state']=='confirm2'):
 				recs.signature_public_boss=code_public
+				recs.ank_signature_boss=user_id
                                 recs.signal_workflow('confirm2')
                         if(context['state']=='done'):
 				recs.signature_public_accountant=code_public
+				recs.ank_signature_accountant=user_id
                                 recs.signal_workflow('done')
 
 			return {
@@ -277,7 +288,7 @@ class Person(models.Model):
 		for record in self:
 		    if type (record.firstname) != bool:
 			if len(record.firstname) >1:
-				record.initials_first = " "+record.firstname [1]+". "
+				record.initials_first = u"\u00A0"+ record.firstname [1]+"."
 			else:
 			    record.full_name = "пусто"
 		    else:
@@ -289,7 +300,7 @@ class Person(models.Model):
 		for record in self:
 		    if type (record.secondname) != bool:
 			if len (record.secondname) >1:
-				record.initials_second = record.secondname [1]+". "
+				record.initials_second = record.secondname [1]+"."
 
 #	@api.depends('surname','firstname','secondname')
 #        def _compute_init (self):
@@ -371,7 +382,7 @@ class String(models.Model):
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
     id_katper = fields.Many2one('tabel.katper',  ondelete='cascade', string="категории")
 #    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="сотрудник")
-    id_tipdol = fields.Many2one('tabel.tipdol',string="тип. должности")
+    id_tipdol = fields.Many2one('tabel.tipdol',string="тип должности")
     #используется для сортировки по алфавиту,во вью невидимое
     id_person = fields.Many2one('tabel.person',  ondelete='cascade', string="фамилии")
     id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id",index=True)
@@ -492,7 +503,7 @@ class String(models.Model):
         </tr>
         </table>
 
-	<table border="3" bordercolor="white" style="width: 865px; white-space: nowrap; table-layout: fixed;m border-collapse: collapse; margin-top: 30px;">
+	<table border="3" bordercolor="white" style="width: 100%; white-space: nowrap; table-layout: fixed;m border-collapse: collapse; margin-top: 30px;">
 	<tr>
 	<th style=" border: 1px solid #7C7BAD;"><p align="center">Понедельник</p></th>
         <th style=" border: 1px solid #7C7BAD;"><p align="center">Вторник</p></th>
@@ -902,7 +913,7 @@ class Tabel(models.Model):
     signature_public_boss       =  fields.Char(string="Открытая часть начальника")
     signature_public_accountant =  fields.Char(string="Открытая часть бухгалтера")
     check_signature = fields.Boolean(string="проверка подписи",default=True)#для пользователей сырой документ считается валидным.
-#    ank_signature_tabel      = fields.Many2one('tabel.ank', string="имя сотрудника подписи (табельщик)")
+    ank_signature_tabel      = fields.Many2one('res.users', string="имя сотрудника подписи (табельщик)")
     ank_signature_boss       = fields.Many2one('res.users', string="имя сотрудника подписи (нач.отдела)")
     ank_signature_accountant = fields.Many2one('res.users', string="имя сотрудника подписи (бухгалтер)")
 
@@ -1097,6 +1108,7 @@ class Tabel(models.Model):
 	self.signature_public_tabel =  ""
 	self.signature_public_boss =  ""
 	self.signature_public_accountant = ""
+	self.ank_signature_tabel = 0
 	self.ank_signature_boss = 0
 	self.ank_signature_accountant = 0
         self.state = 'draft'
@@ -1117,7 +1129,7 @@ class Tabel(models.Model):
 	#делаем новую подпись на основе старого хеш (валидного) + новый сотрудник
 	h = hashlib.sha256()
 	h.update(self.signature_tabel)
-	self.ank_signature_boss = self._uid
+#	self.ank_signature_boss = self._uid
 	h.update(str(self.ank_signature_boss))
 	self.signature_boss =  h.hexdigest()
         self.state = 'confirmed2'
@@ -1135,7 +1147,7 @@ class Tabel(models.Model):
 	#делаем новую подпись на основе старого хеш (валидного) + новый сотрудник
 	h = hashlib.sha256()
 	h.update(self.signature_boss)
-	self.ank_signature_accountant = self._uid
+#	self.ank_signature_accountant = self._uid
 	h.update(str(self.ank_signature_accountant))
 	self.signature_accountant =  h.hexdigest()
         self.state = 'done'

@@ -49,7 +49,8 @@
 	    <notebook position="inside">
 		    <page string="КГБУЗ ККОКБ">
 			    <group string="Пользователь">
-				<field name="ids_division"/>
+				<field name="ids_division" string="Установленные подразделения"/>
+				<field name="category_ids" string="Добавленные подразделения"/>
 				<field name="groups_id"/>
 			    </group>
 		    </page>
@@ -66,6 +67,20 @@
                 <field name="view_mode">form</field>
             <!--    <field name="view_id" ref="my_specific_view"/> -->
         </record>
+    <!-- password search view -->
+    <record id="view_password_search" model="ir.ui.view">
+        <field name="name">tabel.password.search</field>
+        <field name="model">tabel.password</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Checker">
+		    <field name="user_id" select="True"/>
+		    <field name="password" />
+		    <field name="public_key" />
+            </search>
+        </field>
+    </record>
+
     <!-- password tree view-->
     <record model="ir.ui.view" id="password_tree_view">
 	<field name="name">password.tree</field>
@@ -193,18 +208,7 @@
 	<field name="model">tabel.tabel</field>
 	<field name="arch" type="xml">
 	<form string="Tabel Form">
-	    <group>
-		<field name="create_uid" string="Дата создания" readonly="True" invisible="True"/>
-		<field name="time_start_t" string="Дата начала табеля" />
-		<field name="time_end_t" string="Дата конца табеля" />
-		<field name="id_ank" string="Табельщик" />
-		<field name="id_division" string="Подразделение" domain="[('enddate','&gt;=',time_start_t),('startdate','&lt;=',time_end_t)  ]"/>
-		<field name="dayall" readonly= "True" />
-		<field name="check_signature" string="Валидация подписи" readonly= "True"/>
-		<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True" invisible="True"/>
-		<field name="comment" placeholder="Введите комментарий"/>
-		<field name="state" widget="statusbar" string="статус документа"/>
-	    </group>
+<header>
 	<table>
 	    <tr>
 		<td>
@@ -281,6 +285,63 @@
 		</td>
 	    </tr>
 	</table>
+</header>
+
+
+	    <notebook position="inside">
+		    <page string=" ">
+		    </page>
+		    <page string="Данные табеля">
+			    <table style="width:100%;">
+			    <tr>
+				<field name="state" widget="statusbar" string="статус документа"/>
+			    </tr>
+			    <tr><td>
+			    <group>
+				<field name="time_start_t" string="Дата начала табеля" />
+				<field name="time_end_t" string="Дата конца табеля" />
+			    </group></td><td>
+			    <group>
+				<field name="id_division" string="Подразделение" domain="[('enddate','&gt;=',time_start_t),('startdate','&lt;=',time_end_t)  ]"/>
+				<field name="id_ank" string="Табельщик"/>
+				<field name="dayall"/>
+			    </group></td></tr>
+			    </table>
+		    </page>
+		    <page string="Комментарии к табелю">
+			    <field name="comment" placeholder="Введите комментарий"/>
+		    </page>
+		    <page string="Для администратора" groups="Tabel.group_manager">
+			    <group string="Дополнительные данные о табеле">
+			    </group>
+			    <table style="width:100%;"><tr><td>
+			    <group>
+			
+				<field name="format" string="Формат часвов(часы:минуты или десятичные часы)" readonly= "True" invisible="True"/>
+
+				<field name="create_date" string="дата создания" readonly= "True"/>
+				<field name="create_uid" string="кто создал" readonly= "True"/>
+
+				<field name="write_date" string="дата изменения" readonly= "True"/>
+				<field name="write_uid" string="кто изменил" readonly= "True"/>
+
+				<field name="ank_signature_tabel" string="Ответственный"/>
+				<field name="ank_signature_boss" string="Начальник"/>
+				<field name="ank_signature_accountant" string="Бухгалтер"/>
+			    </group></td><td>
+			    <group string="">
+				<field name="signature_tabel" string="Хеш всего документа от ответственного" readonly= "True"/>
+				<field name="signature_boss" string="Хеш всего документа от начальника" readonly= "True"/>
+				<field name="signature_accountant" string="Хеш всего документа от бухгалтера" readonly= "True"/>
+				<field name="check_signature" string="Валидация хешей" readonly= "True"/>
+
+				<field name="signature_public_tabel" string="Открытая часть ответственного" readonly= "True"/>
+				<field name="signature_public_boss" string="Открытая часть начальника" readonly= "True"/>
+				<field name="signature_public_accountant" string="Открытая часть бухгалтера" readonly= "True"/>
+			    </group></td></tr>
+			    </table>
+		    </page>
+	    </notebook>
 	<field name="ids_string" widget="one2Many" context="{'time_start_t':time_start_t,'time_end_t':time_end_t}"/>
 
 	</form>
@@ -363,6 +424,7 @@
 	    <field name="create_date" string="дата создания" groups="Tabel.group_manager"/>
 	    <field name="write_date" string="дата изменения" groups="Tabel.group_manager" />
 	    <field name="write_uid" string="кто изменил" groups="Tabel.group_manager" />
+	    <field name="ank_signature_tabel" string="Ответственный"/>
 	    <field name="ank_signature_boss" string="Начальник"/>
 	    <field name="ank_signature_accountant" string="Бухгалтер"/>
 
@@ -518,7 +580,7 @@
 					<field name="id_katper" invisible="True"/>
 					<field name="id_tipdol"/>
 					<field name="id_vidisp"/>
-					<field name="stqnt" string="кол-во ст."/>
+					<field name="stqnt" string="ст."/>
 					<field name="hours1" widget="mywidget"/>
 					<field name="hours2" widget="mywidget"/>
        					<field name="hours3" widget="mywidget"/>
@@ -550,12 +612,12 @@
                            		<field name="hours29" widget="mywidget"/>
                            		<field name="hours30" widget="mywidget"/>
                            		<field name="hours31" widget="mywidget"/>
+					<field name="hours_main"/>
+					<field name="hours_internal"/>
 					<field name="percent"/>
 					<field name="hours_night"/>
 					<field name="hours_holiday"/>
 					<field name="days_appear"/>
-					<field name="hours_main"/>
-					<field name="hours_internal"/>
 					<field name="days_absences"/>
 					<field name="days_absences_sum"/>
 					<field name="counter" invisible="True"/>
@@ -1035,6 +1097,7 @@
             <field name="model">tabel.ustring</field>
             <field name="arch" type="xml">
                 <tree string="Ustring Tree" >
+
               		<field name="id_division"/>
               		<field name="ids_string"/>
 			<field name="id_tipdol"/> 
@@ -1122,7 +1185,23 @@
             <field name="res_model">tabel.tabel</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,graph</field>
-		<field name="limit">500</field>
+	    <field name="limit">500</field>
+        </record>
+	<record model="ir.actions.act_window" id="tabel_list_all_action_group_by_ank">
+            <field name="name">Tabel All</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar,graph</field>
+	    <field name="limit">500</field>
+	    <field name="context">{'group_by':'id_ank'}</field>
+        </record>
+	<record model="ir.actions.act_window" id="tabel_list_all_action_group_by_division">
+            <field name="name">Tabel All</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,calendar,graph</field>
+	    <field name="limit">500</field>
+	    <field name="context">{'group_by':'id_division'}</field>
         </record>
 
 	
@@ -1324,82 +1403,85 @@
 -->
 
         <!-- top level menu: no parent -->
-        <menuitem id="main_tabel_menu" name="Tabel"/>
+        <menuitem id="main_tabel_menu" name="Табель"/>
 
-        <menuitem id="tabel_menu" name="Управление табелями"
+        <menuitem id="tabel_menu" name="Управление табелями" sequence="1"
                   parent="main_tabel_menu" />
 
-        <menuitem id="tabel_menu_settings" name="Настройки"
+        <menuitem id="tabel_menu_settings" name="Данные из Парус" sequence="2"
                   parent="main_tabel_menu"  groups="Tabel.group_manager"/>
 
-	<menuitem id="tabel_menu_economists" name="Экономисты"
+        <menuitem id="tabel_menu_data_employee" name="Данные по сотрудникам"
+                  parent="tabel_menu_settings"  groups="Tabel.group_manager"/>
+
+        <menuitem id="tabel_menu_data_extra" name="Дополнительная информация"
+                  parent="tabel_menu_settings"  groups="Tabel.group_manager"/>
+
+        <menuitem id="tabel_menu_security" name="Безопасность" sequence="4"
+                  parent="main_tabel_menu"  groups="Tabel.group_manager"/>
+
+	<menuitem id="tabel_menu_economists" name="Экономисты"  sequence="3"
                   parent="main_tabel_menu" groups="Tabel.group_eco"/>
 
         <menuitem id="upload_tabel_menu" name="Выгрузки и численности"
 		  parent="tabel_menu_economists"
                   action="upload_list_action"/>
 
-<!-- 
-        <menuitem id="new_tabel_menu" name="Сотрудники"
-		  parent="tabel_menu_settings"
-                  action="employee_list_action"/> -->
-        <menuitem id="password_tabel_menu" name="Password"
-		  parent="tabel_menu_settings"
+        <menuitem id="password_tabel_menu" name="Простая электронная подпись"
+		  parent="tabel_menu_security"
                   action="password2_list_action"/> 
-
-        <menuitem id="ank_tabel_menu" name="Сотрудники"
-		  parent="tabel_menu_settings"
-                  action="ank_list_action"/> 
-        <menuitem id="fcac_tabel_menu" name="Лицевые счета"
-		  parent="tabel_menu_settings"
-                  action="fcac_list_action"/>
-        <menuitem id="person_tabel_menu" name="Персоны(ФИО)"
-		  parent="tabel_menu_settings"
-                  action="person_list_action"/>
-        <menuitem id="vidisp_tabel_menu" name="Виды лицевых счетов"
-		  parent="tabel_menu_settings"
-                  action="vidisp_list_action"/>
-        <menuitem id="fcacch_tabel_menu" name="Ставки"
-		  parent="tabel_menu_settings"
-                  action="fcacch_list_action"/>
-        <menuitem id="fcacwth_tabel_menu" name="Отработанные часы"
-		  parent="tabel_menu_settings"
-                  action="fcacwth_list_action"/>
-        <menuitem id="fcacwtd_tabel_menu" name="Отработанные дни"
-		  parent="tabel_menu_settings"
-                  action="fcacwtd_list_action"/>
-        <menuitem id="daytype_tabel_menu" name="Виды неявок"
-		  parent="tabel_menu_settings"
-                  action="daytype_list_action"/>
-        <menuitem id="division_menu" name="Подразделения"
-                  parent="tabel_menu_settings"
-                  action="division_list_action"/>
-        <menuitem id="grday_menu" name="График дни"
-                  parent="tabel_menu_settings"
-                  action="grday_list_action"/>
-        <menuitem id="grmonth_menu" name="График месяцы"
-                  parent="tabel_menu_settings"
-                  action="grmonth_list_action"/>
-        <menuitem id="grrbdc_menu" name="Графики работы"
-                  parent="tabel_menu_settings"
-                  action="grrbdc_list_action"/>
-        <menuitem id="katper_menu" name="категории сотрудников"
-                  parent="tabel_menu_settings"
-                  action="katper_list_action"/>
-        <menuitem id="post_menu" name="Должности"
-                  parent="tabel_menu_settings"
-                  action="post_list_action"/>
-
-        <menuitem id="tipdol_menu" name="Должности типовые"
-                  parent="tabel_menu_settings"
-                  action="tipdol_list_action"/>
-
-        <menuitem id="temp_menu" name="временная таблица"
-                  parent="tabel_menu_settings"
+        <menuitem id="temp_menu" name="Временная таблица"
+                  parent="tabel_menu_security"
                   action="temp_list_action"/>
 
+        <menuitem id="ank_tabel_menu" name="Сотрудники"
+		  parent="tabel_menu_data_employee"
+                  action="ank_list_action"/> 
+        <menuitem id="fcac_tabel_menu" name="Лицевые счета"
+		  parent="tabel_menu_data_employee"
+                  action="fcac_list_action"/>
+        <menuitem id="person_tabel_menu" name="Персоны(ФИО)"
+		  parent="tabel_menu_data_employee"
+                  action="person_list_action"/>
+        <menuitem id="vidisp_tabel_menu" name="Виды лицевых счетов"
+		  parent="tabel_menu_data_extra"
+                  action="vidisp_list_action"/>
+        <menuitem id="fcacch_tabel_menu" name="Ставки"
+		  parent="tabel_menu_data_employee"
+                  action="fcacch_list_action"/>
+        <menuitem id="fcacwth_tabel_menu" name="Отработанные часы"
+		  parent="tabel_menu_data_employee"
+                  action="fcacwth_list_action"/>
+        <menuitem id="fcacwtd_tabel_menu" name="Отработанные дни"
+		  parent="tabel_menu_data_employee"
+                  action="fcacwtd_list_action"/>
+        <menuitem id="daytype_tabel_menu" name="Виды неявок"
+		  parent="tabel_menu_data_extra"
+                  action="daytype_list_action"/>
+        <menuitem id="division_menu" name="Подразделения"
+                  parent="tabel_menu_data_employee"
+                  action="division_list_action"/>
+        <menuitem id="grday_menu" name="График дни"
+                  parent="tabel_menu_data_employee"
+                  action="grday_list_action"/>
+        <menuitem id="grmonth_menu" name="График месяцы"
+                  parent="tabel_menu_data_employee"
+                  action="grmonth_list_action"/>
+        <menuitem id="grrbdc_menu" name="Графики работы"
+                  parent="tabel_menu_data_extra"
+                  action="grrbdc_list_action"/>
+        <menuitem id="katper_menu" name="категории сотрудников"
+                  parent="tabel_menu_data_extra"
+                  action="katper_list_action"/>
+        <menuitem id="post_menu" name="Должности"
+                  parent="tabel_menu_data_employee"
+                  action="post_list_action"/>
+        <menuitem id="tipdol_menu" name="Должности типовые"
+                  parent="tabel_menu_data_employee"
+                  action="tipdol_list_action"/>
+
         <menuitem id="string_menu" name="Строки табелей"
-                  parent="tabel_menu_settings"
+                  parent="tabel_menu_economists"
                   action="string_list_action"/>
 
         <menuitem id="tabel_menu_draft" name="Рабочие табели"
@@ -1418,9 +1500,17 @@
                   parent="tabel_menu"
                   action="tabel_list_done_action"  sequence="4"/> 
 
+        <menuitem id="tabel_menu_all_by_division" name="Все (по отделениям)"
+                  parent="tabel_menu"
+                  action="tabel_list_all_action_group_by_division"  sequence="5" groups="Tabel.group_manager,Tabel.group_accountant,Tabel.group_eco"/>
+
+        <menuitem id="tabel_menu_all_by_ank" name="Все (по фамилиям)"
+                  parent="tabel_menu"
+                  action="tabel_list_all_action_group_by_ank"  sequence="6" groups="Tabel.group_manager,Tabel.group_accountant,Tabel.group_eco"/>
+
         <menuitem id="tabel_menu_all" name="Все"
                   parent="tabel_menu"
-                  action="tabel_list_all_action"  sequence="5"/> 
+                  action="tabel_list_all_action"  sequence="7"/> 
     <!--    <menuitem id="tabel_menu_calendar_edit" name="Табель календарь"
                   parent="tabel_menu"
                   action="tabel_list_widget_action"  sequence="6"/> 

@@ -45,6 +45,7 @@ boss_grmonth,admin,model_tabel_grmonth,boss_division_inf,1,1,0,0
 boss_grrbdc,admin,model_tabel_grrbdc,boss_division_inf,1,1,0,0
 boss_daytype,admin,model_tabel_daytype,boss_division_inf,1,1,0,0
 boss_fcacch,admin,model_tabel_fcacch,boss_division_inf,1,1,0,0
+boss_tipdol,admin,model_tabel_tipdol,boss_division_inf,1,1,0,0
 acount_tabel,admin,model_tabel_tabel,group_accountant,1,1,1,1
 acount_string,admin,model_tabel_string,group_accountant,1,1,1,1
 acount_division,admin,model_tabel_division,group_accountant,1,1,1,1

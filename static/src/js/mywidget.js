@@ -25,7 +25,10 @@ openerp.Tabel = function (instance) {
 
 	    //Change name of widget column (attr string)
 	    if(d.getDay()>= 0 && d.getDay()<=6)
-    	    this.string+="\n"+["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"][d.getDay()]
+    	    this.string+=""+["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"][d.getDay()]
+	    //this.style.backgroundColor = "red";
+//	    for (i in this.widget)
+//		this.string=this.string++"\n"
 	}
 },
 
@@ -42,13 +45,29 @@ openerp.Tabel = function (instance) {
 	d.setDate(  d.getDate()+ number );
 	if ( d.getDay()==0 || d.getDay()==6)
 		    if (res.length>0)
-			return "<p class=\"oe_readonly\" style=\" color:#4d394b; background:#eadee0;  \" >" + res;
+			return "<div class=\"oe_readonly\" style=\" color:#4d394b; background:#eadee0;  \" >" + res+"</div>";
 		    else
-			return "<p  class=\"oe_readonly\" style=\" color:#4d394b; background:#eadee0;  \" > &nbsp;&nbsp;</p>";
+			return "<div  class=\"oe_readonly\" style=\" color:#4d394b; background:#eadee0;  \" > &nbsp;&nbsp;</div>";
 	}
         return res;
 	},
     });
+    instance.web.list.Handle = instance.web.list.Column.extend({
+    init: function () {
+        this._super.apply(this, arguments);
+        // Handle overrides the field to not be form-editable.
+        this.modifiers.readonly = false;
+    },
+    /**
+     * Return styling hooks for a drag handle
+     *
+     * @private
+     */
+    _format: function (row_data, options) {
+//        return '<div class="oe_list_handle">';
+	return '<div  style=\" color:#4d394b; background:#eadee0;  \"> ';
+    }
+});
       instance.web.ListView.include(/** @lends instance.web.ListView# */{
 /*	        resize_fields: function () {
             if (!this.editor.is_editing()) { return; }
@@ -63,5 +82,8 @@ openerp.Tabel = function (instance) {
         },
 */
 	 });
+
+
+
 };
 

@@ -27,7 +27,7 @@
 
 <!--	ADMIN -->
 	<record id="admin_rule" model="ir.rule">
-            <field name="name">Админ подписывает все</field>
+            <field name="name">Админ читает,изменяет,создает табели любых статусов и подразделений</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('group_manager'))]"/>
             <field name="perm_read" eval="1"/>
@@ -41,7 +41,7 @@
 
 <!--	BOSS INF -->
 	<record id="bos3" model="ir.rule">
-            <field name="name">Нач. отдела подписывать только своего отдела и статус 'confirmed'</field>
+            <field name="name">Нач. отдела изменяет и читает все 'confirmed' и только своего отдела</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('boss_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -49,12 +49,12 @@
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
-                [ ('state','not in',['draft','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division]) ]
+                [  ('state','not in',['draft','confirmed2','done']),('id_division.id','in', [(emp.id) for emp in user.ids_division]) ]
             </field>
         </record>
 
 	<record id="bos2" model="ir.rule">
-            <field name="name">Нач. отдела видеть все табели своего отдела</field>
+            <field name="name">Нач. отдела читает все табели своих отделов</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('boss_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -68,7 +68,7 @@
 
 <!--	TABEL_DIVISION_INF -->
 	<record id="inf3" model="ir.rule">
-            <field name="name">Нач. отдела инф. подписывать только своего отдела и статус 'confirmed'</field>
+            <field name="name">Табельщик имеет все действия с 'draft' документами которые он создал или создал админ(0)</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('tabel_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
@@ -83,11 +83,11 @@
 
 
 	<record id="inf2" model="ir.rule">
-            <field name="name">Нач. отдела инф. видеть все табели своего отдела</field>
+            <field name="name">Табельщик читает все документы с остальными статусами но только те котоые он создал или админ(0)</field>
             <field name="model_id" ref="model_tabel_tabel"/>
             <field name="groups" eval="[(4, ref('tabel_division_inf'))]"/>
             <field name="perm_read" eval="1"/>
-            <field name="perm_write" eval="0"/>
+            <field name="perm_write" eval="1"/>
             <field name="perm_create" eval="0"/>
             <field name="perm_unlink" eval="0"/>
             <field name="domain_force">
