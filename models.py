@@ -579,45 +579,14 @@ class String(models.Model):
 
          return result
 
-    #поле используемое для вычисления изменений в строке, если они есть то counter > 0
-#    @api.one
-#    @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31','stqnt','id_fcac','hours_night','hours_holiday')
-#    def compute_counter (self):
-#	self.counter = 2
     #функция разнести
     @api.one
     def compute_complet (self):
-		    self.hours1= self.complet
-            	    self.hours2= self.complet
-            	    self.hours3= self.complet
-            	    self.hours4= self.complet
-            	    self.hours5= self.complet
-		    self.hours6= self.complet
-            	    self.hours7= self.complet
-            	    self.hours8= self.complet
-            	    self.hours9= self.complet
-            	    self.hours10= self.complet
-            	    self.hours11= self.complet
-            	    self.hours12= self.complet
-            	    self.hours13= self.complet
-            	    self.hours14= self.complet
-            	    self.hours15= self.complet
-            	    self.hours16= self.complet
-            	    self.hours17= self.complet
-            	    self.hours18= self.complet
-            	    self.hours19= self.complet
-            	    self.hours20= self.complet
-            	    self.hours21= self.complet
-            	    self.hours22= self.complet
-            	    self.hours23= self.complet
-            	    self.hours24= self.complet
-            	    self.hours25= self.complet
-            	    self.hours26= self.complet
-            	    self.hours27= self.complet
-            	    self.hours28= self.complet
-            	    self.hours29= self.complet
-            	    self.hours30= self.complet
-            	    self.hours31= self.complet
+		    #прогон по колонкам 1-31
+		    for j in range(1, 32):
+			    hours='hours{0}'.format(j)
+			    setattr(self, hours, self.complet)
+
     #функция вычисляющая количетсво дней неявок,явок,отработанных часов и т.д.
     @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
     def _compute_days_appear(self):
@@ -672,10 +641,6 @@ class String(models.Model):
 				if len(a)>0:
 				    if a not in d_abse:
 					return -1
-
-
-#			    if re.search(':|,|-',a)>=0:
-#				a =time_format.timeToFloat  (a)
 			
 			    try:#проверяем если в поле число значит считаем часы
 				float(a)
@@ -700,86 +665,22 @@ class String(models.Model):
 				    record.hours_main = time_format.timeToFloat (record.hours_main)
 
 				if flag == 1:#считаем внутренние
-				#    if current_model.format:#сморим какой нужен формат вывода
-				#	record.hours_internal = floatToTime (float(record.hours_internal)+ float(a))
-				#    else:
-					record.hours_internal = str (float(record.hours_internal)+ float(a))
+				    record.hours_internal = str (float(record.hours_internal)+ float(a))
 				else:
-				#    if current_model.format:#сморим какой нужен формат вывода
-				#	record.hours_main = floatToTime (float(record.hours_main)+ float(a))
-				#    else:
-			    		record.hours_main = str (float(record.hours_main)+ float(a))
+				    record.hours_main = str (float(record.hours_main)+ float(a))
 
 				record.days_appear = str (int(record.days_appear) + 1)#в любом случае это явка
 			return 1
 
 
-
-		    if summ (record.hours1) == -1:
-			record.counter=2
-            	    if summ (record.hours2) == -1:
-			record.counter=2
-            	    if summ (record.hours3) == -1:
-			record.counter=2
-            	    if summ (record.hours4) == -1:
-			record.counter=2
-            	    if summ (record.hours5) == -1:
-			record.counter=2
-		    if summ (record.hours6) == -1:
-			record.counter=2
-            	    if summ (record.hours7) == -1:
-			record.counter=2
-            	    if summ (record.hours8) == -1:
-			record.counter=2
-            	    if summ (record.hours9) == -1:
-			record.counter=2
-            	    if summ (record.hours10) == -1:
-			record.counter=2
-            	    if summ (record.hours11) == -1:
-			record.counter=2
-            	    if summ (record.hours12) == -1:
-			record.counter=2
-            	    if summ (record.hours13) == -1:
-			record.counter=2
-            	    if summ (record.hours14) == -1:
-			record.counter=2
-            	    if summ (record.hours15) == -1:
-			record.counter=2
-            	    if summ (record.hours16) == -1:
-			record.counter=2
-            	    if summ (record.hours17) == -1:
-			record.counter=2
-            	    if summ (record.hours18) == -1:
-			record.counter=2
-            	    if summ (record.hours19) == -1:
-			record.counter=2
-            	    if summ (record.hours20) == -1:
-			record.counter=2
-            	    if summ (record.hours21) == -1:
-			record.counter=2
-            	    if summ (record.hours22) == -1:
-			record.counter=2
-            	    if summ (record.hours23) == -1:
-			record.counter=2
-            	    if summ (record.hours24) == -1:
-			record.counter=2
-            	    if summ (record.hours25) == -1:
-			record.counter=2
-            	    if summ (record.hours26) == -1:
-			record.counter=2
-            	    if summ (record.hours27) == -1:
-			record.counter=2
-            	    if summ (record.hours28) == -1:
-			record.counter=2
-            	    if summ (record.hours29) == -1:
-			record.counter=2
-            	    if summ (record.hours30) == -1:
-			record.counter=2
-		    if summ (record.hours31) == -1:
-			record.counter=2		
-
+		    #прогон по колонкам 1-31
+		    for j in range(1, 32):
+				hours='hours{0}'.format(j)
+				if summ (getattr(record, hours)) == -1:
+					setattr(record, 'counter', 2)
 
 	            record.id_person = record.id_fcac.ank_rn.orgbase_rn.id
+
 		    if record.days_absences_sum == "0":
 			    record.days_absences_sum = " "
 		    if record.days_appear == "0":
@@ -790,12 +691,9 @@ class String(models.Model):
 		    if record.hours_internal == "0.0":
 			    record.hours_internal = " "
 		    if record.percent:
-			record.days_appear= " "
-		    # 4 строки надо удалить + переделать округление
-		    #if record.hours_internal.find(':')>=0:
-		#	    record.hours_internal = time_format.timeToFloat (record.hours_internal)
-		#    if record.hours_main.find(':')>=0:
-		#	    record.hours_main = timeToFloat (record.hours_main)
+			    record.days_appear= " "
+
+		    # переделать округление?
 		    try:
 			aaa=float(record.hours_internal)
 			record.hours_internal = str (round (aaa,2)  )
@@ -859,7 +757,7 @@ class Tabel(models.Model):
     _inherits = {
 	'tabel.ank':'id_ank',
 }
-
+    
     #первый день текущего месяца
     def time_first (self):
 	now_date = datetime.date.today()
@@ -923,6 +821,7 @@ class Tabel(models.Model):
     time_end_t = fields.Date(string="time end of tabel", default = time_last,index=True)
     id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default)
     ids_string = fields.One2many('tabel.string', 'id_tabel', string="string")
+    ids_grstring = fields.One2many('tabel.grstring', 'id_tabel', string="string",  limit = 500)
     state = fields.Selection([
          ('draft', "Не подписанный"),
          ('confirmed', "Подписанный табельщиком"),
@@ -931,6 +830,7 @@ class Tabel(models.Model):
     ])
     id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="division_id", required=True,default= div_default)
     dayall = fields.Integer(string="Количество рабочих дней в месяце")
+
 
     def fields_view_get(self, cr, uid, view_id=None, view_type='form', context=True, toolbar=False, submenu=False):
 
@@ -943,12 +843,26 @@ class Tabel(models.Model):
 
     @api.one
     def time_button (self):
-	if self.format:
-		self.format = False
-	else:
-		self.format = True
-#	time_format.time_format (self)
-#	self.hours1
+	def ftohhmm(a):
+	    if a: #проверка на заполненность
+		a = re.sub(',' , '.' , a) #замена запятых точками (6,5 --> 6.5)
+		if (re.search ('^\-?\d+((,|\.)\d+)?$',a) >= 0): #проверка на число
+		    if float(a)<24: #проверка корректности ввода
+			a=float(a)*60
+			minutes=a%60
+			hours=a/60
+			if int(round(minutes))<10:
+			    return str(int(hours))+":0"+str(int(round(minutes)))
+			else:
+			    return str(int(hours))+":"+str(int(round(minutes)))
+	    return a
+
+	if self:
+	    for i in self.ids_string:
+		for j in range(1, 32):
+		    hours='hours{0}'.format(j)
+		    setattr(i, hours, ftohhmm(getattr(i, hours))) #прогон по колонкам 1-31
+
 
     #Обновить данные по пропускам(приказам),если появился новый сотрудник или больничный или отпуск и т.д. то данные обновятся не стирая введеные часы
     @api.one
@@ -1423,6 +1337,171 @@ class Upload(models.Model):
 			
 			j=j+1
 
+
+class Grstring(models.Model):
+    _name = 'tabel.grstring'
+    _rec_name = 'id_fcac'
+    _order = 'tipdol_rn,id_person'
+    _inherits = {
+		    'tabel.fcac':'id_fcac',
+		}
+    id_fcac = fields.Many2one('tabel.fcac',required="True",  ondelete='cascade', string="fcac_id")
+    #используется для сортировки по алфавиту,во вью невидимое
+    id_person = fields.Many2one('tabel.person',  ondelete='cascade', string="фамилии")
+    id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id")
+    time_start_s = fields.Date (related='id_tabel.time_start_t', string="время начала")
+
+
+    hours1  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="1")
+    hours2  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="2")
+    hours3  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="3")
+    hours4  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="4")
+    hours5  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="5")
+    hours6  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="6")
+    hours7  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="7")
+    hours8  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="8")
+    hours9  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="9")
+    hours10  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="10")
+    hours11  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="11")
+    hours12  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="12")
+    hours13  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="13")
+    hours14  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="14")
+    hours15  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="15")
+    hours16  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="16")
+    hours17  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="17")
+    hours18  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="18")
+    hours19  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="19")
+    hours20  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="20")
+    hours21  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="21")
+    hours22  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="22")
+    hours23  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="23")
+    hours24  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="24")
+    hours25  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="25")
+    hours26  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="26")
+    hours27  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="27")
+    hours28  = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="28")
+    hours29 = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="29")
+    hours30 = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="30")
+    hours31 = fields.Selection([
+         (u'день', u"День"),
+         (u'ночь', u"Ночь"),
+    ],string="31")
+    days_appear = fields.Integer(string="Всего",compute='_compute_days_appear')
+    days_night_appear = fields.Integer(string="Ноч",compute='_compute_days_appear')
+    def create(self, cr, uid, values, context):
+			context = {}
+			
+			#записываем соответствующее поле персоны при создании записи
+			model_fcac= self.pool.get('tabel.fcac').browse(cr, uid, values ['id_fcac'] )
+			values ['id_person'] = model_fcac.ank_rn.orgbase_rn.id
+
+			id = super(Grstring, self).create(cr, uid, values)
+			return id
+    #функция вычисляющая количетсво дней неявок,явок,отработанных часов и т.д.
+    @api.depends('hours1','hours2','hours3','hours4','hours5','hours6','hours7','hours8','hours9','hours10','hours11','hours12','hours13','hours14','hours15','hours16','hours17','hours18','hours19','hours20','hours21','hours22','hours23','hours24','hours25','hours26','hours27','hours28','hours29','hours30','hours31')
+    def _compute_days_appear(self):
+	for record in self:
+	    ret=0
+	    night=0
+	    for j in range(1, 32):
+			hours='hours{0}'.format(j)
+			if getattr(record, hours):
+			    if getattr(record, hours) == u'ночь':
+				night+=8
+			    ret+=12
+
+	    record.days_appear=ret
+	    record.days_night_appear=night
 
 
 

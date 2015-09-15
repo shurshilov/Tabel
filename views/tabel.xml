@@ -183,7 +183,7 @@
                 <tree string="Post Tree" >
 			<field name="id" />
              		<field name="name"/> 
-			<field name="enddate"/>
+			<field name="enddate" string="дата окончания подразделения"/>
 			<field name="startdate"/>
                 </tree>
             </field>
@@ -239,7 +239,7 @@
 			<button
 				name="time_button"
 				type="object"
-				string="Формат (минуты/десятые доли)"
+				string="Перевести в часы:минуты"
 				colors="red:format == True"
 				class="oe_inline oe_stat_button"
 				icon="fa-clock-o"
@@ -289,7 +289,8 @@
 
 
 	    <notebook position="inside">
-		    <page string=" ">
+		    <page string="Табель">
+			<field name="ids_string" widget="one2Many" context="{'time_start_t':time_start_t,'time_end_t':time_end_t}"/>
 		    </page>
 		    <page string="Данные табеля">
 			    <table style="width:100%;">
@@ -302,8 +303,8 @@
 				<field name="time_end_t" string="Дата конца табеля" />
 			    </group></td><td>
 			    <group>
-				<field name="id_division" string="Подразделение" domain="[('enddate','&gt;=',time_start_t),('startdate','&lt;=',time_end_t)  ]"/>
 				<field name="id_ank" string="Табельщик"/>
+				<field name="id_division" string="Подразделение" domain="[('enddate','&gt;=',time_start_t),('startdate','&lt;=',time_end_t)  ]"/>
 				<field name="dayall"/>
 			    </group></td></tr>
 			    </table>
@@ -342,29 +343,30 @@
 			    </table>
 		    </page>
 	    </notebook>
-	<field name="ids_string" widget="one2Many" context="{'time_start_t':time_start_t,'time_end_t':time_end_t}"/>
 
 	</form>
 	</field>
     </record>
 
-
-<!--
     <record id="tabel_form_view_widget" model="ir.ui.view">
 	<field name="name">tabel_form_view_widget</field>
 	<field name="model">tabel.tabel</field>
-	<field name="inherit_id" ref="Tabel.tabel_form_view" />
+<!--	<field name="act_window_id" ref="tabel_list_widget_action"/> -->
 	<field name="arch" type="xml">
-	    <field name="ids_string" context="{'time_start_t':time_start_t,'time_end_t':time_end_t}">
+	<form string="Tabel Form">
+	    	<field name="time_start_t" string="Дата начала табеля1"/>
+		<field name="time_end_t" string="Дата конца табеля" invisible="True"/>
+		<field name="id_ank" string="Табельщик"  />
+		<field name="id_division" string="Подразделение" domain="[('enddate','&gt;=',time_start_t),('startdate','&lt;=',time_end_t)  ]"/>
+
+	    <field name="ids_grstring">
 		<tree editable="bottom">
 		    			<field name="time_start_s" invisible="True" />
+					<field name="days_appear" string="Сум" />
+					<field name="days_night_appear" string="Ноч" />
 					<field name="id_fcac" string="ФИО" />
+
 					<field name="id_person" string="ФИО" invisible="True"/>
-					<field name="id_post" invisible="True"/>
-					<field name="id_katper" invisible="True"/>
-					<field name="id_tipdol"/>
-					<field name="id_vidisp"/>
-					<field name="stqnt" string="кол-во ст."/>
 					<field name="hours1" widget="mywidget"/>
 					<field name="hours2" widget="mywidget"/>
        					<field name="hours3" widget="mywidget"/>
@@ -396,22 +398,15 @@
                            		<field name="hours29" widget="mywidget"/>
                            		<field name="hours30" widget="mywidget"/>
                            		<field name="hours31" widget="mywidget"/>
-					<field name="percent"/>
-					<field name="hours_night"/>
-					<field name="hours_holiday"/>
-					<field name="days_appear"/>
-					<field name="hours_main"/>
-					<field name="hours_internal"/>
-					<field name="days_absences"/>
-					<field name="days_absences_sum"/>
-					<field name="counter" invisible="True"/>
-					<field name="complet" invisible="True"/>
+
 		</tree>
+
 	    </field>
+</form>
 	</field>
     </record>
 
--->
+
     <!-- tabel tree view -->
     <record model="ir.ui.view" id="tabel_tree_view">
 	<field name="name">tabel.tree</field>
@@ -422,8 +417,8 @@
 	    <field name="id_ank" string="Табельщик"/>
 	    <field name="id_division" string="Подразделение" />
 	    <field name="create_date" string="дата создания" groups="Tabel.group_manager"/>
-	    <field name="write_date" string="дата изменения" groups="Tabel.group_manager" />
-	    <field name="write_uid" string="кто изменил" groups="Tabel.group_manager" />
+	    <field name="write_date"  />
+	    <field name="write_uid"  />
 	    <field name="ank_signature_tabel" string="Ответственный"/>
 	    <field name="ank_signature_boss" string="Начальник"/>
 	    <field name="ank_signature_accountant" string="Бухгалтер"/>
@@ -441,6 +436,8 @@
 	</tree>
 	</field>
     </record>
+
+
 
     <!-- tabel graph view -->
     <record model="ir.ui.view" id="tabel_graph_view">
@@ -620,8 +617,9 @@
 					<field name="days_appear"/>
 					<field name="days_absences"/>
 					<field name="days_absences_sum"/>
-					<field name="counter" invisible="True"/>
+					<field name="counter" invisible="False"/>
 					<field name="complet" invisible="True"/>
+			
 				
 					
 	</tree>
@@ -1204,6 +1202,19 @@
 	    <field name="context">{'group_by':'id_division'}</field>
         </record>
 
+	<record model="ir.actions.act_window" id="tabel_list_widget_action">
+            <field name="name">Tabel.calendar.edit</field>
+            <field name="res_model">tabel.tabel</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form,tree</field>
+	    <field name="view_id" ref="tabel_form_view_widget"/>
+	    <field name="context">{'state':'draft'}</field>
+	    <field name="view_ids" eval="[
+                (5,),
+                (0,0,{'view_mode':'tree','view_id':ref('tabel_tree_view')}),
+                (0,0,{'view_mode':'form','view_id':ref('tabel_form_view_widget')}),
+                ]"/>
+        </record>
 	
 	<record model="ir.actions.act_window" id="tabel_list_draft_action">
             <field name="name">На подпись табельщика</field>
@@ -1211,6 +1222,12 @@
             <field name="view_type">form</field>
 	    <field name="domain">[('state','=', 'draft')]</field>
             <field name="view_mode">tree,form,graph</field>
+	    <field name="view_id" ref="tabel_form_view"/>
+	    <field name="view_ids" eval="[
+                (5,),
+                (0,0,{'view_mode':'tree','view_id':ref('tabel_tree_view')}),
+                (0,0,{'view_mode':'form','view_id':ref('tabel_form_view')}),
+                ]"/>
 	    <field name="search_view_id" ref="view_tabel_search2"/>
 	    <field name="context">{'search_default_male':1,'state':'draft'}</field>
 
@@ -1222,6 +1239,8 @@
             <field name="view_type">form</field>
 	    <field name="domain">[('state','=', 'confirmed2')]</field>
             <field name="view_mode">tree,form</field>
+	    <field name="search_view_id" ref="view_tabel_search2"/>
+	    <field name="context">{'search_default_male':1,'state':'confirmed'}</field>
         </record>
 
 	
@@ -1231,6 +1250,9 @@
 	    <field name="domain">[('state','=','confirmed')]</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
+	    <field name="search_view_id" ref="view_tabel_search2"/>
+	    <field name="context">{'search_default_male':1,'state':'confirmed2'}</field>
+
         </record>
 
 	
@@ -1240,6 +1262,9 @@
             <field name="view_type">form</field>
 	    <field name="domain">[('state','=', 'done')]</field>
             <field name="view_mode">tree,form</field>
+	    <field name="search_view_id" ref="view_tabel_search2"/>
+	    <field name="context">{'search_default_male':1,'state':'done'}</field>
+
         </record>
 
 
@@ -1515,6 +1540,10 @@
                   parent="tabel_menu"
                   action="tabel_list_widget_action"  sequence="6"/> 
 -->
+        <menuitem id="tabel_menu_calendar_edit" name="Табель календарь"
+                  parent="tabel_menu"
+                  action="tabel_list_widget_action"  sequence="6" groups="Tabel.group_manager,Tabel.group_tabel_calendar"/>
+
 
 
 	

@@ -1,3 +1,7 @@
+/*изменения для tabel_calendar*/
+.openerp .oe_list.oe_list_editable.oe_editing .oe_form_field input, .openerp .oe_list.oe_list_editable.oe_editing .oe_form_field textarea, .openerp .oe_list.oe_list_editable.oe_editing .oe_form_field select {
+    min-width: 70px;
+}
 .openerp th, .openerp td {
     /* padding: 0; */
     /* text-align: left; */
