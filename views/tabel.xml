@@ -342,6 +342,9 @@
 			    </group></td></tr>
 			    </table>
 		    </page>
+		    <page string="История">
+			<field name="ids_log" string="Логи" readonly="True"/>
+		    </page>
 	    </notebook>
 
 	</form>
@@ -625,6 +628,23 @@
 	</tree>
 	</field>
     </record>
+<!-- log tree view-->
+    <record model="ir.ui.view" id="log_tree_view">
+            <field name="name">tabel.log.tree</field>
+            <field name="model">tabel.log</field>
+            <field name="arch" type="xml">
+                <tree string="test tree"  colors="blue:status == 1; red:status == 2" toolbar="True">
+			<field name="id" invisible="True"/>
+			<field name="create_date" string="Когда:" readonly= "True"/>
+			<field name="create_uid" string="Кем:" readonly= "True" />
+			<field name="write_date" string="Дата изменения:" readonly= "True" invisible="True"/>
+			<field name="write_uid" string="Дата изменения:" readonly= "True" invisible="True"/>
+			<field name="action" string="Действие:" readonly="True"/>
+			<field name="status" string="Статус" invisible="True"/>
+                </tree>
+            </field>
+    </record>
+
 <!-- tipdol form view -->
          <record model="ir.ui.view" id="tipdol_form_view">
             <field name="name">tipdol.form</field>

@@ -140,6 +140,15 @@ class Temp(models.TransientModel):
                 else:
                         raise exceptions.ValidationError("Не правильный пароль(Повторите ввод)!")
 
+#Таблица логов работы с табелями
+class Log(models.Model):
+    _name = 'tabel.log'
+
+    id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id")
+    user_id = fields.Many2one('res.users','Пользователь')
+    action = fields.Char(string="Действие")
+    status = fields.Integer(string="Состояние действия")
+
 
 
 #Значение нормы часов для конкретного дня месяца по конкретному виду часов
@@ -822,6 +831,8 @@ class Tabel(models.Model):
     id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default)
     ids_string = fields.One2many('tabel.string', 'id_tabel', string="string")
     ids_grstring = fields.One2many('tabel.grstring', 'id_tabel', string="string",  limit = 500)
+    ids_log = fields.One2many('tabel.log', 'id_tabel', string="log")
+
     state = fields.Selection([
          ('draft', "Не подписанный"),
          ('confirmed', "Подписанный табельщиком"),
@@ -831,6 +842,33 @@ class Tabel(models.Model):
     id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="division_id", required=True,default= div_default)
     dayall = fields.Integer(string="Количество рабочих дней в месяце")
 
+#Логгирование изменений
+    def write(self, cr, uid, ids, vals, context=None):
+	current_tabel = self.pool.get('tabel.tabel').browse(cr, uid, ids[0])
+	current_state = current_tabel.state
+
+        write_res = super(Tabel, self).write(cr, uid, ids, vals, context=context)
+
+	log= u'изменения в табеле:'+u"\n"
+	state_id = 0
+	state_check = {'draft':0,'confirmed':1,'confirmed2':2,'done':3, }
+	if vals.has_key('state') and current_state:
+#	    raise exceptions.ValidationError(str(state_check[vals['state']])+str( state_check[current_state]) )
+	    if state_check[vals['state']] > state_check[current_state]:
+		log = u'подписание'
+		state_id = 1
+	    else:
+		log = u'аннулирование'
+		state_id = 2
+	    self.pool.get('tabel.log').create(cr, uid, {'user_id':uid,'action':log,'id_tabel': ids[0],'status':state_id})
+
+	if vals.has_key('ids_string'):
+	    for i in vals['ids_string']:
+		    if i[2]:
+			    current_string=self.pool.get('tabel.string').browse(cr, uid, i[1])
+			    log += unicode(i)+u" "+ current_string.id_person.surname
+	    self.pool.get('tabel.log').create(cr, uid, {'user_id':uid,'action':log,'id_tabel': ids[0],'status':state_id})
+        return write_res
 
     def fields_view_get(self, cr, uid, view_id=None, view_type='form', context=True, toolbar=False, submenu=False):
 
