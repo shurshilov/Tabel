@@ -6,6 +6,9 @@
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/password_validation.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/graph_example.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tree_view.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/print_button.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/report_page1.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/report_page2.png "Optional title")
 
 ====== INSTALL Debian Wheezy & Odoo на OpenVZ ======
   * 1. Download template from https://openvz.org/Download/template/precreated

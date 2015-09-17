@@ -439,7 +439,7 @@ class String(models.Model):
     hours_internal = fields.Char(string="Вну",compute='_compute_days_appear')
     days_absences = fields.Char (string="Неяв",compute='_compute_days_appear')
     days_absences_sum = fields.Char (string="Сум",compute='_compute_days_appear')
-    counter = fields.Integer (string = "Счет",default=0)
+    counter = fields.Integer (string = "Счет",compute='_compute_days_appear')
     percent = fields.Char (string = "Прц")
     complet = fields.Char (string = "Разнести")
     time_start_s = fields.Date (related='id_tabel.time_start_t', string="дата начала(строка в каком месяце)")
@@ -610,7 +610,7 @@ class String(models.Model):
 	for record in self:
 #		проверка на то чтобы должности и типовые должности совпадали
 #		if record.id_tipdol.code != record.id_post.name:
-#		    record.counter=1
+#		    record.\counter=1
 
 #		if record.counter:
 #		    record.counter = str(float (record.counter) +1)
@@ -853,7 +853,7 @@ class Tabel(models.Model):
 	state_id = 0
 	state_check = {'draft':0,'confirmed':1,'confirmed2':2,'done':3, }
 
-	#delete string in field ids_string of model Tabel
+	#add log delete string in field ids_string of model Tabel
 	if vals.has_key('ids_string'):
 #	    raise exceptions.ValidationError(str(vals))
 	    for i in vals['ids_string']:
@@ -864,7 +864,7 @@ class Tabel(models.Model):
 
         write_res = super(Tabel, self).write(cr, uid, ids, vals, context=context)
 
-	#write string in field ids_string of model Tabel
+	#add log write string in field ids_string of model Tabel
 	if vals.has_key('ids_string'):
 	    for i in vals['ids_string']:
 		if i[1]:
@@ -872,6 +872,7 @@ class Tabel(models.Model):
 		    if i[0] == 1:
 			    log +=u'Изменение строки: ' + unicode(i) + u' ' + current_string.id_person.full_name + '\n'
 
+	#add log digital signature
 	if vals.has_key('state') and current_state!=False:
 	    if state_check[vals['state']] > state_check[current_state]:
 		log = u'подписание'
@@ -1078,6 +1079,7 @@ class Tabel(models.Model):
 	self.ank_signature_tabel = 0
 	self.ank_signature_boss = 0
 	self.ank_signature_accountant = 0
+	self.check_signature = True
         self.state = 'draft'
 
     #Функция хеширования табеля, хэширует весь документ(т.е. каждое поле)
