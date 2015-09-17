@@ -620,7 +620,7 @@
 					<field name="days_appear"/>
 					<field name="days_absences"/>
 					<field name="days_absences_sum"/>
-					<field name="counter" invisible="False"/>
+					<field name="counter" invisible="True"/>
 					<field name="complet" invisible="True"/>
 			
 				

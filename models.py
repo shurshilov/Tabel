@@ -448,10 +448,13 @@ class String(models.Model):
     def create(self, cr, uid, values, context):
 			context = {}
 			values ['counter']=1
+			state_id=0
 			#записываем соответствующее поле персоны при создании записи
 			model_fcac= self.pool.get('tabel.fcac').browse(cr, uid, values ['id_fcac'] )
+    			log = u'Добавлена строка:'+ model_fcac.ank_rn.orgbase_rn.full_name+u'\n'
 			values ['id_person'] = model_fcac.ank_rn.orgbase_rn.id
 			id = super(String, self).create(cr, uid, values)
+			self.pool.get('tabel.log').create(cr, uid, {'user_id':uid,'action':log,'id_tabel': values['id_tabel'],'status':state_id})
 			return id
 
     def fields_view_get(self, cr, uid, view_id=None, view_type='form',context=None, toolbar=False, submenu=False):
@@ -846,28 +849,40 @@ class Tabel(models.Model):
     def write(self, cr, uid, ids, vals, context=None):
 	current_tabel = self.pool.get('tabel.tabel').browse(cr, uid, ids[0])
 	current_state = current_tabel.state
+	log= u' '
+	state_id = 0
+	state_check = {'draft':0,'confirmed':1,'confirmed2':2,'done':3, }
+
+	#delete string in field ids_string of model Tabel
+	if vals.has_key('ids_string'):
+#	    raise exceptions.ValidationError(str(vals))
+	    for i in vals['ids_string']:
+		if i[1]:
+		    current_string=self.pool.get('tabel.string').browse(cr, uid, i[1])
+		    if i[0] == 2:
+			    log +=u'Удаление строки: ' + unicode(i) + u' ' + current_string.id_person.full_name + u'\n'
 
         write_res = super(Tabel, self).write(cr, uid, ids, vals, context=context)
 
-	log= u'изменения в табеле:'+u"\n"
-	state_id = 0
-	state_check = {'draft':0,'confirmed':1,'confirmed2':2,'done':3, }
-	if vals.has_key('state') and current_state:
-#	    raise exceptions.ValidationError(str(state_check[vals['state']])+str( state_check[current_state]) )
+	#write string in field ids_string of model Tabel
+	if vals.has_key('ids_string'):
+	    for i in vals['ids_string']:
+		if i[1]:
+		    current_string=self.pool.get('tabel.string').browse(cr, uid, i[1])
+		    if i[0] == 1:
+			    log +=u'Изменение строки: ' + unicode(i) + u' ' + current_string.id_person.full_name + '\n'
+
+	if vals.has_key('state') and current_state!=False:
 	    if state_check[vals['state']] > state_check[current_state]:
 		log = u'подписание'
 		state_id = 1
 	    else:
 		log = u'аннулирование'
 		state_id = 2
+
+	if log != u' ':
 	    self.pool.get('tabel.log').create(cr, uid, {'user_id':uid,'action':log,'id_tabel': ids[0],'status':state_id})
 
-	if vals.has_key('ids_string'):
-	    for i in vals['ids_string']:
-		    if i[2]:
-			    current_string=self.pool.get('tabel.string').browse(cr, uid, i[1])
-			    log += unicode(i)+u" "+ current_string.id_person.surname
-	    self.pool.get('tabel.log').create(cr, uid, {'user_id':uid,'action':log,'id_tabel': ids[0],'status':state_id})
         return write_res
 
     def fields_view_get(self, cr, uid, view_id=None, view_type='form', context=True, toolbar=False, submenu=False):

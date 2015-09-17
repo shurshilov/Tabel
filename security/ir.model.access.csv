@@ -31,6 +31,7 @@ tabel_grrbdc,admin,model_tabel_grrbdc,tabel_division_inf,1,1,1,1
 tabel_fcacch,admin,model_tabel_fcacch,tabel_division_inf,1,1,1,1
 tabel_tipdol,admin,model_tabel_tipdol,tabel_division_inf,1,1,1,1
 tabel_daytype,admin,model_tabel_daytype,tabel_division_inf,1,1,0,0
+tabel_log,admin,model_tabel_log,tabel_division_inf,1,1,1,0
 boss_tabel,admin,model_tabel_tabel,boss_division_inf,1,1,0,0
 boss_string,admin,model_tabel_string,boss_division_inf,1,1,0,0
 boss_division,admin,model_tabel_division,boss_division_inf,1,1,0,0
@@ -47,6 +48,7 @@ boss_daytype,admin,model_tabel_daytype,boss_division_inf,1,1,0,0
 boss_fcacch,admin,model_tabel_fcacch,boss_division_inf,1,1,0,0
 boss_tipdol,admin,model_tabel_tipdol,boss_division_inf,1,1,0,0
 boss_grstring,admin,model_tabel_grstring,boss_division_inf,1,1,1,0
+boss_log,admin,model_tabel_log,boss_division_inf,1,1,1,0
 acount_tabel,admin,model_tabel_tabel,group_accountant,1,1,1,1
 acount_string,admin,model_tabel_string,group_accountant,1,1,1,1
 acount_division,admin,model_tabel_division,group_accountant,1,1,1,1
@@ -61,6 +63,7 @@ acount_grmonth,admin,model_tabel_grmonth,group_accountant,1,1,1,1
 acount_grrbdc,admin,model_tabel_grrbdc,group_accountant,1,1,1,1
 acount_fcacch,admin,model_tabel_fcacch,group_accountant,1,1,1,1
 acount_daytype,admin,model_tabel_daytype,group_accountant,1,1,1,1
+acount_log,admin,model_tabel_log,group_accountant,1,1,1,0
 eco_tabel,admin,model_tabel_tabel,group_eco,1,1,1,1
 eco_string,admin,model_tabel_string,group_eco,1,1,1,1
 eco_division,admin,model_tabel_division,group_eco,1,1,1,1
@@ -79,4 +82,4 @@ eco_tipdol,admin,model_tabel_tipdol,group_eco,1,1,1,1
 eco_daytype,admin,model_tabel_daytype,group_eco,1,1,0,0
 eco_upload,admin,model_tabel_upload,group_eco,1,1,1,1
 eco_ustring,admin,model_tabel_ustring,group_eco,1,1,1,1
-
+eco_log,admin,model_tabel_log,group_eco,1,1,1,0
