@@ -160,6 +160,17 @@ class Grday (models.Model):
 	hourinday = fields.Float(string="HOUR IN DAY")
 
 
+#Приказы (orders)
+class Oleav (models.Model):
+	_name = 'tabel.oleav'
+
+	orgbase_rn = fields.Many2one('tabel.person', ondelete='cascade',string="ORGBASE_RN")
+	fcac_rn = fields.Many2one('tabel.fcac', ondelete='cascade',string="fcac_RN")
+	daytype_rn = fields.Many2one('tabel.daytype', ondelete='cascade',string="DAYTYPE_RN")
+	startdate = fields.Date(string="startdate order")
+	enddate = fields.Date(string="enddate order")
+
+
 
 #Таблица с категориями работников, не используется
 class Katper (models.Model):
@@ -391,7 +402,7 @@ class String(models.Model):
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
     id_katper = fields.Many2one('tabel.katper',  ondelete='cascade', string="категории")
 #    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="сотрудник")
-    id_tipdol = fields.Many2one('tabel.tipdol',string="тип должности")
+    id_tipdol = fields.Many2one('tabel.tipdol',string="должность")
     #используется для сортировки по алфавиту,во вью невидимое
     id_person = fields.Many2one('tabel.person',  ondelete='cascade', string="фамилии")
     id_tabel = fields.Many2one('tabel.tabel',  ondelete='cascade', string="tabel_id",index=True)
@@ -439,7 +450,7 @@ class String(models.Model):
     hours_internal = fields.Char(string="Вну",compute='_compute_days_appear')
     days_absences = fields.Char (string="Неяв",compute='_compute_days_appear')
     days_absences_sum = fields.Char (string="Сум",compute='_compute_days_appear')
-    counter = fields.Integer (string = "Счет",compute='_compute_days_appear')
+    counter = fields.Integer (string = "Счет", default=0)
     percent = fields.Char (string = "Прц")
     complet = fields.Char (string = "Разнести")
     time_start_s = fields.Date (related='id_tabel.time_start_t', string="дата начала(строка в каком месяце)")
@@ -835,6 +846,7 @@ class Tabel(models.Model):
     ids_string = fields.One2many('tabel.string', 'id_tabel', string="string")
     ids_grstring = fields.One2many('tabel.grstring', 'id_tabel', string="string",  limit = 500)
     ids_log = fields.One2many('tabel.log', 'id_tabel', string="log")
+    check_empty =  fields.Integer(string="check empty or nochange",compute='_check_tabel')
 
     state = fields.Selection([
          ('draft', "Не подписанный"),
@@ -860,7 +872,7 @@ class Tabel(models.Model):
 		if i[1]:
 		    current_string=self.pool.get('tabel.string').browse(cr, uid, i[1])
 		    if i[0] == 2:
-			    log +=u'Удаление строки: ' + unicode(i) + u' ' + current_string.id_person.full_name + u'\n'
+			    log +=u'Удаление строки: ' +  unicode(str(i),'unicode-escape') + u' ' + current_string.id_person.full_name + u'\n'
 
         write_res = super(Tabel, self).write(cr, uid, ids, vals, context=context)
 
@@ -870,7 +882,7 @@ class Tabel(models.Model):
 		if i[1]:
 		    current_string=self.pool.get('tabel.string').browse(cr, uid, i[1])
 		    if i[0] == 1:
-			    log +=u'Изменение строки: ' + unicode(i) + u' ' + current_string.id_person.full_name + '\n'
+			    log +=u'Изменение строки: ' + unicode(str(i),'unicode-escape') + u' ' + current_string.id_person.full_name + '\n'
 
 	#add log digital signature
 	if vals.has_key('state') and current_state!=False:
@@ -896,7 +908,38 @@ class Tabel(models.Model):
         return result
 
     @api.one
+    def _check_tabel (self):
+	if self.ids_string == 0:
+	    self.check_empty = 1
+#	raise exceptions.ValidationError(self.ids_log)
+	a=datetime.date(2015, 9, 16).strftime('%Y-%m-%d')
+	if self.ids_log == 0 or self.ids_log == False or not self.ids_log and self.create_date > a:
+	    self.check_empty = 1
+
+
+    @api.one
     def time_button (self):
+
+#	model_log=self.pool.get('tabel.log').search(self._cr,self._uid,[(1,'=',1)])
+#	for i in model_log:
+#	    current_logs = self.pool.get('tabel.log').browse(self._cr, self._uid, i)
+#	    new_action=re.split('\[|\]',current_logs.action)
+#	    k=0
+#	    now_time = datetime.datetime.now()
+#	    delta = datetime.timedelta(hours=2) # дельта в 2 часа
+#	    now_time = now_time - delta # минус 2 часа
+#	    #2015-09-23 09:25:21
+#	    log_time = datetime.datetime.strptime(current_logs.create_date,'%Y-%m-%d %H:%M:%S')
+##	    raise exceptions.ValidationError(now_time)
+#	    my=u''
+#	    if log_time < now_time:
+#		    for j in new_action:
+#			if k%2==1:
+#			    my+=u'['+ unicode(j.encode('utf-8'),'unicode-escape')+u']'
+#			else:
+#			    my+=j
+#			k=k+1
+#		    current_logs.action=my
 	def ftohhmm(a):
 	    if a: #проверка на заполненность
 		a = re.sub(',' , '.' , a) #замена запятых точками (6,5 --> 6.5)
@@ -916,6 +959,7 @@ class Tabel(models.Model):
 		for j in range(1, 32):
 		    hours='hours{0}'.format(j)
 		    setattr(i, hours, ftohhmm(getattr(i, hours))) #прогон по колонкам 1-31
+
 
 
     #Обновить данные по пропускам(приказам),если появился новый сотрудник или больничный или отпуск и т.д. то данные обновятся не стирая введеные часы
@@ -973,15 +1017,16 @@ class Tabel(models.Model):
 		    model_string.id_katper=model_string.id_fcac.katper_rn.id
 
 	#Обновляем данные по дням(кодам), создаем промежуточную таблицу, в нее записываем данные по дням и далее проходи по всем дням и обновляем
-	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, FCAC_RN  int, DAYTYPE_RN int, DATE date);") 
+# create temp Oleav
+	self._cr.execute("CREATE TEMP TABLE tmp_z (ID int unique, ORGBASE_RN int,  FCAC_RN  int, DAYTYPE_RN int, STARTDATE date, ENDDATE date);")
 	a = datetime.datetime.strptime(self.time_start_t, '%Y-%m-%d').date()
 	for i in self.ids_string:
-		self._cr.execute("INSERT INTO tmp_z (id, fcac_rn, daytype_rn, date) SELECT T.id, T.FCAC_RN, T.DAYTYPE_RN, T.DATE FROM tabel_fcacwtd AS T  WHERE T.FCAC_RN = "+str(i.id_fcac.id)+" and T.date::date <='"+str(self.time_end_t)+"' and T.date::date >= '"+str(self.time_start_t)+"' ;")
-	i = 1
+	    self._cr.execute("INSERT INTO tmp_z (id, orgbase_rn, fcac_rn, daytype_rn, startdate, enddate) SELECT T.id, T.ORGBASE_RN, T.FCAC_RN, T.DAYTYPE_RN, T.STARTDATE, T.ENDDATE FROM tabel_oleav AS T WHERE T.FCAC_RN = "+str(i.id_fcac.id)+" and T.enddate::date <='"+str(self.time_end_t)+"' and T.startdate::date >= '"+str(self.time_start_t)+"' ;")
+	    i = 1
 	while i < 32:
-		self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = P.nick FROM tabel_daytype AS P WHERE P.id   IN (SELECT tmp_z.DAYTYPE_RN  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and "+str(self.id)+" =tabel_string.id_tabel  and tmp_z.date::date ='"+a.strftime('%Y-%m-%d')+"') ;")
+		self._cr.execute("UPDATE tabel_string SET  hours"+str(i)+" = P.nick FROM tabel_daytype AS P  WHERE P.id   IN (SELECT tmp_z.DAYTYPE_RN  FROM tmp_z WHERE  tmp_z.FCAC_RN = tabel_string.id_fcac "+" and "+str(self.id)+" =tabel_string.id_tabel  and tmp_z.startdate::date <='"+a.strftime('%Y-%m-%d')+"'   and tmp_z.enddate::date >='"+a.strftime('%Y-%m-%d')+"' );")
 		a+=datetime.timedelta(days=1)
-		i+=1	
+		i+=1
 	self._cr.execute("DROP TABLE tmp_z;")
 
     @api.one 

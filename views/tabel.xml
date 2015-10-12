@@ -415,7 +415,7 @@
 	<field name="name">tabel.tree</field>
         <field name="model">tabel.tabel</field>
 	<field name="arch" type="xml">
-	<tree string="Tabel List">
+	<tree string="Tabel List"  colors="red:check_empty == 1; red:check_empty == 2"  >
 <!--	    <field name="id"/>  -->
 	    <field name="id_ank" string="Табельщик"/>
 	    <field name="id_division" string="Подразделение" />
@@ -435,6 +435,7 @@
 	    <field name="signature_public_boss" string="Public2"/>
 	    <field name="signature_public_accountant" string="Public3"/>
 	    <field name="ids_string" string="Количество записей"/>
+	    <field name="check_empty" string="Пустой?" invisible="True"/>
 
 	</tree>
 	</field>
@@ -644,6 +645,21 @@
                 </tree>
             </field>
     </record>
+<!-- oleav tree view -->
+    <record model="ir.ui.view" id="oleav_tree_view">
+            <field name="name">oleav.tree</field>
+            <field name="model">tabel.oleav</field>
+            <field name="arch" type="xml">
+                <tree string="Oleav Tree" >
+			<field name="id"/>
+			<field name="orgbase_rn"/>
+			<field name="fcac_rn"/>
+			<field name="daytype_rn"/>
+			<field name="startdate"/>
+			<field name="enddate"/>
+                </tree>
+            </field>
+        </record>
 
 <!-- tipdol form view -->
          <record model="ir.ui.view" id="tipdol_form_view">
@@ -1175,13 +1191,16 @@
 		<search string="Checker">
 		    <filter 
 		    string="Текущий и последующие месяцы" 
-		    name="male" 
-		    domain="[('time_end_t', '>=' ,(context_today()).strftime('%d-%m-%Y'))]" 
+		    name="male"
+		    domain="[('write_date', '>=' ,(context_today()-relativedelta(months=2)+relativedelta(days=20)).strftime('%d-%m-%Y') )]"
 		    help = "Чтобы посмотреть табели за прошлые месяцы нажмите ВСЕ"/>
 		    <field name="time_start_t" select="True"/>
 		    <field name="id_ank" select="True"/>
 		</search>
 		</field>
+<!--		    domain="[('time_end_t', '>=' ,(context_today()).strftime('%d-%m-%Y'))]" 
+    domain="[('time_end_t', '>=' ,(context_today()-relativedelta(months=1)+relativedelta(days=20)).strftime('%d-%m-%Y'))]"
+-->
 	</record>
 
 <!-- ACTIONS -->
@@ -1437,6 +1456,15 @@
             <field name="view_mode">tree,form</field>
 	    <field name="limit">80</field>
         </record>
+
+        <record model="ir.actions.act_window" id="oleav_list_action">
+            <field name="name">Oleav</field>
+            <field name="res_model">tabel.oleav</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+	    <field name="limit">80</field>
+        </record>
+
 	<!--
 	<record model="ir.actions.act_window" id="tabel_list_widget_action">
             <field name="name">Tabel.calendar.edit</field>
@@ -1528,6 +1556,11 @@
         <menuitem id="string_menu" name="Строки табелей"
                   parent="tabel_menu_economists"
                   action="string_list_action"/>
+
+        <menuitem id="oleav_tabel_menu" name="Приказы"
+		  parent="tabel_menu_data_employee"
+                  action="oleav_list_action"/>
+
 
         <menuitem id="tabel_menu_draft" name="Рабочие табели"
                   parent="tabel_menu"
