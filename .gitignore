@@ -9,4 +9,3 @@
 *.csv~
 import/database
 orm.py
-import.py
