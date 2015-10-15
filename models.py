@@ -259,7 +259,8 @@ class Fcacch(models.Model):
 class Vidisp(models.Model):
 	_name = 'tabel.vidisp'
 	_rec_name = 'code'
-
+	
+#	id_upload = fields.Many2one('tabel.upload', string="upload_id")
 	code = fields.Char(string="code of Vidisp", required=True)
 	name = fields.Char(string="name of Vidisp", required=True)
 
@@ -400,7 +401,12 @@ class String(models.Model):
     _order = 'id_tipdol, id_person'
 
     id_fcac = fields.Many2one('tabel.fcac',  ondelete='cascade', string="fcac_id")
-    id_katper = fields.Many2one('tabel.katper',  ondelete='cascade', string="категории")
+    #При добалении категория выбирается автоматом по л.с. 
+    #А должность и вид исполнения выбираются табельщиком
+
+    id_katper = fields.Many2one(related='id_fcac.katper_rn',string="Категория сотрудника")
+
+#    id_katper = fields.Many2one('tabel.katper',  ondelete='cascade', string="категории")
 #    id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="сотрудник")
     id_tipdol = fields.Many2one('tabel.tipdol',string="должность")
     #используется для сортировки по алфавиту,во вью невидимое
@@ -578,6 +584,11 @@ class String(models.Model):
 	    from lxml import etree
 	    from openerp.osv.orm import setup_modifiers
 	    doc = etree.XML(result['arch'])
+
+#            for node in doc.xpath("//field[@name='id_katper']"):
+#                            node.set('readonly', "1")
+#                            setup_modifiers(node, result['fields']['id_katper'])
+
             for node in doc.xpath("//field[@name='days_appear']"):
                             node.set('readonly', "1")
                             setup_modifiers(node, result['fields']['days_appear'])
@@ -1043,7 +1054,7 @@ class Tabel(models.Model):
 		model_string.id_post=model_string.id_fcac.post_rn.id
 		model_string.id_tipdol=model_string.id_fcac.tipdol_rn.id
 		model_string.id_vidisp=model_string.id_fcac.vidisp_rn.id
-		model_string.id_katper=model_string.id_fcac.katper_rn.id
+#		model_string.id_katper=model_string.id_fcac.katper_rn.id
 		model_string.id_person=model_string.id_fcac.ank_rn.orgbase_rn.id
 #"""
 #Вариант 1
@@ -1263,16 +1274,30 @@ class Ustring(models.Model):
 
 class Upload(models.Model):
     _name = 'tabel.upload'
+
+    #функция для дефаулта юзера (идет во вьюху с валидацией простой подписи)
+    @api.depends('checker')
+    def allvidisp(self):
+        	#  return [1,2,3,4,5,14,17,23,24]
+        	  return [1,5]
+
+
+
     time_start = fields.Date(string="time start of tabel")
     time_end = fields.Date(string="time end of tabel")
     id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="Подразделение")
     ids_ustring = fields.One2many('tabel.ustring', 'id_upload', string="ustring")
+    ids_vidisp = fields.Many2many('tabel.vidisp', string="Виды лицевых счетов",default = allvidisp)
     checker = fields.Boolean(string="Выгрузка или численность? (галочка-выгрузка)")
 
 
     @api.one 
     def action_upload(self):
-
+	a="("
+	for j in self.ids_vidisp:
+	    a+=str(j.id)+", "
+	a+=" -1 )"
+#	raise exceptions.ValidationError(a)
 	if self.checker == True:
 	    if not self.id_division:
 		#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
@@ -1283,10 +1308,10 @@ class Upload(models.Model):
 	else:
 	    if not self.id_division:
 		#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
-		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"' and T.id_vidisp in (5,4,1)  )  ;")
+		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"' and T.id_vidisp in "+ a +"  )  ;")
 	    else:
 		#Добавляем лицевые счета (сотрудники) Нужно сделать через промежуточную таблицу апдейт
-		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"' and T.id_vidisp in (5,4,1) and (SELECT id_division FROM tabel_tabel where tabel_tabel.id= T.id_tabel)="+str(self.id_division.id)+" )  ;")
+		self._cr.execute("INSERT INTO tabel_ustring (id_string,id_upload,id_tipdol,id_person,id_vidisp,stqnt,id_tabel,id_fcac) (SELECT T.id,"+str(self.id)+",T.id_tipdol,T.id_person,T.id_vidisp,T.stqnt,T.id_tabel,T.id_fcac  FROM tabel_string AS T  WHERE  ( (SELECT time_start_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date <='"+str(self.time_end)+"' ) and (SELECT time_end_t FROM tabel_tabel where tabel_tabel.id= T.id_tabel)::date >= '"+str(self.time_start)+"' and T.id_vidisp in "+ a +" and (SELECT id_division FROM tabel_tabel where tabel_tabel.id= T.id_tabel)="+str(self.id_division.id)+" )  ;")
 
 	for i in self.ids_ustring:
 	    #Выбираем из даты отдельно год и месяц для поиска
@@ -1390,8 +1415,11 @@ class Upload(models.Model):
 			    if a:
 					if a in [u'А',u'Р', u'ОУ', u'р']:
 					    flagEx = False
+					    if a in [u'Р', u'р']:
+						self._cr.execute("UPDATE tabel_ustring SET  id_vidisp = 16  where tabel_ustring.id = "+str(i.id)+";")
 					else:
 					    flagEx = True
+					    
 			    if flagEx:
 	    			id_day= self.pool.get('tabel.grday').search(self._cr,self._uid,[('monthday','=',j),('grmonth_rn','=',month_model.id)])
 				#Если не рабочий день (Праздничный или выходной, то берем данные из предыдущего дня)

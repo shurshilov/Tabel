@@ -415,7 +415,7 @@
 	<field name="name">tabel.tree</field>
         <field name="model">tabel.tabel</field>
 	<field name="arch" type="xml">
-	<tree string="Tabel List"  colors="red:check_empty == 1; red:check_empty == 2"  >
+	<tree string="Tabel List"  colors="green:check_empty == 1; green:check_empty == 2"  >
 <!--	    <field name="id"/>  -->
 	    <field name="id_ank" string="Табельщик"/>
 	    <field name="id_division" string="Подразделение" />
@@ -1063,6 +1063,7 @@
                 <tree string="Upload Tree" >
 			<field name="time_start"/>
              		<field name="time_end"/>
+			<field name="id_division"/>
              		<field name="checker"/>
 <!--			<field name="id_fcac"/>
              		<field name="id_tipdol"/>-->
@@ -1079,6 +1080,7 @@
 			<field name="time_start"/>
              		<field name="time_end"/>
              		<field name="id_division" domain="[('enddate','&gt;=',time_start),('startdate','&lt;=',time_end)   ]" placeholder="Сначала введите дату,(не выбрано=выгрузить все)"/>
+         		<field name="ids_vidisp"/>
              		<field name="checker"/>
 <!--			<field name="id_fcac"/>
          		<field name="id_tipdol"/> -->
@@ -1202,6 +1204,107 @@
     domain="[('time_end_t', '>=' ,(context_today()-relativedelta(months=1)+relativedelta(days=20)).strftime('%d-%m-%Y'))]"
 -->
 	</record>
+<!--Timesheets-ALL Tab search view-->
+	<record id="view_tabel_search3" model="ir.ui.view">
+		<field name="name">tabel.tabel.search3</field>
+		<field name="model">tabel.tabel</field>
+		<field name="type">search</field>
+		<field name="arch" type="xml">
+		<search string="Checker">
+
+		    <field name="time_start_t" select="True"/>
+		    <field name="id_ank" select="True"/>
+		    <field name="time_end_t" />
+
+		    <group expand="0" string="Годы">
+		    <filter
+		    string="Текущий год"
+		    name="filter4"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-01-01')), ('time_end_t', '&lt;' , (context_today()+relativedelta(years=1)).strftime('%Y-01-01'))]"
+		    help = "Отображает табели за текущий год"
+		    />
+		    </group>
+
+<!--time_end_t.replace('-*[0-9]-*[0-9]','-01-01') -->
+<!--domain="[('time_end_t', '&gt;=' , time_end_t   ), ('time_end_t', '&lt;' , (context_today() ).strftime('%Y-02-01'))]"-->
+		    <group expand="0" string="Месяцы">
+		    <filter
+		    string="Январь"
+		    name="filter7"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-01-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-02-01'))]"
+		    help = "Отображает табели за январь выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Февраль"
+		    name="filter8"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-02-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-03-01'))]"
+		    help = "Отображает табели за февраль выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Март"
+		    name="filter9"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-03-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-04-01'))]"
+		    help = "Отображает табели за март выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Апрель"
+		    name="filter10"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-04-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-05-01'))]"
+		    help = "Отображает табели за апрель выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Май"
+		    name="filter11"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-05-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-06-01'))]"
+		    help = "Отображает табели за май выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Июнь"
+		    name="filter12"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-06-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-07-01'))]"
+		    help = "Отображает табели за июнь выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Июль"
+		    name="filter13"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-07-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-08-01'))]"
+		    help = "Отображает табели за июль выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Август"
+		    name="filter14"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-08-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-09-01'))]"
+		    help = "Отображает табели за август выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Сентябрь"
+		    name="filter15"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-09-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-10-01'))]"
+		    help = "Отображает табели за сентябрь выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Октябрь"
+		    name="filter16"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-10-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-11-01'))]"
+		    help = "Отображает табели за октябрь выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Ноябрь"
+		    name="filter17"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-11-01')), ('time_end_t', '&lt;' , (context_today()).strftime('%Y-12-01'))]"
+		    help = "Отображает табели за ноябрь выбранного года"/>
+		    <separator/>
+		    <filter
+		    string="Декабрь"
+		    name="filter18"
+		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-12-01')), ('time_end_t', '&lt;' , (context_today()+relativedelta(years=1)).strftime('%Y-01-01'))]"
+		    help = "Отображает табели за декабрь выбранного года"/>
+		    </group>
+
+		</search>
+		</field>
+	</record>
+
 
 <!-- ACTIONS -->
         <record model="ir.actions.act_window" id="string_list_action">
@@ -1223,6 +1326,8 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,graph</field>
 	    <field name="limit">500</field>
+	    <field name="search_view_id" ref="view_tabel_search3"/>
+	    <field name="context">{'search_default_filter4':1}</field>
         </record>
 	<record model="ir.actions.act_window" id="tabel_list_all_action_group_by_ank">
             <field name="name">Tabel All</field>

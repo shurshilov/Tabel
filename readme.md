@@ -9,7 +9,7 @@
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/print_button.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/report_page1.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/report_page2.png "Optional title")
-
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/filter.png "Optional title")
 ====== INSTALL Debian Wheezy & Odoo на OpenVZ ======
   * 1. Download template from https://openvz.org/Download/template/precreated
   * 2. Install with proxmox (option ip-addr, id, name etc. Connection Bridge)
