@@ -1,7 +1,7 @@
 ########################################
 #SCREENSHOTS WORK OF MODULE TABEL#
 ########################################
-![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabe_change_mode.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabel_change_mode.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/password_tree_view.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/password_validation.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabel_graph_view_all.png "Optional title")
