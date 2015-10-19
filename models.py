@@ -1280,7 +1280,8 @@ class Upload(models.Model):
     def allvidisp(self):
         	#  return [1,2,3,4,5,14,17,23,24]
         	  return [1,5]
-
+    def checker_default (self):
+	return self._context['checker']
 
 
     time_start = fields.Date(string="time start of tabel")
@@ -1288,7 +1289,17 @@ class Upload(models.Model):
     id_division = fields.Many2one('tabel.division',  ondelete='cascade', string="Подразделение")
     ids_ustring = fields.One2many('tabel.ustring', 'id_upload', string="ustring")
     ids_vidisp = fields.Many2many('tabel.vidisp', string="Виды лицевых счетов",default = allvidisp)
-    checker = fields.Boolean(string="Выгрузка или численность? (галочка-выгрузка)")
+
+    report = fields.Selection([
+         ('draft', "Не создан"),
+         ('create', "Отчет готов"),
+    ],default='draft')
+
+    checker = fields.Selection([
+         ('upload', "Выгрузка"),
+         ('list', "Среднесписочная численность"),
+	 ('individual', "Физические лица"),
+    ],default=checker_default)
 
 
     @api.one 
@@ -1332,7 +1343,7 @@ class Upload(models.Model):
 #										#
 #										#
 #										#
-	    if self.checker == True:
+	    if self.checker == "upload":
 		#Считаем часы для выгрузки
 		#Каждый вид записываем в соответствующее поле
 		if i.id_vidisp.name==u" Совмещение":
@@ -1381,7 +1392,7 @@ class Upload(models.Model):
 #										#
 #										#
 #№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№№#################################################
-	    if self.checker == False:
+	    if self.checker != "upload":
 		dayweek =  int(datetime.datetime.strptime(self.time_start, '%Y-%m-%d').date().weekday())
 		cnt=dayweek
 
@@ -1464,7 +1475,7 @@ class Upload(models.Model):
 				
 			
 			j=j+1
-
+	self.report='create'
 
 class Grstring(models.Model):
     _name = 'tabel.grstring'

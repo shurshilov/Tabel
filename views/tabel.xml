@@ -1061,10 +1061,11 @@
             <field name="model">tabel.upload</field>
             <field name="arch" type="xml">
                 <tree string="Upload Tree" >
-			<field name="time_start"/>
-             		<field name="time_end"/>
+			<field name="time_start" string="Начало выборки (дата)"/>
+             		<field name="time_end" string="Конец выборки (дата)"/>
 			<field name="id_division"/>
-             		<field name="checker"/>
+             		<field name="checker" string="Вид отчета"/>
+             		<field name="report" string="Состояние"/>
 <!--			<field name="id_fcac"/>
              		<field name="id_tipdol"/>-->
                 </tree>
@@ -1077,24 +1078,23 @@
             <field name="arch" type="xml">
 		<form string="Upload Form">
                         <group>
-			<field name="time_start"/>
-             		<field name="time_end"/>
+			<field name="time_start" string="Начало выборки (дата)"/>
+             		<field name="time_end" string="Конец выборки (дата)"/>
              		<field name="id_division" domain="[('enddate','&gt;=',time_start),('startdate','&lt;=',time_end)   ]" placeholder="Сначала введите дату,(не выбрано=выгрузить все)"/>
-         		<field name="ids_vidisp"/>
-             		<field name="checker"/>
-<!--			<field name="id_fcac"/>
-         		<field name="id_tipdol"/> -->
+         		<field name="ids_vidisp" string="Какие виды лицевых счетов выбирать"/>
+             		<field name="checker" readonly="True" string="Вид отчета"/>
+             		<field name="report" readonly="True" string="Состояние"/>
 			<button
 				name="action_upload"
 				type="object"
-				string="Создать выгрузку"
+				string="Создать отчет"
 				class="oe_inline oe_stat_button"
 				icon="fa-file-o"
-				confirm="Вы уверены что хотите обновить данные из приказов?Данные будут перезаписаны."
+				confirm="Вы уверены что хотите создать отчет?Данные будут перезаписаны."
 			/>
-			<separator string="Выгрузки и численности"/>
+		<!--	<separator string="Экономика"/> -->
                         </group>
-             		<field name="ids_ustring" widget="handle"/>
+             	<!--	<field name="ids_ustring" widget="handle"/> -->
                 </form>
             </field>
         </record>
@@ -1545,14 +1545,49 @@
 	    <field name="context">{'state':'create'}</field>
 	</record>
 	<!-- window action upload-->
-	<record model="ir.actions.act_window" id="upload_list_action">
+
+
+
+	<record model="ir.actions.act_window" id="upload_action">
             <field name="name">Upload</field>
             <field name="res_model">tabel.upload</field>
             <field name="view_type">form</field>
     	    <field name="view_mode">tree,form</field>
-<!--	    <field name="view_id" ref="Tabel.upload_form_view"/> -->
+	    <field name="domain">[('checker','=', 'upload')]</field>
+	    <field name="view_id" ref="Tabel.upload_tree_view"/>
+	    <field name="context">{'checker':'upload'}</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="list_action">
+            <field name="name">List</field>
+            <field name="res_model">tabel.upload</field>
+            <field name="view_type">form</field>
+    	    <field name="view_mode">tree,form</field>
+	    <field name="domain">[('checker','=', 'list')]</field>
+	    <field name="view_id" ref="Tabel.upload_tree_view"/>
+	    <field name="context">{'checker':'list'}</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="individual_action">
+            <field name="name">Individual</field>
+            <field name="res_model">tabel.upload</field>
+            <field name="view_type">form</field>
+    	    <field name="view_mode">tree,form</field>
+	    <field name="domain">[('checker','=', 'individual')]</field> 
+	    <field name="view_id" ref="Tabel.upload_tree_view"/>
+	    <field name="context">{'checker':'individual'}</field>
+        </record>
+
+	<record model="ir.actions.act_window" id="all_eco_action">
+            <field name="name">All</field>
+            <field name="res_model">tabel.upload</field>
+            <field name="view_type">form</field>
+    	    <field name="view_mode">tree,form</field>
 	    <field name="view_id" ref="Tabel.upload_tree_view"/>
         </record>
+
+
+
 
         <record model="ir.actions.act_window" id="ustring_list_action">
             <field name="name">Ustring</field>
@@ -1561,6 +1596,8 @@
             <field name="view_mode">tree,form</field>
 	    <field name="limit">80</field>
         </record>
+
+
 
         <record model="ir.actions.act_window" id="oleav_list_action">
             <field name="name">Oleav</field>
@@ -1601,9 +1638,22 @@
 	<menuitem id="tabel_menu_economists" name="Экономисты"  sequence="3"
                   parent="main_tabel_menu" groups="Tabel.group_eco"/>
 
-        <menuitem id="upload_tabel_menu" name="Выгрузки и численности"
+        <menuitem id="tabel_menu_upload" name="Выгрузки"
 		  parent="tabel_menu_economists"
-                  action="upload_list_action"/>
+                  action="upload_action"/>
+
+        <menuitem id="tabel_menu_list" name="Среднесписочные"
+		  parent="tabel_menu_economists"
+                  action="list_action"/>
+
+        <menuitem id="tabel_menu_individual" name="Физические лица"
+		  parent="tabel_menu_economists"
+                  action="individual_action"/>
+
+        <menuitem id="tabel_menu_all_eco" name="Все отчеты"
+		  parent="tabel_menu_economists"
+                  action="all_eco_action"  groups="Tabel.group_manager"/>
+
 
         <menuitem id="password_tabel_menu" name="Простая электронная подпись"
 		  parent="tabel_menu_security"

@@ -115,7 +115,7 @@ padding-bottom: 8px;
 }
 /*уменьшаем клетки таблицы*/
 .openerp .oe_list_content > tbody > tr > td.oe_list_field_cell {
-  padding: 3px 0px;
+  padding: 0px 0px;
   white-space: pre-line;
   height: 37px;
 }

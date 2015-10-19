@@ -45,9 +45,10 @@ openerp.Tabel = function (instance) {
 	d.setDate(  d.getDate()+ number );
 	if ( d.getDay()==0 || d.getDay()==6)
 		    if (res.length>0)
-			return "<div class=\"oe_readonly\" style=\" color:#4d394b; background:#eadee0;  \" >" + res+"</div>";
+			/*#eadee0  &nbsp&nbsp*/
+			return "<div   style=\" color:#4d394b; background:#a8d4cc; width: 100%; height: 100%; line-height:37px;  \" >" + res+"</div>";
 		    else
-			return "<div  class=\"oe_readonly\" style=\" color:#4d394b; background:#eadee0;  \" > &nbsp;&nbsp;</div>";
+			return "<div   style=\" color:#4d394b; background:#a8d4cc; width: 100%; height: 100%; line-height:37px; \" >  </div>";
 	}
         return res;
 	},
