@@ -1,15 +1,16 @@
 ########################################
 #SCREENSHOTS WORK OF MODULE TABEL#
 ########################################
-![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/edit.png "Optional title")
-![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/view_form.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabe_change_mode.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/password_tree_view.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/password_validation.png "Optional title")
-![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/graph_example.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabel_graph_view_all.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tree_view.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/print_button.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/report_page1.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/report_page2.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/filter.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabel_calendar_view.png "Optional title")
 ====== INSTALL Debian Wheezy & Odoo на OpenVZ ======
   * 1. Download template from https://openvz.org/Download/template/precreated
   * 2. Install with proxmox (option ip-addr, id, name etc. Connection Bridge)
