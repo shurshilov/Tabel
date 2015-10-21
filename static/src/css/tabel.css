@@ -229,7 +229,7 @@ background-color: #7c7bad;
     height: 27px;
 }
 .oe_list_header_columns {
-    font-size:11px;
+    font-size:10px;
 }
 /*Сетка в one2many*/
 .openerp .oe_form_field_one2many .oe_list_content > tbody td {

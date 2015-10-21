@@ -10,6 +10,8 @@
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/filter.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabel_calendar_view.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tabel_graph_view_all.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/site.png "Optional title")
+![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/chat.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/tree_view.png "Optional title")
 ![Alt text](https://github.com/shurshilov/Tabel/blob/master/screenshots/print_button.png "Optional title")
 

@@ -90,7 +90,7 @@ class Temp(models.TransientModel):
         	return self._uid
 	_name = 'tabel.temp'
 	user_id = fields.Many2one('res.users','Пользователь',default = user)
-	password = fields.Char(string="password")
+	password = fields.Char(string="Простая электронная подпись")
 	
 	#функция проверки существует ли такой пароль у такого юзера в базе (проверка идет похешу)	
 	def validation(self, cr, uid, values, context):
@@ -854,9 +854,9 @@ class Tabel(models.Model):
     time_start_t = fields.Date(string="time start of tabel", default = time_first,index=True)
     time_end_t = fields.Date(string="time end of tabel", default = time_last,index=True)
     id_ank = fields.Many2one('tabel.ank',  ondelete='cascade', string="ank_id", required=True,default= ank_default)
-    ids_string = fields.One2many('tabel.string', 'id_tabel', string="string")
-    ids_grstring = fields.One2many('tabel.grstring', 'id_tabel', string="string",  limit = 500)
-    ids_log = fields.One2many('tabel.log', 'id_tabel', string="log")
+    ids_string = fields.One2many('tabel.string', 'id_tabel', string="ids_string")
+    ids_grstring = fields.One2many('tabel.grstring', 'id_tabel', string="ids_grstring",  limit = 500)
+    ids_log = fields.One2many('tabel.log', 'id_tabel', string="ids_log")
     check_empty =  fields.Integer(string="check empty or nochange",compute='_check_tabel')
 
     state = fields.Selection([

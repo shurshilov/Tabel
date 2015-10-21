@@ -142,7 +142,7 @@
 	    <sheet>
 	    <group>
 	    <field name="user_id" />
-	    <field name="password" password="True" default_focus="1" placeholder="Введите пароль"/>
+	    <field name="password" password="True" default_focus="1" placeholder="Введите подпись"/>
 			<button
                                 name="validation"
                                 type="object"
@@ -1300,6 +1300,26 @@
 		    domain="[('time_end_t', '&gt;=' ,(context_today()).strftime('%Y-12-01')), ('time_end_t', '&lt;' , (context_today()+relativedelta(years=1)).strftime('%Y-01-01'))]"
 		    help = "Отображает табели за декабрь выбранного года"/>
 		    </group>
+
+		    <group expand="0" string="Разные">
+			<filter
+			string="Пустые табели"
+			name="filter20"
+			domain="[('ids_string', '=' ,False)]"
+			help = "Отображает табели за январь выбранного года"/>
+			<separator/>
+
+			<filter
+			string="Пустые логи (табели с которыми не работали)"
+			name="filter22"
+			domain="[('ids_log', '=' ,False)]"
+			help = "Отображает табели за январь выбранного года"/>
+			<separator/>
+
+		    </group> 
+
+
+
 
 		</search>
 		</field>
