@@ -13,6 +13,7 @@
     'author': 'Shurshilov Artem',
     'license': 'LGPL-3',
     "price": 29.00,
+    "currency": "EUR",
     'application': False,
     "auto_install": False,
     'installable': True,
